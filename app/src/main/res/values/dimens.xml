@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_radius">8.dp</dimen>
+    
+    <!-- ListMenuItem (lmi) -->
+    <dimen name="lmi_padding_all">12.dp</dimen>
+    <dimen name="lmi_progress_height">8.dp</dimen>
+    <dimen name="lmi_progress_spacedBy">12.dp</dimen>
+</resources>

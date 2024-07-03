@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Your Lists</string>
+    <string name="button_options_cdesc">Displays additional options</string>
 </resources>
