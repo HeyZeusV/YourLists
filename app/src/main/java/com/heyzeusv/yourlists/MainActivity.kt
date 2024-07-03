@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
+import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.sRes
 
 class MainActivity : ComponentActivity() {
@@ -58,7 +59,7 @@ fun YourLists() {
 @Preview
 @Composable
 fun YourListsPreview() {
-    YourListsTheme {
+    PreviewUtil.Preview {
         YourLists()
     }
 }
