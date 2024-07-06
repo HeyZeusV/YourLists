@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Your Lists</string>
-    <string name="button_options_cdesc">Displays additional options</string>
+    <string name="button_cdesc_options">Displays additional options</string>
+
+    <!-- ListMenuBottomSheet (lmbs) -->
+    <string name="lmbs_rename">Rename</string>
+    <string name="lmbs_cdesc_rename">Rename this list.</string>
+    <string name="lmbs_copy">Copy</string>
+    <string name="lmbs_cdesc_copy">Create a copy of this list.</string>
+    <string name="lmbs_delete">Delete</string>
+    <string name="lmbs_cdesc_delete">Delete this list.</string>
 </resources>

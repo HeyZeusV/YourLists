@@ -68,8 +68,8 @@ fun ListMenuItem() {
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Icon(
-                    painter = pRes(R.drawable.button_options),
-                    contentDescription = sRes(R.string.button_options_cdesc),
+                    painter = pRes(R.drawable.icon_options),
+                    contentDescription = sRes(R.string.button_cdesc_options),
                 )
             }
             Row(
@@ -101,14 +101,14 @@ fun ListMenuBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_vertical_spacedBy)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ListMenuBottomSheetAction()
-        ListMenuBottomSheetAction()
-        ListMenuBottomSheetAction()
+        ListMenuBottomSheetActions.entries.forEach {
+            ListMenuBottomSheetAction(action = it)
+        }
     }
 }
 
 @Composable
-fun ListMenuBottomSheetAction() {
+fun ListMenuBottomSheetAction(action: ListMenuBottomSheetActions) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,12 +117,14 @@ fun ListMenuBottomSheetAction() {
         horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_horizontal_spacedBy))
     ) {
         Icon(
-            painter = pRes(R.drawable.button_options),
-            contentDescription = null,
-            modifier = Modifier.fillMaxHeight()
+            painter = pRes(action.iconId),
+            contentDescription = sRes(action.iconCdescId),
+            modifier = Modifier.fillMaxHeight(),
+            tint = action.color
         )
         Text(
-            text = "True",
+            text = sRes(action.nameId),
+            color = action.color,
             style = MaterialTheme.typography.titleLarge
         )
     }
@@ -156,7 +158,7 @@ private fun ListMenuBottomSheetActionPreview() {
     PreviewUtil.apply {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                ListMenuBottomSheetAction()
+                ListMenuBottomSheetAction(ListMenuBottomSheetActions.DELETE)
             }
         }
     }
