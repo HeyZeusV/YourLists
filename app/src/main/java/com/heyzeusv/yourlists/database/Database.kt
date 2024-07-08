@@ -18,7 +18,10 @@ import com.heyzeusv.yourlists.database.models.ItemList
         Category::class
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = true,
+    autoMigrations = [
+
+    ]
 )
 abstract class Database : RoomDatabase() {
 

@@ -25,8 +25,6 @@ object DatabaseModule {
             context,
             Database::class.java,
             "yourListsDatabase"
-        )
-            .addMigrations()
-            .build()
+        ).build()
     }
 }
