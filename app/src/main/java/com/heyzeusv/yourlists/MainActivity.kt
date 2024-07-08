@@ -18,7 +18,9 @@ import com.heyzeusv.yourlists.lists.ListMenu
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.sRes
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
