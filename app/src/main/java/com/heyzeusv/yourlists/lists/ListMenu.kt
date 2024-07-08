@@ -37,7 +37,7 @@ import com.heyzeusv.yourlists.util.sRes
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListMenu() {
-    var showBottomSheet by remember { mutableStateOf(true) }
+    var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
     if (showBottomSheet) {
