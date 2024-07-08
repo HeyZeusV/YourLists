@@ -20,7 +20,7 @@ import com.heyzeusv.yourlists.database.models.ItemList
     version = 1,
     exportSchema = true
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class Database : RoomDatabase() {
 
     abstract fun itemListDao(): ItemListDao
 }

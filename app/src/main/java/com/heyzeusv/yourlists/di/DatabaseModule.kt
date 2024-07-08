@@ -2,7 +2,7 @@ package com.heyzeusv.yourlists.di
 
 import android.content.Context
 import androidx.room.Room
-import com.heyzeusv.yourlists.database.AppDatabase
+import com.heyzeusv.yourlists.database.Database
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -16,14 +16,14 @@ import javax.inject.Singleton
 object DatabaseModule {
 
     @Provides
-    fun provideItemListDao(database: AppDatabase): ItemListDao = database.itemListDao()
+    fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): Database {
         return Room.databaseBuilder(
             context,
-            AppDatabase::class.java,
+            Database::class.java,
             "yourListsDatabase"
         )
             .addMigrations()

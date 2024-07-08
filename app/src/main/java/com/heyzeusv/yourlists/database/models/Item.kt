@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.database.models
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 interface BaseItem {
@@ -17,17 +18,27 @@ interface BaseItem {
     foreignKeys = [
         ForeignKey(
             entity = Category::class,
-            parentColumns = arrayOf("name"),
-            childColumns = arrayOf("category"),
+            parentColumns = ["name"],
+            childColumns = ["category"],
             onDelete = ForeignKey.RESTRICT,
             onUpdate = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = ItemList::class,
-            parentColumns = arrayOf("itemListId"),
-            childColumns = arrayOf("parentItemListId"),
+            parentColumns = ["itemListId"],
+            childColumns = ["parentItemListId"],
             onDelete = ForeignKey.CASCADE,
             onUpdate = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(
+            value = ["category"],
+            name = "index_category_name"
+        ),
+        Index(
+            value = ["parentItemListId"],
+            name = "index_parent_id"
         )
     ]
 )
@@ -46,10 +57,14 @@ data class Item(
 @Entity(
     foreignKeys = [ForeignKey(
         entity = Category::class,
-        parentColumns = arrayOf("name"),
-        childColumns = arrayOf("category"),
+        parentColumns = ["name"],
+        childColumns = ["category"],
         onDelete = ForeignKey.RESTRICT,
         onUpdate = ForeignKey.CASCADE
+    )],
+    indices = [Index(
+        value = ["category"],
+        name = "index_default_category_name"
     )]
 )
 data class DefaultItem(
