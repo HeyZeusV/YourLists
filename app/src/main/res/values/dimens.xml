@@ -2,16 +2,16 @@
 <resources>
     <dimen name="card_radius">8.dp</dimen>
     
-    <!-- ListMenuItem (lmi) -->
-    <dimen name="lmi_lists_padding_all">8.dp</dimen>
-    <dimen name="lmi_lists_spacedBy">12.dp</dimen>
-    <dimen name="lmi_options_padding_top">6.dp</dimen>
-    <dimen name="lmi_padding_all">12.dp</dimen>
-    <dimen name="lmi_progress_height">8.dp</dimen>
-    <dimen name="lmi_progress_spacedBy">12.dp</dimen>
-
-    <!-- ListMenuBottomSheet (lmbs) -->
-    <dimen name="lmbs_padding_all">16.dp</dimen>
-    <dimen name="lmbs_vertical_spacedBy">16.dp</dimen>
-    <dimen name="lmbs_horizontal_spacedBy">12.dp</dimen>
+    <!-- OverviewScreen (os) -->
+    <dimen name="os_lists_padding_all">8.dp</dimen>
+    <dimen name="os_lists_spacedBy">12.dp</dimen>
+    <!-- OverviewScreen.ListInfo (osli) -->
+    <dimen name="osli_options_padding_top">6.dp</dimen>
+    <dimen name="osli_padding_all">12.dp</dimen>
+    <dimen name="osli_progress_height">8.dp</dimen>
+    <dimen name="osli_progress_spacedBy">12.dp</dimen>
+    <!-- OverviewScreen.BottomSheet (osbs) -->
+    <dimen name="osbs_padding_all">16.dp</dimen>
+    <dimen name="osbs_vertical_spacedBy">16.dp</dimen>
+    <dimen name="osbs_horizontal_spacedBy">12.dp</dimen>
 </resources>

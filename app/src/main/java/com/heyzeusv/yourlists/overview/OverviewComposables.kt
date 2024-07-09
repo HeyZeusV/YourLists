@@ -59,10 +59,10 @@ fun OverviewScreen(
 
     LazyColumn(
         modifier = Modifier
-            .padding(all = dRes(R.dimen.lmi_lists_padding_all))
+            .padding(all = dRes(R.dimen.os_lists_padding_all))
             .fillMaxSize(),
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmi_lists_spacedBy)),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
     ) {
         items(itemLists) {
             ListInfo(it)
@@ -87,7 +87,7 @@ fun ListInfo(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
     ) {
-        Column(modifier = Modifier.padding(all = dRes(R.dimen.lmi_padding_all))) {
+        Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -103,18 +103,18 @@ fun ListInfo(
                     contentDescription = sRes(R.string.button_cdesc_options),
                     modifier = Modifier
                         .align(Alignment.Top)
-                        .padding(top = dRes(R.dimen.lmi_options_padding_top))
+                        .padding(top = dRes(R.dimen.osli_options_padding_top))
                 )
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmi_progress_spacedBy)),
+                horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osli_progress_spacedBy)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LinearProgressIndicator(
                     progress = { itemList.progress.first },
                     modifier = Modifier
-                        .height(dRes(R.dimen.lmi_progress_height))
+                        .height(dRes(R.dimen.osli_progress_height))
                         .weight(1f),
                     trackColor = MaterialTheme.colorScheme.background,
                     strokeCap = StrokeCap.Round
@@ -130,9 +130,9 @@ fun OverviewBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
-            .padding(all = dRes(R.dimen.lmbs_padding_all))
+            .padding(all = dRes(R.dimen.osbs_padding_all))
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_vertical_spacedBy)),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_vertical_spacedBy)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         OverviewBottomSheetActions.entries.forEach {
@@ -148,7 +148,7 @@ fun OverviewBottomSheetAction(action: OverviewBottomSheetActions) {
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_horizontal_spacedBy))
+        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_horizontal_spacedBy))
     ) {
         Icon(
             painter = pRes(action.iconId),
