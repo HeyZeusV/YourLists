@@ -8,7 +8,7 @@ interface Repository {
     /**
      *  ItemList Queries
      */
-    suspend fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
+    fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
 
     /**
      *  Category Queries

@@ -16,7 +16,7 @@ class RepositoryImpl @Inject constructor(
     /**
      *  ItemList Queries
      */
-    override suspend fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>> =
+    override fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
     /**
