@@ -14,19 +14,19 @@ enum class OverviewBottomSheetActions(
     @StringRes val iconCdescId: Int,
 ) {
     RENAME(
-        nameId = R.string.lmbs_rename,
+        nameId = R.string.osbs_rename,
         iconId = R.drawable.icon_rename,
-        iconCdescId = R.string.lmbs_cdesc_rename,
+        iconCdescId = R.string.osbs_cdesc_rename,
     ),
     COPY(
-        nameId = R.string.lmbs_copy,
+        nameId = R.string.osbs_copy,
         iconId = R.drawable.icon_copy,
-        iconCdescId = R.string.lmbs_cdesc_copy,
+        iconCdescId = R.string.osbs_cdesc_copy,
     ),
     DELETE(
-        nameId = R.string.lmbs_delete,
+        nameId = R.string.osbs_delete,
         iconId = R.drawable.icon_delete,
-        iconCdescId = R.string.lmbs_cdesc_delete,
+        iconCdescId = R.string.osbs_cdesc_delete,
     )
 
     ;
