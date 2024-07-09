@@ -1,4 +1,4 @@
-package com.heyzeusv.yourlists.list
+package com.heyzeusv.yourlists.overview
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,7 +40,7 @@ import com.heyzeusv.yourlists.util.sRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(overviewVM: ListScreenViewModel) {
+fun OverviewScreen(overviewVM: OverviewViewModel) {
     val listState = rememberLazyListState()
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -60,7 +60,7 @@ fun ListScreen(overviewVM: ListScreenViewModel) {
             sheetState = sheetState,
             dragHandle = { },
         ) {
-            ListScreenBottomSheetContent()
+            OverviewBottomSheetContent()
         }
     }
 }
@@ -106,7 +106,7 @@ fun ListInfo() {
 }
 
 @Composable
-fun ListScreenBottomSheetContent(
+fun OverviewBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
@@ -115,14 +115,14 @@ fun ListScreenBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_vertical_spacedBy)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ListScreenBottomSheetActions.entries.forEach {
-            ListScreenBottomSheetAction(action = it)
+        OverviewBottomSheetActions.entries.forEach {
+            OverviewBottomSheetAction(action = it)
         }
     }
 }
 
 @Composable
-fun ListScreenBottomSheetAction(action: ListScreenBottomSheetActions) {
+fun OverviewBottomSheetAction(action: OverviewBottomSheetActions) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -156,11 +156,11 @@ private fun ListInfoPreview() {
 
 @Preview
 @Composable
-private fun ListScreenBottomSheetPreview() {
+private fun OverviewBottomSheetPreview() {
     PreviewUtil.apply {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                ListScreenBottomSheetContent()
+                OverviewBottomSheetContent()
             }
         }
     }
@@ -168,11 +168,11 @@ private fun ListScreenBottomSheetPreview() {
 
 @Preview
 @Composable
-private fun ListScreenBottomSheetActionPreview() {
+private fun OverviewBottomSheetActionPreview() {
     PreviewUtil.apply {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                ListScreenBottomSheetAction(ListScreenBottomSheetActions.DELETE)
+                OverviewBottomSheetAction(OverviewBottomSheetActions.DELETE)
             }
         }
     }

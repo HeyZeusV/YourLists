@@ -1,4 +1,4 @@
-package com.heyzeusv.yourlists.list
+package com.heyzeusv.yourlists.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ListScreenViewModel @Inject constructor(
+class OverviewViewModel @Inject constructor(
     private val repo: Repository
 ) : ViewModel() {
 

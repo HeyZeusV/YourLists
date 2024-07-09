@@ -19,8 +19,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.heyzeusv.yourlists.list.ListScreen
-import com.heyzeusv.yourlists.list.ListScreenViewModel
+import com.heyzeusv.yourlists.overview.OverviewScreen
+import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -67,8 +67,8 @@ fun YourLists(
             startDestination = OverviewDestination.route,
         ) {
             composable(OverviewDestination.route) {
-                val overviewVm = hiltViewModel<ListScreenViewModel>()
-                ListScreen(overviewVm)
+                val overviewVm = hiltViewModel<OverviewViewModel>()
+                OverviewScreen(overviewVm)
             }
         }
     }
