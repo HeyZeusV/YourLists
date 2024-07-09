@@ -3,6 +3,9 @@
     <dimen name="card_radius">8.dp</dimen>
     
     <!-- ListMenuItem (lmi) -->
+    <dimen name="lmi_lists_padding_all">8.dp</dimen>
+    <dimen name="lmi_lists_spacedBy">12.dp</dimen>
+    <dimen name="lmi_options_padding_top">6.dp</dimen>
     <dimen name="lmi_padding_all">12.dp</dimen>
     <dimen name="lmi_progress_height">8.dp</dimen>
     <dimen name="lmi_progress_spacedBy">12.dp</dimen>

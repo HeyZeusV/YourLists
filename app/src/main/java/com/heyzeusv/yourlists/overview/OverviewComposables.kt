@@ -33,25 +33,39 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewScreen(overviewVM: OverviewViewModel) {
-    val listState = rememberLazyListState()
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
+
+    OverviewScreen(
+        itemLists = itemLists
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OverviewScreen(
+    itemLists: List<ItemListWithItems>
+) {
+    val listState = rememberLazyListState()
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .padding(all = dRes(R.dimen.lmi_lists_padding_all))
+            .fillMaxSize(),
         state = listState,
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmi_lists_spacedBy)),
     ) {
         items(itemLists) {
-            ListInfo()
+            ListInfo(it)
         }
     }
     if (showBottomSheet) {
@@ -66,7 +80,9 @@ fun OverviewScreen(overviewVM: OverviewViewModel) {
 }
 
 @Composable
-fun ListInfo() {
+fun ListInfo(
+    itemList: ItemListWithItems,
+) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
@@ -78,12 +94,16 @@ fun ListInfo() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "List Title",
+                    text = itemList.itemList.name,
+                    modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Icon(
                     painter = pRes(R.drawable.icon_options),
                     contentDescription = sRes(R.string.button_cdesc_options),
+                    modifier = Modifier
+                        .align(Alignment.Top)
+                        .padding(top = dRes(R.dimen.lmi_options_padding_top))
                 )
             }
             Row(
@@ -92,14 +112,14 @@ fun ListInfo() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 LinearProgressIndicator(
-                    progress = { .75f },
+                    progress = { itemList.progress.first },
                     modifier = Modifier
                         .height(dRes(R.dimen.lmi_progress_height))
                         .weight(1f),
                     trackColor = MaterialTheme.colorScheme.background,
                     strokeCap = StrokeCap.Round
                 )
-                Text(text = "8/10")
+                Text(text = itemList.progress.second)
             }
         }
     }
@@ -146,10 +166,22 @@ fun OverviewBottomSheetAction(action: OverviewBottomSheetActions) {
 
 @Preview
 @Composable
-private fun ListInfoPreview() {
-    PreviewUtil.apply {
+private fun OverviewScreenPreview() {
+    PreviewUtil.run {
         Preview {
-            ListInfo()
+            OverviewScreen(
+                itemLists = List(15) { halfCheckedItemList },
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListInfoPreview() {
+    PreviewUtil.run {
+        Preview {
+            ListInfo(halfCheckedItemList)
         }
     }
 }
@@ -157,7 +189,7 @@ private fun ListInfoPreview() {
 @Preview
 @Composable
 private fun OverviewBottomSheetPreview() {
-    PreviewUtil.apply {
+    PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 OverviewBottomSheetContent()
@@ -169,7 +201,7 @@ private fun OverviewBottomSheetPreview() {
 @Preview
 @Composable
 private fun OverviewBottomSheetActionPreview() {
-    PreviewUtil.apply {
+    PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 OverviewBottomSheetAction(OverviewBottomSheetActions.DELETE)
