@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,9 +28,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.heyzeusv.yourlists.list.ListScreen
+import com.heyzeusv.yourlists.list.ListViewModel
 import com.heyzeusv.yourlists.overview.OverviewScreen
 import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
+import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.ScaffoldActions
@@ -53,7 +57,7 @@ class MainActivity : ComponentActivity() {
 fun YourLists(
     navController: NavHostController = rememberNavController()
 ) {
-    val sa by remember { mutableStateOf(ScaffoldActions()) }
+    var sa by remember { mutableStateOf(ScaffoldActions()) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -79,8 +83,23 @@ fun YourLists(
             startDestination = OverviewDestination.route,
         ) {
             composable(OverviewDestination.route) {
-                val overviewVm: OverviewViewModel = hiltViewModel()
-                OverviewScreen(overviewVm)
+                val overviewVM: OverviewViewModel = hiltViewModel()
+                OverviewScreen(overviewVM)
+            }
+            composable(
+                route = ListDestination.routeWithArg,
+                arguments = ListDestination.arguments
+            ) { navBackStackEntry ->
+                val listId = navBackStackEntry.arguments?.getLong(ListDestination.ID_ARG) ?: -1
+                val listVM: ListViewModel = hiltViewModel<ListViewModel>().apply {
+                    getItemListWithId(listId)
+                }
+
+                ListScreen(
+                    listVM = listVM,
+                    saSetUp = { sa = it },
+                    onBackPressed = { navController.navigateUp() }
+                )
             }
         }
     }

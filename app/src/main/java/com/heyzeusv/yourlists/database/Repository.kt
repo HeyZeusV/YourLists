@@ -10,6 +10,8 @@ interface Repository {
      */
     fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
 
+    suspend fun getItemListWithId(id: Long): ItemListWithItems?
+
     /**
      *  Category Queries
      */

@@ -19,6 +19,9 @@ class RepositoryImpl @Inject constructor(
     override fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
+    override suspend fun getItemListWithId(id: Long): ItemListWithItems? =
+        withContext(Dispatchers.IO) { itemListDao.getItemListWithId(id) }
+
     /**
      *  Category Queries
      */

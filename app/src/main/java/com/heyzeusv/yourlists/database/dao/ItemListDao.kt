@@ -10,6 +10,12 @@ import kotlinx.coroutines.flow.Flow
 interface ItemListDao {
 
     @Transaction
-    @Query("SELECT * FROM ItemList")
+    @Query("SELECT * " +
+            "FROM ItemList")
     fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
+
+    @Query("SELECT * " +
+            "FROM ItemList " +
+            "WHERE itemListId=(:id)")
+    suspend fun getItemListWithId(id: Long): ItemListWithItems?
 }

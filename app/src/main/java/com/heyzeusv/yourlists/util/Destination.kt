@@ -56,7 +56,7 @@ object ListDestination: Destination {
 
     const val ID_ARG = "list_id"
     var arguments = listOf(
-        navArgument(ID_ARG) { type = NavType.IntType }
+        navArgument(ID_ARG) { type = NavType.LongType }
     )
     val routeWithArg = "$route/{$ID_ARG}"
 }

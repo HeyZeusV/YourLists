@@ -14,12 +14,12 @@ data class ItemList(
 )
 
 data class ItemListWithItems(
-    @Embedded val itemList: ItemList,
+    @Embedded val itemList: ItemList = ItemList(0, ""),
     @Relation(
         parentColumn = "itemListId",
         entityColumn = "parentItemListId"
     )
-    val items: List<Item>
+    val items: List<Item> = emptyList()
 ) {
     @Ignore private val numOfCheckedItems = items.count { it.isChecked }
     @Ignore private val numOfItems = items.size
