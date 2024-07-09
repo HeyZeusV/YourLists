@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.di
 import android.content.Context
 import androidx.room.Room
 import com.heyzeusv.yourlists.database.Database
+import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -19,12 +20,17 @@ object DatabaseModule {
     fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
 
     @Provides
+    fun provideCategoryDao(database: Database): CategoryDao = database.categoryDao()
+
+    @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): Database {
         return Room.databaseBuilder(
             context,
             Database::class.java,
-            "yourListsDatabase"
-        ).build()
+            "YourListsDatabase.db"
+        )
+            .createFromAsset("YourListsInitDatabase.db")
+            .build()
     }
 }

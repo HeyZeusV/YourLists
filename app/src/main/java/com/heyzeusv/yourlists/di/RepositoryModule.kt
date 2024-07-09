@@ -2,6 +2,7 @@ package com.heyzeusv.yourlists.di
 
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.RepositoryImpl
+import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -16,6 +17,7 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideRepository(
-        itemListDao: ItemListDao
-    ): Repository = RepositoryImpl(itemListDao)
+        itemListDao: ItemListDao,
+        categoryDao: CategoryDao
+    ): Repository = RepositoryImpl(itemListDao, categoryDao)
 }
