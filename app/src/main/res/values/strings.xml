@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Your Lists</string>
+    <string name="navigate_back">Navigate Back</string>
     <string name="button_cdesc_options">Displays additional options</string>
 
+    <!-- OverviewScreen (os) -->
+    <string name="os_fab">New List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->
     <string name="osbs_rename">Rename</string>
     <string name="osbs_cdesc_rename">Rename this list.</string>
