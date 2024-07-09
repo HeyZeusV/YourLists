@@ -14,8 +14,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.yourlists.list.ListScreen
+import com.heyzeusv.yourlists.list.ListScreenViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
+import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,7 +42,9 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun YourLists() {
+fun YourLists(
+    navController: NavHostController = rememberNavController()
+) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -53,7 +62,15 @@ fun YourLists() {
             )
         }
     ) {
-        ListScreen()
+        NavHost(
+            navController = navController,
+            startDestination = OverviewDestination.route,
+        ) {
+            composable(OverviewDestination.route) {
+                val overviewVm = hiltViewModel<ListScreenViewModel>()
+                ListScreen(overviewVm)
+            }
+        }
     }
 }
 

@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.dRes
@@ -36,10 +40,20 @@ import com.heyzeusv.yourlists.util.sRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen() {
+fun ListScreen(overviewVM: ListScreenViewModel) {
+    val listState = rememberLazyListState()
+    val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = listState,
+    ) {
+        items(itemLists) {
+            ListInfo()
+        }
+    }
     if (showBottomSheet) {
         ModalBottomSheet(onDismissRequest = { showBottomSheet = false },
             modifier = Modifier.fillMaxSize(),
