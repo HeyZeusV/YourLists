@@ -1,4 +1,4 @@
-package com.heyzeusv.yourlists.lists
+package com.heyzeusv.yourlists.list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,7 +36,7 @@ import com.heyzeusv.yourlists.util.sRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListMenu() {
+fun ListScreen() {
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
@@ -46,13 +46,13 @@ fun ListMenu() {
             sheetState = sheetState,
             dragHandle = { },
         ) {
-            ListMenuBottomSheetContent()
+            ListScreenBottomSheetContent()
         }
     }
 }
 
 @Composable
-fun ListMenuItem() {
+fun ListInfo() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
@@ -92,7 +92,7 @@ fun ListMenuItem() {
 }
 
 @Composable
-fun ListMenuBottomSheetContent(
+fun ListScreenBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
@@ -101,14 +101,14 @@ fun ListMenuBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.lmbs_vertical_spacedBy)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        ListMenuBottomSheetActions.entries.forEach {
-            ListMenuBottomSheetAction(action = it)
+        ListScreenBottomSheetActions.entries.forEach {
+            ListScreenBottomSheetAction(action = it)
         }
     }
 }
 
 @Composable
-fun ListMenuBottomSheetAction(action: ListMenuBottomSheetActions) {
+fun ListScreenBottomSheetAction(action: ListScreenBottomSheetActions) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,21 +132,21 @@ fun ListMenuBottomSheetAction(action: ListMenuBottomSheetActions) {
 
 @Preview
 @Composable
-private fun ListMenuItemPreview() {
+private fun ListInfoPreview() {
     PreviewUtil.apply {
         Preview {
-            ListMenuItem()
+            ListInfo()
         }
     }
 }
 
 @Preview
 @Composable
-private fun ListMenuBottomSheetPreview() {
+private fun ListScreenBottomSheetPreview() {
     PreviewUtil.apply {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                ListMenuBottomSheetContent()
+                ListScreenBottomSheetContent()
             }
         }
     }
@@ -154,11 +154,11 @@ private fun ListMenuBottomSheetPreview() {
 
 @Preview
 @Composable
-private fun ListMenuBottomSheetActionPreview() {
+private fun ListScreenBottomSheetActionPreview() {
     PreviewUtil.apply {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                ListMenuBottomSheetAction(ListMenuBottomSheetActions.DELETE)
+                ListScreenBottomSheetAction(ListScreenBottomSheetActions.DELETE)
             }
         }
     }

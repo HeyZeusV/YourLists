@@ -14,7 +14,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.heyzeusv.yourlists.lists.ListMenu
+import com.heyzeusv.yourlists.list.ListScreen
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.sRes
@@ -53,7 +53,7 @@ fun YourLists() {
             )
         }
     ) {
-        ListMenu()
+        ListScreen()
     }
 }
 

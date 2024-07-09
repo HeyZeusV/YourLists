@@ -1,4 +1,4 @@
-package com.heyzeusv.yourlists.lists
+package com.heyzeusv.yourlists.list
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -8,7 +8,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import com.heyzeusv.yourlists.R
 
-enum class ListMenuBottomSheetActions(
+enum class ListScreenBottomSheetActions(
     @StringRes val nameId: Int,
     @DrawableRes val iconId: Int,
     @StringRes val iconCdescId: Int,
