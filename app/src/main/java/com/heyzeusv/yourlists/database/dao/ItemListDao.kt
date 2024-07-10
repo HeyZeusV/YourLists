@@ -15,6 +15,7 @@ interface ItemListDao : BaseDao<ItemList> {
             "FROM ItemList")
     fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
 
+    @Transaction
     @Query("SELECT * " +
             "FROM ItemList " +
             "WHERE itemListId=(:id)")
