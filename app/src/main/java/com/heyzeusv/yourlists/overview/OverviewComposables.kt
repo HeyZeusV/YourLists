@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.ScaffoldInfo
@@ -66,29 +67,40 @@ fun OverviewScreen(
         )
     }
     OverviewScreen(
-        itemLists = itemLists
+        itemLists = itemLists,
+        emptyButtonOnClick = { navController.navigateToItemListWithId(-1) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewScreen(
-    itemLists: List<ItemListWithItems>
+    itemLists: List<ItemListWithItems>,
+    emptyButtonOnClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(all = dRes(R.dimen.os_lists_padding_all))
-            .fillMaxSize(),
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
-    ) {
-        items(itemLists.reversed()) {
-            ListInfo(it)
+    if (itemLists.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(all = dRes(R.dimen.os_lists_padding_all))
+                .fillMaxSize(),
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
+        ) {
+            items(itemLists.reversed()) {
+                ListInfo(it)
+            }
         }
+    } else {
+        EmptyList(
+            message = sRes(R.string.os_empty),
+            buttonOnClick = emptyButtonOnClick,
+            buttonIcon = OverviewDestination.fabIcon,
+            buttonText = sRes(OverviewDestination.fabText)
+        )
     }
     if (showBottomSheet) {
         ModalBottomSheet(onDismissRequest = { showBottomSheet = false },
@@ -193,6 +205,20 @@ private fun OverviewScreenPreview() {
         Preview {
             OverviewScreen(
                 itemLists = List(15) { halfCheckedItemList },
+                emptyButtonOnClick = { },
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OverviewScreenEmptyPreview() {
+    PreviewUtil.run {
+        Preview {
+            OverviewScreen(
+                itemLists = emptyList(),
+                emptyButtonOnClick = { },
             )
         }
     }

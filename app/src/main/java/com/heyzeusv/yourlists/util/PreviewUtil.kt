@@ -38,7 +38,10 @@ object PreviewUtil {
         itemList = ItemList(0L, "Half Checked / Half UnChecked Item List"),
         items = List(10) { if (it % 2 == 0) itemChecked else itemUnchecked }
     )
-
+    val emptyItemList = ItemListWithItems(
+        itemList = ItemList(0L, "Empty List"),
+        items = emptyList()
+    )
 
     @Composable
     fun Preview(content: @Composable () -> Unit) {

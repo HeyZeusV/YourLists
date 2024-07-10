@@ -11,10 +11,12 @@
     <string name="iad_error">Can\'t be blank!</string>
 
     <!-- ListScreen (ls) -->
+    <string name="ls_empty">Add a single item or an existing list!</string>
     <string name="ls_ad_title">New List</string>
     <string name="ls_fab">Add</string>
 
     <!-- OverviewScreen (os) -->
+    <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->
     <string name="osbs_rename">Rename</string>

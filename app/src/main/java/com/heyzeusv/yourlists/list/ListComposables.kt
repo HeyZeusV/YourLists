@@ -32,6 +32,7 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -74,25 +75,38 @@ fun ListScreen(
             listVM.insertItemList(input)
         }
     )
-    ListScreen(itemList = itemList)
+    ListScreen(
+        itemList = itemList,
+        emptyButtonOnClick = { }
+    )
 }
 
 @Composable
 fun ListScreen(
-    itemList: ItemListWithItems
+    itemList: ItemListWithItems,
+    emptyButtonOnClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(all = dRes(R.dimen.ls_list_padding_all))
-            .fillMaxSize(),
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
-    ) {
-        items(itemList.items) {
-            ItemInfo(item = it)
+    if (itemList.items.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(all = dRes(R.dimen.ls_list_padding_all))
+                .fillMaxSize(),
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
+        ) {
+            items(itemList.items) {
+                ItemInfo(item = it)
+            }
         }
+    } else {
+        EmptyList(
+            message = sRes(R.string.ls_empty),
+            buttonOnClick = emptyButtonOnClick,
+            buttonIcon = ListDestination.fabIcon,
+            buttonText = sRes(ListDestination.fabText)
+        )
     }
 }
 
@@ -136,7 +150,25 @@ fun ItemInfo(
 @Composable
 fun ListScreenPreview() {
     PreviewUtil.run {
-        ListScreen(itemList = halfCheckedItemList)
+        Preview {
+            ListScreen(
+                itemList = halfCheckedItemList,
+                emptyButtonOnClick = { }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun ListScreenEmptyPreview() {
+    PreviewUtil.run {
+        Preview {
+            ListScreen(
+                itemList = emptyItemList,
+                emptyButtonOnClick = { }
+            )
+        }
     }
 }
 

@@ -2,6 +2,11 @@
 <resources>
     <dimen name="card_radius">8.dp</dimen>
 
+    <!-- EmptyList (el) -->
+    <dimen name="el_icon_size">36.dp</dimen>
+    <dimen name="el_padding_horizontal">16.dp</dimen>
+    <dimen name="el_text_padding_bottom">12.dp</dimen>
+
     <!-- InputAlertDialog (iad) -->
     <dimen name="iad_padding_all">24.dp</dimen>
     <dimen name="iad_title_padding_bottom">16.dp</dimen>
