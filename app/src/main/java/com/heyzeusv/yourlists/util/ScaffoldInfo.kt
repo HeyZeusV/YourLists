@@ -1,7 +1,8 @@
 package com.heyzeusv.yourlists.util
 
-data class ScaffoldActions(
+data class ScaffoldInfo(
     val destination: Destination = OverviewDestination,
+    val customTitle: String = "",
     val topBarNavPressed: () -> Unit = { },
     val topBarActionLeftPressed: () -> Unit = { },
     val topBarActionRightPressed: () -> Unit = { },

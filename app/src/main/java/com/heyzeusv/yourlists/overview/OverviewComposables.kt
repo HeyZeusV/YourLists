@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.overview
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -32,15 +33,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.ScaffoldInfo
 import com.heyzeusv.yourlists.util.dRes
+import com.heyzeusv.yourlists.util.navigateToItemListWithId
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
 
 @Composable
-fun OverviewScreen(overviewVM: OverviewViewModel) {
+fun OverviewScreen(
+    overviewVM: OverviewViewModel,
+    navController: NavHostController,
+    siSetUp: (ScaffoldInfo) -> Unit,
+) {
+    BackHandler {
+        navController.navigateUp()
+    }
+    siSetUp(
+        ScaffoldInfo(
+            destination = OverviewDestination,
+            fabAction = { navController.navigateToItemListWithId(-1)}
+        )
+    )
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
 
     OverviewScreen(

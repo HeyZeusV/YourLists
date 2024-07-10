@@ -24,27 +24,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.ScaffoldActions
+import com.heyzeusv.yourlists.util.ScaffoldInfo
 import com.heyzeusv.yourlists.util.dRes
 
 @Composable
 fun ListScreen(
     listVM: ListViewModel,
-    saSetUp: (ScaffoldActions) -> Unit,
-    onBackPressed: () -> Unit
+    navController: NavHostController,
+    siSetUp: (ScaffoldInfo) -> Unit,
 ) {
     BackHandler {
-        onBackPressed()
+        navController.navigateUp()
     }
-    saSetUp(
-        ScaffoldActions(
+    siSetUp(
+        ScaffoldInfo(
             destination = ListDestination,
-            topBarNavPressed = onBackPressed
+            topBarNavPressed = { navController.navigateUp() },
         )
     )
 

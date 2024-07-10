@@ -36,7 +36,7 @@ import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.ScaffoldActions
+import com.heyzeusv.yourlists.util.ScaffoldInfo
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -57,23 +57,23 @@ class MainActivity : ComponentActivity() {
 fun YourLists(
     navController: NavHostController = rememberNavController()
 ) {
-    var sa by remember { mutableStateOf(ScaffoldActions()) }
+    var si by remember { mutableStateOf(ScaffoldInfo()) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { YourListsTopAppBar(sa = sa) },
+        topBar = { YourListsTopAppBar(si = si) },
         floatingActionButton = {
-            if (sa.destination.fabText != 0) {
+            if (si.destination.fabText != 0) {
                 ExtendedFloatingActionButton(
-                    text = { Text(text = sRes(sa.destination.fabText)) },
+                    text = { Text(text = sRes(si.destination.fabText)) },
                     icon = {
                         Icon(
-                            imageVector = sa.destination.fabIcon,
-                            contentDescription = sRes(sa.destination.fabText)
+                            imageVector = si.destination.fabIcon,
+                            contentDescription = sRes(si.destination.fabText)
                         )
                     },
                     modifier = Modifier.height(48.dp),
-                    onClick = sa.fabAction,
+                    onClick = si.fabAction,
                 )
             }
         }
@@ -84,11 +84,15 @@ fun YourLists(
         ) {
             composable(OverviewDestination.route) {
                 val overviewVM: OverviewViewModel = hiltViewModel()
-                OverviewScreen(overviewVM)
+                OverviewScreen(
+                    overviewVM = overviewVM,
+                    navController = navController,
+                    siSetUp = { si = it },
+                )
             }
             composable(
                 route = ListDestination.routeWithArg,
-                arguments = ListDestination.arguments
+                arguments = ListDestination.arguments,
             ) { navBackStackEntry ->
                 val listId = navBackStackEntry.arguments?.getLong(ListDestination.ID_ARG) ?: -1
                 val listVM: ListViewModel = hiltViewModel<ListViewModel>().apply {
@@ -97,8 +101,8 @@ fun YourLists(
 
                 ListScreen(
                     listVM = listVM,
-                    saSetUp = { sa = it },
-                    onBackPressed = { navController.navigateUp() }
+                    navController = navController,
+                    siSetUp = { si = it },
                 )
             }
         }
@@ -107,38 +111,39 @@ fun YourLists(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YourListsTopAppBar(sa: ScaffoldActions) {
+fun YourListsTopAppBar(si: ScaffoldInfo) {
+    val title = if (si.destination.title != 0) sRes(si.destination.title) else si.customTitle
     TopAppBar(
         title = {
             Text(
-                text = sRes(sa.destination.title),
+                text = title,
                 style = MaterialTheme.typography.headlineSmall
             )
         },
         navigationIcon = {
-            if (sa.destination.navDescription != 0) {
-                IconButton(onClick = sa.topBarNavPressed) {
+            if (si.destination.navDescription != 0) {
+                IconButton(onClick = si.topBarNavPressed) {
                     Icon(
-                        imageVector = sa.destination.navIcon,
-                        contentDescription = sRes(sa.destination.navDescription)
+                        imageVector = si.destination.navIcon,
+                        contentDescription = sRes(si.destination.navDescription)
                     )
                 }
             }
         },
         actions = {
-            if (sa.destination.actionLeftDescription != 0) {
-                IconButton(onClick = sa.topBarActionLeftPressed) {
+            if (si.destination.actionLeftDescription != 0) {
+                IconButton(onClick = si.topBarActionLeftPressed) {
                     Icon(
-                        imageVector = sa.destination.actionLeftIcon,
-                        contentDescription = sRes(sa.destination.actionLeftDescription)
+                        imageVector = si.destination.actionLeftIcon,
+                        contentDescription = sRes(si.destination.actionLeftDescription)
                     )
                 }
             }
-            if (sa.destination.actionRightDescription != 0) {
-                IconButton(onClick = sa.topBarActionRightPressed) {
+            if (si.destination.actionRightDescription != 0) {
+                IconButton(onClick = si.topBarActionRightPressed) {
                     Icon(
-                        imageVector = sa.destination.actionRightIcon,
-                        contentDescription = sRes(sa.destination.actionRightDescription)
+                        imageVector = si.destination.actionRightIcon,
+                        contentDescription = sRes(si.destination.actionRightDescription)
                     )
                 }
             }
@@ -154,6 +159,6 @@ fun YourListsTopAppBar(sa: ScaffoldActions) {
 @Composable
 fun YourListsTopAppBarPreview() {
     PreviewUtil.Preview {
-        YourListsTopAppBar(sa = ScaffoldActions())
+        YourListsTopAppBar(si = ScaffoldInfo())
     }
 }

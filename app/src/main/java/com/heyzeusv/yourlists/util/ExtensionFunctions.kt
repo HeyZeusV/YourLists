@@ -10,6 +10,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 
 /**
  *  Load a string resource with formatting.
@@ -40,3 +43,28 @@ fun pRes(@DrawableRes id: Int): Painter = painterResource(id)
 @Composable
 @ReadOnlyComposable
 fun dRes(@DimenRes id: Int): Dp = dimensionResource(id)
+
+/**
+ *  Navigates app to given route.
+ *
+ *  @param route [Destination] to navigate to.
+ */
+fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) {
+    // pressing back from any screen would pop back stack to Overview
+    popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) { saveState = true }
+    // only 1 copy of a destination is ever created
+    launchSingleTop = true
+    // previous data and state is saved
+    restoreState = true
+}
+
+/**
+ *  Navigates to [ListDestination] while also passing an id to determine which [ItemListWithItems]
+ *  to display.
+ *
+ *  @param listId Id of ItemList to display
+ */
+fun NavHostController.navigateToItemListWithId(listId: Long) {
+    this.navigateSingleTopTo("${ListDestination.route}/$listId")
+}
+
