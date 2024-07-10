@@ -16,11 +16,11 @@ object PreviewUtil {
 
     val itemUnchecked = Item(
         itemId = 0L,
-        name = "UncheckedItem",
+        name = "UncheckedItem UncheckedItem UncheckedItem UncheckedItem UncheckedItem",
         isChecked = false,
         category = "Preview",
         quantity = 3.33,
-        unit = "Units",
+        unit = "Unit",
         parentItemListId = 0L,
         originItemListId = null
     )
