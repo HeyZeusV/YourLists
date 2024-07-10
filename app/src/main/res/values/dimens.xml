@@ -2,6 +2,12 @@
 <resources>
     <dimen name="card_radius">8.dp</dimen>
 
+    <!-- InputAlertDialog (iad) -->
+    <dimen name="iad_padding_all">24.dp</dimen>
+    <dimen name="iad_title_padding_bottom">16.dp</dimen>
+    <dimen name="iad_input_padding_bottom">8.dp</dimen>
+    <dimen name="iad_buttons_spacedBy">8.dp</dimen>
+
     <!-- ListScreen (ls) -->
     <dimen name="ls_list_padding_all">12.dp</dimen>
     <dimen name="ls_list_spacedBy">8.dp</dimen>
