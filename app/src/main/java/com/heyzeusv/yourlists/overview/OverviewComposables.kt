@@ -70,6 +70,9 @@ fun OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { navController.navigateToItemListWithId(it) },
         emptyButtonOnClick = { navController.navigateToItemListWithId(-1) },
+        optionRenameOnClick = { },
+        optionCopyOnClick = overviewVM::copyItemList,
+        optionDeleteOnClick = overviewVM::deleteItemList,
     )
 }
 
@@ -79,9 +82,12 @@ fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (Long) -> Unit,
     emptyButtonOnClick: () -> Unit,
+    optionRenameOnClick: () -> Unit,
+    optionCopyOnClick: (ItemListWithItems) -> Unit,
+    optionDeleteOnClick: (ItemList) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    var showBottomSheet by remember { mutableStateOf<ItemList?>(null) }
+    var showBottomSheet by remember { mutableStateOf<ItemListWithItems?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
     if (itemLists.isNotEmpty()) {
@@ -96,7 +102,7 @@ fun OverviewScreen(
                 ListInfo(
                     itemList = it,
                     itemListOnClick = itemListOnClick,
-                    optionOnClick = { iLId -> showBottomSheet = iLId },
+                    optionOnClick = { selected -> showBottomSheet = selected },
                 )
             }
         }
@@ -115,7 +121,19 @@ fun OverviewScreen(
             dragHandle = { },
         ) {
             OverviewBottomSheetContent(
-                itemList = showBottomSheet!!
+                itemList = showBottomSheet!!,
+                renameOnClick = { 
+                    // TODO Set up input alert dialog to take input for rename
+                    showBottomSheet = null
+                },
+                copyOnClick = {
+                    optionCopyOnClick(showBottomSheet!!)
+                    showBottomSheet = null
+                },
+                deleteOnClick = {
+                    optionDeleteOnClick(showBottomSheet!!.itemList)
+                    showBottomSheet = null
+                },
             )
         }
     }
@@ -125,7 +143,7 @@ fun OverviewScreen(
 fun ListInfo(
     itemList: ItemListWithItems,
     itemListOnClick: (Long) -> Unit,
-    optionOnClick: (ItemList) -> Unit,
+    optionOnClick: (ItemListWithItems) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -150,7 +168,7 @@ fun ListInfo(
                     modifier = Modifier
                         .align(Alignment.Top)
                         .padding(top = dRes(R.dimen.osli_options_padding_top))
-                        .clickable { optionOnClick(itemList.itemList) },
+                        .clickable { optionOnClick(itemList) },
                 )
             }
             Row(
@@ -174,7 +192,10 @@ fun ListInfo(
 
 @Composable
 fun OverviewBottomSheetContent(
-    itemList: ItemList,
+    itemList: ItemListWithItems,
+    renameOnClick: () -> Unit,
+    copyOnClick: () -> Unit,
+    deleteOnClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -183,19 +204,33 @@ fun OverviewBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_vertical_spacedBy)),
     ) {
         Text(
-            text = sRes(R.string.osbs_manage, itemList.name),
+            text = sRes(R.string.osbs_manage, itemList.itemList.name),
             style = MaterialTheme.typography.headlineMedium
         )
-        OverviewBottomSheetActions.entries.forEach {
-            OverviewBottomSheetAction(action = it)
-        }
+        OverviewBottomSheetAction(
+            action = OverviewBottomSheetActions.RENAME,
+            actionOnClick = renameOnClick,
+        )
+        OverviewBottomSheetAction(
+            action = OverviewBottomSheetActions.COPY,
+            actionOnClick = copyOnClick,
+        )
+        OverviewBottomSheetAction(
+            action = OverviewBottomSheetActions.DELETE,
+            actionOnClick = deleteOnClick,
+        )
     }
 }
 
 @Composable
-fun OverviewBottomSheetAction(action: OverviewBottomSheetActions) {
+fun OverviewBottomSheetAction(
+    action: OverviewBottomSheetActions,
+    actionOnClick: () -> Unit,
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { actionOnClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_horizontal_spacedBy))
     ) {
@@ -222,6 +257,9 @@ private fun OverviewScreenPreview() {
                 itemLists = List(15) { halfCheckedItemList },
                 itemListOnClick = { },
                 emptyButtonOnClick = { },
+                optionRenameOnClick = { },
+                optionCopyOnClick = { },
+                optionDeleteOnClick = { },
             )
         }
     }
@@ -236,6 +274,9 @@ private fun OverviewScreenEmptyPreview() {
                 itemLists = emptyList(),
                 itemListOnClick = { },
                 emptyButtonOnClick = { },
+                optionRenameOnClick = { },
+                optionCopyOnClick = { },
+                optionDeleteOnClick = { },
             )
         }
     }
@@ -261,7 +302,12 @@ private fun OverviewBottomSheetPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                OverviewBottomSheetContent(halfCheckedItemList.itemList)
+                OverviewBottomSheetContent(
+                    itemList = halfCheckedItemList,
+                    renameOnClick = { },
+                    copyOnClick = { },
+                    deleteOnClick = { },
+                )
             }
         }
     }
@@ -273,7 +319,10 @@ private fun OverviewBottomSheetActionPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                OverviewBottomSheetAction(OverviewBottomSheetActions.DELETE)
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.DELETE,
+                    actionOnClick = { },
+                )
             }
         }
     }

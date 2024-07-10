@@ -11,6 +11,10 @@ interface Repository {
      */
     suspend fun insertItemList(vararg itemLists: ItemList): Long
 
+    suspend fun updateItemList(vararg itemLists: ItemList)
+
+    suspend fun deleteItemList(vararg itemLists: ItemList)
+
     fun getAllItemLists(): Flow<List<ItemListWithItems>>
 
     suspend fun getItemListWithId(id: Long): ItemListWithItems?

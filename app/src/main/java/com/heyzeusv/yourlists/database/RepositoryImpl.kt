@@ -20,6 +20,12 @@ class RepositoryImpl @Inject constructor(
     override suspend fun insertItemList(vararg itemLists: ItemList): Long =
         withContext(Dispatchers.IO) { itemListDao.insert(*itemLists).first() }
 
+    override suspend fun updateItemList(vararg itemLists: ItemList) =
+        withContext(Dispatchers.IO) { itemListDao.update(*itemLists) }
+
+    override suspend fun deleteItemList(vararg itemLists: ItemList) =
+        withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
+
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 

@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.overview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,6 +25,31 @@ class OverviewViewModel @Inject constructor(
 
     init {
         getAllItemLists()
+    }
+
+    fun renameItemList(itemList: ItemList, newName: String) {
+        viewModelScope.launch {
+            val renamed = itemList.copy(name = newName)
+            repo.updateItemList(renamed)
+        }
+    }
+
+    fun copyItemList(itemList: ItemListWithItems) {
+        viewModelScope.launch {
+            val copyName = "${itemList.itemList.name} - Copy"
+            val copy = itemList.itemList.copy(
+                itemListId = 0L,
+                name = copyName.take(32)
+            )
+            repo.insertItemList(copy)
+            // TODO: copy items once DAO is set up for it
+        }
+    }
+
+    fun deleteItemList(itemList: ItemList) {
+        viewModelScope.launch {
+            repo.deleteItemList(itemList)
+        }
     }
 
     private fun getAllItemLists() {
