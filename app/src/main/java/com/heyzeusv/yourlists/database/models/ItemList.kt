@@ -23,7 +23,11 @@ data class ItemListWithItems(
 ) {
     @Ignore private val numOfCheckedItems = items.count { it.isChecked }
     @Ignore private val numOfItems = items.size
-    @Ignore private val progressFloat = numOfCheckedItems.toFloat() / numOfItems
+    @Ignore private val progressFloat = if (numOfItems == 0) {
+        0f
+    } else {
+        numOfCheckedItems.toFloat() / numOfItems
+    }
     @Ignore private val progressString = "$numOfCheckedItems/$numOfItems"
     @Ignore val progress = Pair(progressFloat, progressString)
 }
