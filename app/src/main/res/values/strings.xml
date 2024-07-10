@@ -12,6 +12,7 @@
 
     <!-- ListScreen (ls) -->
     <string name="ls_ad_title">New List</string>
+    <string name="ls_fab">Add</string>
 
     <!-- OverviewScreen (os) -->
     <string name="os_fab">New List</string>

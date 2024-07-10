@@ -52,7 +52,7 @@ object ListDestination: Destination {
     override val actionRightIcon: ImageVector = Blank
     override val actionRightDescription: Int = 0
     override val fabIcon: ImageVector = Icons.Default.Add
-    override val fabText: Int = R.string.os_fab
+    override val fabText: Int = R.string.ls_fab
 
     const val ID_ARG = "list_id"
     var arguments = listOf(

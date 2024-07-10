@@ -62,7 +62,7 @@ fun YourLists(
         modifier = Modifier.fillMaxSize(),
         topBar = { YourListsTopAppBar(si = si) },
         floatingActionButton = {
-            if (si.destination.fabText != 0) {
+            if (si.isFabDisplayed) {
                 ExtendedFloatingActionButton(
                     text = { Text(text = sRes(si.destination.fabText)) },
                     icon = {

@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,13 +53,17 @@ fun ListScreen(
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     var isNewList by remember { mutableStateOf(itemList.itemList.itemListId == 0L) }
 
-    siSetUp(
-        ScaffoldInfo(
-            destination = ListDestination,
-            customTitle = itemList.itemList.name,
-            topBarNavPressed = { navController.navigateUp() },
+    LaunchedEffect(key1 = itemList) {
+        siSetUp(
+            ScaffoldInfo(
+                destination = ListDestination,
+                customTitle = itemList.itemList.name,
+                topBarNavPressed = { navController.navigateUp() },
+                isFabDisplayed = itemList.items.isNotEmpty(),
+                fabAction = { }
+            )
         )
-    )
+    }
     InputAlertDialog(
         display = isNewList,
         onDismissRequest = { },

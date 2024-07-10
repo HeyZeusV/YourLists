@@ -6,5 +6,6 @@ data class ScaffoldInfo(
     val topBarNavPressed: () -> Unit = { },
     val topBarActionLeftPressed: () -> Unit = { },
     val topBarActionRightPressed: () -> Unit = { },
-    val fabAction: () -> Unit = { }
+    val isFabDisplayed: Boolean = true,
+    val fabAction: () -> Unit = { },
 )

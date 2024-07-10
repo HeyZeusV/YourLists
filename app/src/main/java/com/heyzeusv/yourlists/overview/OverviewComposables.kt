@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,14 +54,17 @@ fun OverviewScreen(
     BackHandler {
         navController.navigateUp()
     }
-    siSetUp(
-        ScaffoldInfo(
-            destination = OverviewDestination,
-            fabAction = { navController.navigateToItemListWithId(-1)}
-        )
-    )
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
 
+    LaunchedEffect(key1 = itemLists.size) {
+        siSetUp(
+            ScaffoldInfo(
+                destination = OverviewDestination,
+                isFabDisplayed = itemLists.isNotEmpty(),
+                fabAction = { navController.navigateToItemListWithId(-1) }
+            )
+        )
+    }
     OverviewScreen(
         itemLists = itemLists
     )
@@ -82,7 +86,7 @@ fun OverviewScreen(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
     ) {
-        items(itemLists) {
+        items(itemLists.reversed()) {
             ListInfo(it)
         }
     }
