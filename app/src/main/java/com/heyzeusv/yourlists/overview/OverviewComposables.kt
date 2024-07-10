@@ -38,10 +38,12 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EmptyList
+import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.ScaffoldInfo
 import com.heyzeusv.yourlists.util.dRes
+import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemListWithId
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
@@ -70,7 +72,7 @@ fun OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { navController.navigateToItemListWithId(it) },
         emptyButtonOnClick = { navController.navigateToItemListWithId(-1) },
-        optionRenameOnClick = { },
+        optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
     )
@@ -82,13 +84,14 @@ fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (Long) -> Unit,
     emptyButtonOnClick: () -> Unit,
-    optionRenameOnClick: () -> Unit,
+    optionRenameOnClick: (ItemList, String) -> Unit,
     optionCopyOnClick: (ItemListWithItems) -> Unit,
     optionDeleteOnClick: (ItemList) -> Unit,
 ) {
     val listState = rememberLazyListState()
     var showBottomSheet by remember { mutableStateOf<ItemListWithItems?>(null) }
     val sheetState = rememberModalBottomSheetState()
+    var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
 
     if (itemLists.isNotEmpty()) {
         LazyColumn(
@@ -122,8 +125,8 @@ fun OverviewScreen(
         ) {
             OverviewBottomSheetContent(
                 itemList = showBottomSheet!!,
-                renameOnClick = { 
-                    // TODO Set up input alert dialog to take input for rename
+                renameOnClick = {
+                    showRenameAlertDialog = showBottomSheet!!.itemList
                     showBottomSheet = null
                 },
                 copyOnClick = {
@@ -137,6 +140,17 @@ fun OverviewScreen(
             )
         }
     }
+    InputAlertDialog(
+        display = showRenameAlertDialog != null,
+        onDismissRequest = { showRenameAlertDialog = null },
+        title = sRes(R.string.os_ad_rename_title),
+        maxLength = iRes(R.integer.title_max_length),
+        onConfirm = { input ->
+            optionRenameOnClick(showRenameAlertDialog!!, input)
+            showRenameAlertDialog = null
+        },
+        onDismiss = { showRenameAlertDialog = null }
+    )
 }
 
 @Composable
@@ -257,7 +271,7 @@ private fun OverviewScreenPreview() {
                 itemLists = List(15) { halfCheckedItemList },
                 itemListOnClick = { },
                 emptyButtonOnClick = { },
-                optionRenameOnClick = { },
+                optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
                 optionDeleteOnClick = { },
             )
@@ -274,7 +288,7 @@ private fun OverviewScreenEmptyPreview() {
                 itemLists = emptyList(),
                 itemListOnClick = { },
                 emptyButtonOnClick = { },
-                optionRenameOnClick = { },
+                optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
                 optionDeleteOnClick = { },
             )

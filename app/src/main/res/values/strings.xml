@@ -18,6 +18,7 @@
     <!-- OverviewScreen (os) -->
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
+    <string name="os_ad_rename_title">Rename List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->
     <string name="osbs_manage">Manage %1$s</string>
     <string name="osbs_rename">Rename</string>
