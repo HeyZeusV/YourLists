@@ -21,9 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +49,6 @@ fun ListScreen(
     }
 
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
-    var isNewList by remember { mutableStateOf(itemList.itemList.itemListId == 0L) }
 
     LaunchedEffect(key1 = itemList) {
         siSetUp(
@@ -61,23 +57,20 @@ fun ListScreen(
                 customTitle = itemList.itemList.name,
                 topBarNavPressed = { navController.navigateUp() },
                 isFabDisplayed = itemList.items.isNotEmpty(),
-                fabAction = { }
+                fabAction = { },
             )
         )
     }
     InputAlertDialog(
-        display = isNewList,
+        display = itemList.itemList.itemListId == 0L,
         onDismissRequest = { },
         title = sRes(R.string.ls_ad_title),
         maxLength = iRes(R.integer.title_max_length),
-        onConfirm = { input ->
-            isNewList = false
-            listVM.insertItemList(input)
-        }
+        onConfirm = { input -> listVM.insertItemList(input) },
     )
     ListScreen(
         itemList = itemList,
-        emptyButtonOnClick = { }
+        emptyButtonOnClick = { },
     )
 }
 

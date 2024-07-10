@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.list
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
@@ -14,10 +15,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repo: Repository
 ) : ViewModel() {
-
-    private val _itemList = MutableStateFlow(ItemListWithItems())
+    private val _itemList = MutableStateFlow(ItemListWithItems(ItemList(-1L, "")))
     val itemList = _itemList.asStateFlow()
 
     fun insertItemList(name: String) {
@@ -28,9 +29,13 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    fun getItemListWithId(id: Long) {
+    private fun getItemListWithId(id: Long) {
         viewModelScope.launch {
             _itemList.update { repo.getItemListWithId(id) ?: ItemListWithItems() }
         }
+    }
+
+    init {
+        getItemListWithId(checkNotNull(savedStateHandle["list_id"]))
     }
 }

@@ -80,7 +80,7 @@ fun YourLists(
         NavHost(
             navController = navController,
             startDestination = OverviewDestination.route,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
         ) {
             composable(OverviewDestination.route) {
                 val overviewVM: OverviewViewModel = hiltViewModel()
@@ -93,11 +93,8 @@ fun YourLists(
             composable(
                 route = ListDestination.routeWithArg,
                 arguments = ListDestination.arguments,
-            ) { navBackStackEntry ->
-                val listId = navBackStackEntry.arguments?.getLong(ListDestination.ID_ARG) ?: -1
-                val listVM: ListViewModel = hiltViewModel<ListViewModel>().apply {
-                    getItemListWithId(listId)
-                }
+            ) {
+                val listVM: ListViewModel = hiltViewModel<ListViewModel>()
 
                 ListScreen(
                     listVM = listVM,

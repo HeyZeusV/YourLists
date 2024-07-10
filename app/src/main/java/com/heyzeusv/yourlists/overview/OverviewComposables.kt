@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.overview
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -62,13 +63,14 @@ fun OverviewScreen(
             ScaffoldInfo(
                 destination = OverviewDestination,
                 isFabDisplayed = itemLists.isNotEmpty(),
-                fabAction = { navController.navigateToItemListWithId(-1) }
+                fabAction = { navController.navigateToItemListWithId(-1) },
             )
         )
     }
     OverviewScreen(
         itemLists = itemLists,
-        emptyButtonOnClick = { navController.navigateToItemListWithId(-1) }
+        itemListOnClick = { navController.navigateToItemListWithId(it) },
+        emptyButtonOnClick = { navController.navigateToItemListWithId(-1) },
     )
 }
 
@@ -76,6 +78,7 @@ fun OverviewScreen(
 @Composable
 fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
+    itemListOnClick: (Long) -> Unit,
     emptyButtonOnClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
@@ -91,7 +94,10 @@ fun OverviewScreen(
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
         ) {
             items(itemLists.reversed()) {
-                ListInfo(it)
+                ListInfo(
+                    itemList = it,
+                    itemListOnClick = itemListOnClick
+                )
             }
         }
     } else {
@@ -116,9 +122,12 @@ fun OverviewScreen(
 @Composable
 fun ListInfo(
     itemList: ItemListWithItems,
+    itemListOnClick: (Long) -> Unit,
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { itemListOnClick(itemList.itemList.itemListId) },
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
     ) {
         Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
@@ -205,6 +214,7 @@ private fun OverviewScreenPreview() {
         Preview {
             OverviewScreen(
                 itemLists = List(15) { halfCheckedItemList },
+                itemListOnClick = { },
                 emptyButtonOnClick = { },
             )
         }
@@ -218,6 +228,7 @@ private fun OverviewScreenEmptyPreview() {
         Preview {
             OverviewScreen(
                 itemLists = emptyList(),
+                itemListOnClick = { },
                 emptyButtonOnClick = { },
             )
         }
@@ -229,7 +240,10 @@ private fun OverviewScreenEmptyPreview() {
 private fun ListInfoPreview() {
     PreviewUtil.run {
         Preview {
-            ListInfo(halfCheckedItemList)
+            ListInfo(
+                itemList = halfCheckedItemList,
+                itemListOnClick = { }
+            )
         }
     }
 }
