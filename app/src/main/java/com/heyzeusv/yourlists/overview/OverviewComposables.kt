@@ -4,9 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.OverviewDestination
@@ -82,7 +81,7 @@ fun OverviewScreen(
     emptyButtonOnClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf<ItemList?>(null) }
     val sheetState = rememberModalBottomSheetState()
 
     if (itemLists.isNotEmpty()) {
@@ -96,7 +95,8 @@ fun OverviewScreen(
             items(itemLists.reversed()) {
                 ListInfo(
                     itemList = it,
-                    itemListOnClick = itemListOnClick
+                    itemListOnClick = itemListOnClick,
+                    optionOnClick = { iLId -> showBottomSheet = iLId },
                 )
             }
         }
@@ -108,13 +108,15 @@ fun OverviewScreen(
             buttonText = sRes(OverviewDestination.fabText)
         )
     }
-    if (showBottomSheet) {
-        ModalBottomSheet(onDismissRequest = { showBottomSheet = false },
+    if (showBottomSheet != null) {
+        ModalBottomSheet(onDismissRequest = { showBottomSheet = null },
             modifier = Modifier.fillMaxSize(),
             sheetState = sheetState,
             dragHandle = { },
         ) {
-            OverviewBottomSheetContent()
+            OverviewBottomSheetContent(
+                itemList = showBottomSheet!!
+            )
         }
     }
 }
@@ -123,6 +125,7 @@ fun OverviewScreen(
 fun ListInfo(
     itemList: ItemListWithItems,
     itemListOnClick: (Long) -> Unit,
+    optionOnClick: (ItemList) -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -147,6 +150,7 @@ fun ListInfo(
                     modifier = Modifier
                         .align(Alignment.Top)
                         .padding(top = dRes(R.dimen.osli_options_padding_top))
+                        .clickable { optionOnClick(itemList.itemList) },
                 )
             }
             Row(
@@ -170,14 +174,18 @@ fun ListInfo(
 
 @Composable
 fun OverviewBottomSheetContent(
+    itemList: ItemList,
 ) {
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.osbs_padding_all))
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_vertical_spacedBy)),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = sRes(R.string.osbs_manage, itemList.name),
+            style = MaterialTheme.typography.headlineMedium
+        )
         OverviewBottomSheetActions.entries.forEach {
             OverviewBottomSheetAction(action = it)
         }
@@ -187,16 +195,14 @@ fun OverviewBottomSheetContent(
 @Composable
 fun OverviewBottomSheetAction(action: OverviewBottomSheetActions) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_horizontal_spacedBy))
     ) {
         Icon(
             painter = pRes(action.iconId),
             contentDescription = sRes(action.iconCdescId),
-            modifier = Modifier.fillMaxHeight(),
+            modifier = Modifier.height(action.iconSize),
             tint = action.color
         )
         Text(
@@ -242,7 +248,8 @@ private fun ListInfoPreview() {
         Preview {
             ListInfo(
                 itemList = halfCheckedItemList,
-                itemListOnClick = { }
+                itemListOnClick = { },
+                optionOnClick = { },
             )
         }
     }
@@ -254,7 +261,7 @@ private fun OverviewBottomSheetPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                OverviewBottomSheetContent()
+                OverviewBottomSheetContent(halfCheckedItemList.itemList)
             }
         }
     }

@@ -19,6 +19,7 @@
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->
+    <string name="osbs_manage">Manage %1$s</string>
     <string name="osbs_rename">Rename</string>
     <string name="osbs_cdesc_rename">Rename this list.</string>
     <string name="osbs_copy">Copy</string>
