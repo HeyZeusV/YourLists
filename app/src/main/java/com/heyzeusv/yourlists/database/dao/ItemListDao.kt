@@ -3,11 +3,12 @@ package com.heyzeusv.yourlists.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ItemListDao {
+interface ItemListDao : BaseDao<ItemList> {
 
     @Transaction
     @Query("SELECT * " +

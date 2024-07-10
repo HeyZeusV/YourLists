@@ -28,7 +28,7 @@ class OverviewViewModel @Inject constructor(
 
     private fun getAllItemLists() {
         viewModelScope.launch {
-            repo.getAllItemListsWithItems().flowOn(Dispatchers.IO).collectLatest { lists ->
+            repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
                 _itemLists.update { lists }
             }
         }

@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.database
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import com.heyzeusv.yourlists.database.models.Category
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +17,10 @@ class RepositoryImpl @Inject constructor(
     /**
      *  ItemList Queries
      */
-    override fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>> =
+    override suspend fun insertItemList(vararg itemLists: ItemList): Long =
+        withContext(Dispatchers.IO) { itemListDao.insert(*itemLists).first() }
+
+    override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
     override suspend fun getItemListWithId(id: Long): ItemListWithItems? =

@@ -32,10 +32,10 @@ fun InputAlertDialog(
     title: String,
     maxLength: Int,
     onConfirm: (String) -> Unit,
-    onDismiss: (() -> Unit)?,
+    onDismiss: (() -> Unit)? = null,
 ) {
     var input by remember { mutableStateOf("") }
-    var isError by remember { mutableStateOf(true) }
+    var isError by remember { mutableStateOf(false) }
 
     if (display) {
         BasicAlertDialog(onDismissRequest = onDismissRequest) {

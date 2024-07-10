@@ -2,11 +2,13 @@ package com.heyzeusv.yourlists.util
 
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.IntegerRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -43,6 +45,16 @@ fun pRes(@DrawableRes id: Int): Painter = painterResource(id)
 @Composable
 @ReadOnlyComposable
 fun dRes(@DimenRes id: Int): Dp = dimensionResource(id)
+
+/**
+ *  Load a integer resource.
+ *
+ *  @param id The resource identifier.
+ *  @return The integer value associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun iRes(@IntegerRes id: Int): Int = integerResource(id)
 
 /**
  *  Navigates app to given route.

@@ -20,6 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,10 +31,13 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.ScaffoldInfo
 import com.heyzeusv.yourlists.util.dRes
+import com.heyzeusv.yourlists.util.iRes
+import com.heyzeusv.yourlists.util.sRes
 
 @Composable
 fun ListScreen(
@@ -42,15 +48,27 @@ fun ListScreen(
     BackHandler {
         navController.navigateUp()
     }
+
+    val itemList by listVM.itemList.collectAsStateWithLifecycle()
+    var isNewList by remember { mutableStateOf(itemList.itemList.itemListId == 0L) }
+
     siSetUp(
         ScaffoldInfo(
             destination = ListDestination,
+            customTitle = itemList.itemList.name,
             topBarNavPressed = { navController.navigateUp() },
         )
     )
-
-    val itemList by listVM.itemList.collectAsStateWithLifecycle()
-
+    InputAlertDialog(
+        display = isNewList,
+        onDismissRequest = { },
+        title = sRes(R.string.ls_ad_title),
+        maxLength = iRes(R.integer.title_max_length),
+        onConfirm = { input ->
+            isNewList = false
+            listVM.insertItemList(input)
+        }
+    )
     ListScreen(itemList = itemList)
 }
 
