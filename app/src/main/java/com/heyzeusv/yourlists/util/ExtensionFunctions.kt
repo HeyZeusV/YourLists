@@ -78,8 +78,10 @@ fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) 
  *  @param listId Id of ItemList to display.
  *  @param listName Name of ItemList to display.
  */
-fun NavHostController.navigateToItemList(listId: Long, listName: String) {
-    this.navigateSingleTopTo("${ListDestination.route}/$listId/$listName")
+fun NavHostController.navigateToItemList(listId: Long, listName: String?) {
+    ListDestination.let {
+        this.navigateSingleTopTo("${it.route}/$listId?${it.NAME_ARG}=$listName")
+    }
 }
 
 /**

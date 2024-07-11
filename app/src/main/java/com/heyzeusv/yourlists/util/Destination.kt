@@ -55,13 +55,17 @@ object ListDestination: Destination {
     override val fabIcon: ImageVector = Icons.Default.Add
     override val fabText: Int = R.string.ls_fab
 
-    const val ID_ARG = "list_id"
-    const val NAME_ARG = "list_name"
+    const val ID_ARG = "listId"
+    const val NAME_ARG = "listName"
     var arguments = listOf(
         navArgument(ID_ARG) { type = NavType.LongType },
-        navArgument(NAME_ARG) { type = NavType.StringType }
+        navArgument(NAME_ARG) {
+            type = NavType.StringType
+            nullable = true
+            defaultValue = null
+        },
     )
-    val routeWithArg = "$route/{$ID_ARG}/{$NAME_ARG}"
+    val routeWithArg = "$route/{$ID_ARG}?$NAME_ARG={$NAME_ARG}"
 }
 
 val Destinations = listOf(OverviewDestination, ListDestination)

@@ -3,6 +3,9 @@ package com.heyzeusv.yourlists
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,6 +47,7 @@ import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.currentDestination
+import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -95,10 +99,35 @@ fun YourLists(
             }
         }
     ) { paddingValues ->
+        val transitionDuration = iRes(R.integer.nav_transition_duration)
         NavHost(
             navController = navController,
             startDestination = OverviewDestination.route,
             modifier = Modifier.padding(paddingValues),
+            enterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(transitionDuration),
+                    initialOffsetX = { it }
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(transitionDuration),
+                    targetOffsetX = { -it }
+                )
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    animationSpec = tween(transitionDuration),
+                    initialOffsetX = { -it }
+                )
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    animationSpec = tween(transitionDuration),
+                    targetOffsetX = { it }
+                )
+            }
         ) {
             composable(OverviewDestination.route) {
                 val overviewVM: OverviewViewModel = hiltViewModel()
@@ -138,10 +167,11 @@ fun YourListsTopAppBar(
     onActionRightPressed: () -> Unit,
 ) {
     var isNavEnabled by remember { mutableStateOf(true) }
+    val transitionDuration = iRes(R.integer.nav_transition_duration)
 
     LaunchedEffect(key1 = destination) {
         isNavEnabled = false
-        delay(700)
+        delay(transitionDuration.toLong())
         isNavEnabled = true
     }
     TopAppBar(

@@ -1,6 +1,5 @@
 package com.heyzeusv.yourlists.overview
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -64,7 +63,6 @@ fun OverviewScreen(
     val topAppBarTitle = sRes(OverviewDestination.title)
 
     LaunchedEffect(key1 = Unit) {
-        Log.d("tag", "overview Launched")
         topAppBarSetup(
             TopAppBarState(
                 destination = OverviewDestination,
@@ -75,16 +73,15 @@ fun OverviewScreen(
     fabSetup(
         FabState(
             isFabDisplayed = itemLists.isNotEmpty(),
-            fabAction = { navController.navigateToItemList(-1, "") },
+            fabAction = { navController.navigateToItemList(-1, null) },
         )
     )
     OverviewScreen(
         itemLists = itemLists,
-        itemListOnClick = {
-                          id, name -> navController.navigateToItemList(id, name)
-            Log.d("tag", "overview itemListOnClick")
-                          },
-        emptyButtonOnClick = { navController.navigateToItemList(-1, "") },
+        itemListOnClick = { id, name ->
+            navController.navigateToItemList(id, name)
+        },
+        emptyButtonOnClick = { navController.navigateToItemList(-1, null) },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
