@@ -21,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,35 +48,54 @@ fun ListScreen(
     navController: NavHostController,
     topAppBarSetup: (TopAppBarState) -> Unit,
     fabSetup: (FabState) -> Unit,
-    topAppBarTitle: String,
+    topAppBarTitle: String?,
 ) {
     BackHandler {
         navController.navigateUp()
     }
 
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
+    var isNewList by remember { mutableStateOf(topAppBarTitle == null) }
+    val newListTitle = sRes(ListDestination.title)
 
     LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
             TopAppBarState(
                 destination = ListDestination,
-                title = topAppBarTitle,
+                title = topAppBarTitle ?: newListTitle,
                 onNavPressed = { navController.navigateUp() },
             )
         )
     }
-    fabSetup(
-        FabState(
-            isFabDisplayed = itemList.items.isNotEmpty(),
-            fabAction = { },
+    LaunchedEffect(key1 = itemList.items) {
+        // TODO Check this again once Items are able to be added
+        fabSetup(
+            FabState(
+                isFabDisplayed = itemList.items.isNotEmpty(),
+                fabAction = { },
+            )
         )
-    )
+    }
     InputAlertDialog(
-        display = itemList.itemList.itemListId == 0L,
+        display = isNewList,
         onDismissRequest = { },
         title = sRes(R.string.ls_ad_title),
         maxLength = iRes(R.integer.title_max_length),
-        onConfirm = { input -> listVM.insertItemList(input) },
+        onConfirm = { input ->
+            listVM.insertItemList(input)
+            topAppBarSetup(
+                TopAppBarState(
+                    destination = ListDestination,
+                    title = input,
+                    onNavPressed = { navController.navigateUp() },
+                )
+            )
+            isNewList = false
+        },
+        onDismiss = {
+            navController.navigateUp()
+            isNewList = false
+        }
     )
     ListScreen(
         itemList = itemList,
