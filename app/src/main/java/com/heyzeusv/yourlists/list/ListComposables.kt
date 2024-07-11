@@ -30,6 +30,7 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EmptyList
+import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -42,7 +43,8 @@ import com.heyzeusv.yourlists.util.sRes
 fun ListScreen(
     listVM: ListViewModel,
     navController: NavHostController,
-    siSetUp: (TopAppBarState) -> Unit,
+    topAppBarSetup: (TopAppBarState) -> Unit,
+    fabSetup: (FabState) -> Unit,
 ) {
     BackHandler {
         navController.navigateUp()
@@ -50,17 +52,21 @@ fun ListScreen(
 
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = itemList) {
-        siSetUp(
+    LaunchedEffect(key1 = Unit) {
+        topAppBarSetup(
             TopAppBarState(
                 destination = ListDestination,
-                title = itemList.itemList.name,
+                customTitle = itemList.itemList.name,
                 onNavPressed = { navController.navigateUp() },
-//                isFabDisplayed = itemList.items.isNotEmpty(),
-//                fabAction = { },
             )
         )
     }
+    fabSetup(
+        FabState(
+            isFabDisplayed = itemList.items.isNotEmpty(),
+            fabAction = { },
+        )
+    )
     InputAlertDialog(
         display = itemList.itemList.itemListId == 0L,
         onDismissRequest = { },

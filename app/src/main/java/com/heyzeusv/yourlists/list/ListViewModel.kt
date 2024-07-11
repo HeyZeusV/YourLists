@@ -19,6 +19,7 @@ class ListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val repo: Repository
 ) : ViewModel() {
+
     private val _itemList = MutableStateFlow(ItemListWithItems(ItemList(-1L, "")))
     val itemList = _itemList.asStateFlow()
 

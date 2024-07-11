@@ -38,6 +38,7 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EmptyList
+import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -52,22 +53,28 @@ import com.heyzeusv.yourlists.util.sRes
 fun OverviewScreen(
     overviewVM: OverviewViewModel,
     navController: NavHostController,
-    siSetUp: (TopAppBarState) -> Unit,
+    topAppBarSetup: (TopAppBarState) -> Unit,
+    fabSetup: (FabState) -> Unit,
 ) {
     BackHandler {
         navController.navigateUp()
     }
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
 
-    LaunchedEffect(key1 = itemLists.size) {
-        siSetUp(
+    LaunchedEffect(key1 = Unit) {
+        topAppBarSetup(
             TopAppBarState(
                 destination = OverviewDestination,
-//                isFabDisplayed = itemLists.isNotEmpty(),
-//                fabAction = { navController.navigateToItemListWithId(-1) },
+                customTitle = "",
             )
         )
     }
+    fabSetup(
+        FabState(
+            isFabDisplayed = itemLists.isNotEmpty(),
+            fabAction = { navController.navigateToItemListWithId(-1) },
+        )
+    )
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { navController.navigateToItemListWithId(it) },

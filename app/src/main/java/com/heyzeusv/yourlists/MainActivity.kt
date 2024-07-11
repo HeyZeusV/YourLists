@@ -70,7 +70,7 @@ fun YourLists(
         topBar = {
             YourListsTopAppBar(
                 destination = currentBackStack.currentDestination(),
-                title = topAppBarState.title,
+                title = topAppBarState.customTitle,
                 onNavPressed = { topAppBarState.onNavPressed.invoke() },
                 onActionLeftPressed = { topAppBarState.onActionLeftPressed.invoke() },
                 onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
@@ -102,7 +102,8 @@ fun YourLists(
                 OverviewScreen(
                     overviewVM = overviewVM,
                     navController = navController,
-                    siSetUp = { topAppBarState = it },
+                    topAppBarSetup = { topAppBarState = it },
+                    fabSetup = { fabState = it },
                 )
             }
             composable(
@@ -114,7 +115,8 @@ fun YourLists(
                 ListScreen(
                     listVM = listVM,
                     navController = navController,
-                    siSetUp = { topAppBarState = it },
+                    topAppBarSetup = { topAppBarState = it },
+                    fabSetup = { fabState = it }
                 )
             }
         }
@@ -130,10 +132,11 @@ fun YourListsTopAppBar(
     onActionLeftPressed: () -> Unit,
     onActionRightPressed: () -> Unit,
 ) {
+    val realTitle = title.ifBlank { sRes(destination.title) }
     TopAppBar(
         title = {
             Text(
-                text = title,
+                text = realTitle,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 style = MaterialTheme.typography.headlineSmall
