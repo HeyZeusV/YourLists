@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.currentDestination
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -135,6 +137,13 @@ fun YourListsTopAppBar(
     onActionLeftPressed: () -> Unit,
     onActionRightPressed: () -> Unit,
 ) {
+    var isNavEnabled by remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = destination) {
+        isNavEnabled = false
+        delay(700)
+        isNavEnabled = true
+    }
     TopAppBar(
         title = {
             Text(
@@ -147,7 +156,7 @@ fun YourListsTopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = onNavPressed,
-                enabled = destination != OverviewDestination,
+                enabled = destination != OverviewDestination && isNavEnabled,
                 colors = IconButtonDefaults.iconButtonColors(
                     disabledContentColor = MaterialTheme.colorScheme.onSurface
                 )

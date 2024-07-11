@@ -34,7 +34,7 @@ object OverviewDestination: Destination {
     override val route: String = "overview"
     override val title: Int = R.string.app_name
     override val navIcon: ImageVector = Icons.AutoMirrored.Filled.List
-    override val navDescription: Int = R.string.blank_string
+    override val navDescription: Int = R.string.app_name
     override val actionLeftIcon: ImageVector = Blank
     override val actionLeftDescription: Int = 0
     override val actionRightIcon: ImageVector = Blank
