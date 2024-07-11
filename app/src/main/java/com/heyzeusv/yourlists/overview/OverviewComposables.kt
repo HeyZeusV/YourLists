@@ -1,6 +1,5 @@
 package com.heyzeusv.yourlists.overview
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,9 +55,6 @@ fun OverviewScreen(
     topAppBarSetup: (TopAppBarState) -> Unit,
     fabSetup: (FabState) -> Unit,
 ) {
-    BackHandler {
-        navController.navigateUp()
-    }
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     val topAppBarTitle = sRes(OverviewDestination.title)
 
@@ -80,9 +76,7 @@ fun OverviewScreen(
     }
     OverviewScreen(
         itemLists = itemLists,
-        itemListOnClick = { id, name ->
-            navController.navigateToItemList(id, name)
-        },
+        itemListOnClick = { id, name -> navController.navigateToItemList(id, name) },
         emptyButtonOnClick = { navController.navigateToItemList(-1, null) },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,

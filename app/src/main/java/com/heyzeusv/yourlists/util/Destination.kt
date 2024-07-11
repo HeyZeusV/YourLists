@@ -68,6 +68,19 @@ object ListDestination: Destination {
     val routeWithArg = "$route/{$ID_ARG}?$NAME_ARG={$NAME_ARG}"
 }
 
+object AddDestination: Destination {
+    override val route: String = "add"
+    override val title: Int = R.string.as_item_title
+    override val navIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
+    override val navDescription: Int = R.string.navigate_back
+    override val actionLeftIcon: ImageVector = Blank
+    override val actionLeftDescription: Int = 0
+    override val actionRightIcon: ImageVector = Blank
+    override val actionRightDescription: Int = 0
+    override val fabIcon: ImageVector = Blank
+    override val fabText: Int = 0
+}
+
 val Destinations = listOf(OverviewDestination, ListDestination)
 
 val Blank: ImageVector get() = materialIcon(name = "Filled.Blank") { materialPath { } }

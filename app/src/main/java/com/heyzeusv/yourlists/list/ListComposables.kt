@@ -1,6 +1,5 @@
 package com.heyzeusv.yourlists.list
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,10 +49,6 @@ fun ListScreen(
     fabSetup: (FabState) -> Unit,
     topAppBarTitle: String?,
 ) {
-    BackHandler {
-        navController.navigateUp()
-    }
-
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     var isNewList by remember { mutableStateOf(topAppBarTitle == null) }
     val newListTitle = sRes(ListDestination.title)

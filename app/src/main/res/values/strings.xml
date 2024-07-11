@@ -3,6 +3,10 @@
     <string name="navigate_back">Navigate Back</string>
     <string name="button_cdesc_options">Displays additional options</string>
 
+    <!-- AddScreen (as) -->
+    <string name="as_item_title">Add Item</string>
+    <string name="as_list_title">Add List</string>
+
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>
     <string name="iad_confirm">Save</string>
