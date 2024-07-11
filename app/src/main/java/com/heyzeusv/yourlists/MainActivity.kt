@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -70,7 +71,7 @@ fun YourLists(
         topBar = {
             YourListsTopAppBar(
                 destination = currentBackStack.currentDestination(),
-                title = topAppBarState.customTitle,
+                title = topAppBarState.title,
                 onNavPressed = { topAppBarState.onNavPressed.invoke() },
                 onActionLeftPressed = { topAppBarState.onActionLeftPressed.invoke() },
                 onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
@@ -109,14 +110,16 @@ fun YourLists(
             composable(
                 route = ListDestination.routeWithArg,
                 arguments = ListDestination.arguments,
-            ) {
+            ) { bse ->
                 val listVM: ListViewModel = hiltViewModel<ListViewModel>()
-
+                val topAppBarTitle =
+                    bse.arguments?.getString(ListDestination.NAME_ARG) ?: sRes(ListDestination.title)
                 ListScreen(
                     listVM = listVM,
                     navController = navController,
                     topAppBarSetup = { topAppBarState = it },
-                    fabSetup = { fabState = it }
+                    fabSetup = { fabState = it },
+                    topAppBarTitle = topAppBarTitle,
                 )
             }
         }
@@ -132,24 +135,27 @@ fun YourListsTopAppBar(
     onActionLeftPressed: () -> Unit,
     onActionRightPressed: () -> Unit,
 ) {
-    val realTitle = title.ifBlank { sRes(destination.title) }
     TopAppBar(
         title = {
             Text(
-                text = realTitle,
+                text = title,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
                 style = MaterialTheme.typography.headlineSmall
             )
         },
         navigationIcon = {
-            if (destination.navDescription != 0) {
-                IconButton(onClick = onNavPressed) {
-                    Icon(
-                        imageVector = destination.navIcon,
-                        contentDescription = sRes(destination.navDescription)
-                    )
-                }
+            IconButton(
+                onClick = onNavPressed,
+                enabled = destination != OverviewDestination,
+                colors = IconButtonDefaults.iconButtonColors(
+                    disabledContentColor = MaterialTheme.colorScheme.onSurface
+                )
+            ) {
+                Icon(
+                    imageVector = destination.navIcon,
+                    contentDescription = sRes(destination.navDescription)
+                )
             }
         },
         actions = {

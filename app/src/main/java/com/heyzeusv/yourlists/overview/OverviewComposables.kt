@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.overview
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,7 +46,7 @@ import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
-import com.heyzeusv.yourlists.util.navigateToItemListWithId
+import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
 
@@ -60,25 +61,30 @@ fun OverviewScreen(
         navController.navigateUp()
     }
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
+    val topAppBarTitle = sRes(OverviewDestination.title)
 
     LaunchedEffect(key1 = Unit) {
+        Log.d("tag", "overview Launched")
         topAppBarSetup(
             TopAppBarState(
                 destination = OverviewDestination,
-                customTitle = "",
+                title = topAppBarTitle,
             )
         )
     }
     fabSetup(
         FabState(
             isFabDisplayed = itemLists.isNotEmpty(),
-            fabAction = { navController.navigateToItemListWithId(-1) },
+            fabAction = { navController.navigateToItemList(-1, "") },
         )
     )
     OverviewScreen(
         itemLists = itemLists,
-        itemListOnClick = { navController.navigateToItemListWithId(it) },
-        emptyButtonOnClick = { navController.navigateToItemListWithId(-1) },
+        itemListOnClick = {
+                          id, name -> navController.navigateToItemList(id, name)
+            Log.d("tag", "overview itemListOnClick")
+                          },
+        emptyButtonOnClick = { navController.navigateToItemList(-1, "") },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
@@ -89,7 +95,7 @@ fun OverviewScreen(
 @Composable
 fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
-    itemListOnClick: (Long) -> Unit,
+    itemListOnClick: (Long, String) -> Unit,
     emptyButtonOnClick: () -> Unit,
     optionRenameOnClick: (ItemList, String) -> Unit,
     optionCopyOnClick: (ItemListWithItems) -> Unit,
@@ -163,13 +169,13 @@ fun OverviewScreen(
 @Composable
 fun ListInfo(
     itemList: ItemListWithItems,
-    itemListOnClick: (Long) -> Unit,
+    itemListOnClick: (Long, String) -> Unit,
     optionOnClick: (ItemListWithItems) -> Unit,
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { itemListOnClick(itemList.itemList.itemListId) },
+            .clickable { itemListOnClick(itemList.itemList.itemListId, itemList.itemList.name) },
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
     ) {
         Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
@@ -276,7 +282,7 @@ private fun OverviewScreenPreview() {
         Preview {
             OverviewScreen(
                 itemLists = List(15) { halfCheckedItemList },
-                itemListOnClick = { },
+                itemListOnClick = { _, _ -> },
                 emptyButtonOnClick = { },
                 optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
@@ -293,7 +299,7 @@ private fun OverviewScreenEmptyPreview() {
         Preview {
             OverviewScreen(
                 itemLists = emptyList(),
-                itemListOnClick = { },
+                itemListOnClick = { _, _ -> },
                 emptyButtonOnClick = { },
                 optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
@@ -310,7 +316,7 @@ private fun ListInfoPreview() {
         Preview {
             ListInfo(
                 itemList = halfCheckedItemList,
-                itemListOnClick = { },
+                itemListOnClick = { _, _ -> },
                 optionOnClick = { },
             )
         }

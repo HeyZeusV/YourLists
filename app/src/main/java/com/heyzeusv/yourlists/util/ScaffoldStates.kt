@@ -2,7 +2,7 @@ package com.heyzeusv.yourlists.util
 
 data class TopAppBarState(
     val destination: Destination = OverviewDestination,
-    val customTitle: String = "",
+    val title: String = "",
     val onNavPressed: () -> Unit = { },
     val onActionLeftPressed: () -> Unit = { },
     val onActionRightPressed: () -> Unit = { },

@@ -45,6 +45,7 @@ fun ListScreen(
     navController: NavHostController,
     topAppBarSetup: (TopAppBarState) -> Unit,
     fabSetup: (FabState) -> Unit,
+    topAppBarTitle: String,
 ) {
     BackHandler {
         navController.navigateUp()
@@ -56,7 +57,7 @@ fun ListScreen(
         topAppBarSetup(
             TopAppBarState(
                 destination = ListDestination,
-                customTitle = itemList.itemList.name,
+                title = topAppBarTitle,
                 onNavPressed = { navController.navigateUp() },
             )
         )

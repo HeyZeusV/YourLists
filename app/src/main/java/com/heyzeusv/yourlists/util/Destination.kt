@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.util
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
@@ -32,8 +33,8 @@ interface Destination {
 object OverviewDestination: Destination {
     override val route: String = "overview"
     override val title: Int = R.string.app_name
-    override val navIcon: ImageVector = Blank
-    override val navDescription: Int = 0
+    override val navIcon: ImageVector = Icons.AutoMirrored.Filled.List
+    override val navDescription: Int = R.string.blank_string
     override val actionLeftIcon: ImageVector = Blank
     override val actionLeftDescription: Int = 0
     override val actionRightIcon: ImageVector = Blank
@@ -55,10 +56,12 @@ object ListDestination: Destination {
     override val fabText: Int = R.string.ls_fab
 
     const val ID_ARG = "list_id"
+    const val NAME_ARG = "list_name"
     var arguments = listOf(
-        navArgument(ID_ARG) { type = NavType.LongType }
+        navArgument(ID_ARG) { type = NavType.LongType },
+        navArgument(NAME_ARG) { type = NavType.StringType }
     )
-    val routeWithArg = "$route/{$ID_ARG}"
+    val routeWithArg = "$route/{$ID_ARG}/{$NAME_ARG}"
 }
 
 val Destinations = listOf(OverviewDestination, ListDestination)
