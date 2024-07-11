@@ -44,7 +44,7 @@ object OverviewDestination: Destination {
 
 object ListDestination: Destination {
     override val route: String = "list"
-    override val title: Int = 0
+    override val title: Int = R.string.ls_title
     override val navIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
     override val navDescription: Int = R.string.navigate_back
     override val actionLeftIcon: ImageVector = Blank
@@ -60,5 +60,7 @@ object ListDestination: Destination {
     )
     val routeWithArg = "$route/{$ID_ARG}"
 }
+
+val Destinations = listOf(OverviewDestination, ListDestination)
 
 val Blank: ImageVector get() = materialIcon(name = "Filled.Blank") { materialPath { } }

@@ -11,6 +11,7 @@
     <string name="iad_error">Can\'t be blank!</string>
 
     <!-- ListScreen (ls) -->
+    <string name="ls_title">New List</string>
     <string name="ls_empty">Add a single item or an existing list!</string>
     <string name="ls_ad_title">New List</string>
     <string name="ls_fab">Add</string>

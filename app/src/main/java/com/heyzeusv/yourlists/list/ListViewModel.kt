@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,6 @@ class ListViewModel @Inject constructor(
     }
 
     init {
-        getItemListWithId(checkNotNull(savedStateHandle["list_id"]))
+        getItemListWithId(checkNotNull(savedStateHandle[ListDestination.ID_ARG]))
     }
 }

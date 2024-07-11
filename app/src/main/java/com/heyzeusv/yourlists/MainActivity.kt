@@ -28,16 +28,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.heyzeusv.yourlists.list.ListScreen
 import com.heyzeusv.yourlists.list.ListViewModel
 import com.heyzeusv.yourlists.overview.OverviewScreen
 import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
+import com.heyzeusv.yourlists.util.Destination
+import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.ScaffoldInfo
+import com.heyzeusv.yourlists.util.TopAppBarState
+import com.heyzeusv.yourlists.util.currentDestination
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -57,23 +61,33 @@ class MainActivity : ComponentActivity() {
 fun YourLists(
     navController: NavHostController = rememberNavController()
 ) {
-    var si by remember { mutableStateOf(ScaffoldInfo()) }
+    val currentBackStack by navController.currentBackStackEntryAsState()
+    var topAppBarState by remember { mutableStateOf(TopAppBarState()) }
+    var fabState by remember { mutableStateOf(FabState()) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { YourListsTopAppBar(si = si) },
+        topBar = {
+            YourListsTopAppBar(
+                destination = currentBackStack.currentDestination(),
+                title = topAppBarState.title,
+                onNavPressed = { topAppBarState.onNavPressed.invoke() },
+                onActionLeftPressed = { topAppBarState.onActionLeftPressed.invoke() },
+                onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
+            )
+        },
         floatingActionButton = {
-            if (si.isFabDisplayed) {
+            if (fabState.isFabDisplayed) {
                 ExtendedFloatingActionButton(
-                    text = { Text(text = sRes(si.destination.fabText)) },
+                    text = { Text(text = sRes(topAppBarState.destination.fabText)) },
                     icon = {
                         Icon(
-                            imageVector = si.destination.fabIcon,
-                            contentDescription = sRes(si.destination.fabText)
+                            imageVector = topAppBarState.destination.fabIcon,
+                            contentDescription = sRes(topAppBarState.destination.fabText)
                         )
                     },
                     modifier = Modifier.height(48.dp),
-                    onClick = si.fabAction,
+                    onClick = fabState.fabAction,
                 )
             }
         }
@@ -88,7 +102,7 @@ fun YourLists(
                 OverviewScreen(
                     overviewVM = overviewVM,
                     navController = navController,
-                    siSetUp = { si = it },
+                    siSetUp = { topAppBarState = it },
                 )
             }
             composable(
@@ -100,7 +114,7 @@ fun YourLists(
                 ListScreen(
                     listVM = listVM,
                     navController = navController,
-                    siSetUp = { si = it },
+                    siSetUp = { topAppBarState = it },
                 )
             }
         }
@@ -109,8 +123,13 @@ fun YourLists(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun YourListsTopAppBar(si: ScaffoldInfo) {
-    val title = if (si.destination.title != 0) sRes(si.destination.title) else si.customTitle
+fun YourListsTopAppBar(
+    destination: Destination,
+    title: String,
+    onNavPressed: () -> Unit,
+    onActionLeftPressed: () -> Unit,
+    onActionRightPressed: () -> Unit,
+) {
     TopAppBar(
         title = {
             Text(
@@ -121,29 +140,29 @@ fun YourListsTopAppBar(si: ScaffoldInfo) {
             )
         },
         navigationIcon = {
-            if (si.destination.navDescription != 0) {
-                IconButton(onClick = si.topBarNavPressed) {
+            if (destination.navDescription != 0) {
+                IconButton(onClick = onNavPressed) {
                     Icon(
-                        imageVector = si.destination.navIcon,
-                        contentDescription = sRes(si.destination.navDescription)
+                        imageVector = destination.navIcon,
+                        contentDescription = sRes(destination.navDescription)
                     )
                 }
             }
         },
         actions = {
-            if (si.destination.actionLeftDescription != 0) {
-                IconButton(onClick = si.topBarActionLeftPressed) {
+            if (destination.actionLeftDescription != 0) {
+                IconButton(onClick = onActionLeftPressed) {
                     Icon(
-                        imageVector = si.destination.actionLeftIcon,
-                        contentDescription = sRes(si.destination.actionLeftDescription)
+                        imageVector = destination.actionLeftIcon,
+                        contentDescription = sRes(destination.actionLeftDescription)
                     )
                 }
             }
-            if (si.destination.actionRightDescription != 0) {
-                IconButton(onClick = si.topBarActionRightPressed) {
+            if (destination.actionRightDescription != 0) {
+                IconButton(onClick = onActionRightPressed) {
                     Icon(
-                        imageVector = si.destination.actionRightIcon,
-                        contentDescription = sRes(si.destination.actionRightDescription)
+                        imageVector = destination.actionRightIcon,
+                        contentDescription = sRes(destination.actionRightDescription)
                     )
                 }
             }
@@ -159,6 +178,12 @@ fun YourListsTopAppBar(si: ScaffoldInfo) {
 @Composable
 fun YourListsTopAppBarPreview() {
     PreviewUtil.Preview {
-        YourListsTopAppBar(si = ScaffoldInfo())
+        YourListsTopAppBar(
+            destination = OverviewDestination,
+            title = sRes(OverviewDestination.title),
+            onNavPressed = { },
+            onActionLeftPressed = { },
+            onActionRightPressed = { },
+        )
     }
 }

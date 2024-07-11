@@ -33,7 +33,7 @@ import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.ScaffoldInfo
+import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.sRes
@@ -42,7 +42,7 @@ import com.heyzeusv.yourlists.util.sRes
 fun ListScreen(
     listVM: ListViewModel,
     navController: NavHostController,
-    siSetUp: (ScaffoldInfo) -> Unit,
+    siSetUp: (TopAppBarState) -> Unit,
 ) {
     BackHandler {
         navController.navigateUp()
@@ -52,12 +52,12 @@ fun ListScreen(
 
     LaunchedEffect(key1 = itemList) {
         siSetUp(
-            ScaffoldInfo(
+            TopAppBarState(
                 destination = ListDestination,
-                customTitle = itemList.itemList.name,
-                topBarNavPressed = { navController.navigateUp() },
-                isFabDisplayed = itemList.items.isNotEmpty(),
-                fabAction = { },
+                title = itemList.itemList.name,
+                onNavPressed = { navController.navigateUp() },
+//                isFabDisplayed = itemList.items.isNotEmpty(),
+//                fabAction = { },
             )
         )
     }

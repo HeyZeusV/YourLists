@@ -12,6 +12,7 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
@@ -80,3 +81,14 @@ fun NavHostController.navigateToItemListWithId(listId: Long) {
     this.navigateSingleTopTo("${ListDestination.route}/$listId")
 }
 
+/**
+ *  Searches for the currently displayed [Destination] by comparing the current route in back stack
+ *  to all available routes.
+ *
+ *  @return The current [Destination] displayed on screen.
+ */
+fun NavBackStackEntry?.currentDestination(): Destination {
+    return Destinations.find {
+        this?.destination?.route?.contains(it.route) ?: false
+    } ?: OverviewDestination
+}

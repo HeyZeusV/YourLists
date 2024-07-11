@@ -41,7 +41,7 @@ import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.ScaffoldInfo
+import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemListWithId
@@ -52,7 +52,7 @@ import com.heyzeusv.yourlists.util.sRes
 fun OverviewScreen(
     overviewVM: OverviewViewModel,
     navController: NavHostController,
-    siSetUp: (ScaffoldInfo) -> Unit,
+    siSetUp: (TopAppBarState) -> Unit,
 ) {
     BackHandler {
         navController.navigateUp()
@@ -61,10 +61,10 @@ fun OverviewScreen(
 
     LaunchedEffect(key1 = itemLists.size) {
         siSetUp(
-            ScaffoldInfo(
+            TopAppBarState(
                 destination = OverviewDestination,
-                isFabDisplayed = itemLists.isNotEmpty(),
-                fabAction = { navController.navigateToItemListWithId(-1) },
+//                isFabDisplayed = itemLists.isNotEmpty(),
+//                fabAction = { navController.navigateToItemListWithId(-1) },
             )
         )
     }
