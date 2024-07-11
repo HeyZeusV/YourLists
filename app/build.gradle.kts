@@ -49,6 +49,9 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
         }
+        debug {
+            applicationIdSuffix = ".dev"
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

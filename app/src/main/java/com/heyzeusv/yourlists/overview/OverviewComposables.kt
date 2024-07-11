@@ -70,12 +70,14 @@ fun OverviewScreen(
             )
         )
     }
-    fabSetup(
-        FabState(
-            isFabDisplayed = itemLists.isNotEmpty(),
-            fabAction = { navController.navigateToItemList(-1, null) },
+    LaunchedEffect(key1 = itemLists) {
+        fabSetup(
+            FabState(
+                isFabDisplayed = itemLists.isNotEmpty(),
+                fabAction = { navController.navigateToItemList(-1, null) },
+            )
         )
-    )
+    }
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { id, name ->
