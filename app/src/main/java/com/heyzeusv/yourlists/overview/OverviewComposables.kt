@@ -124,7 +124,8 @@ fun OverviewScreen(
         )
     }
     if (showBottomSheet != null) {
-        ModalBottomSheet(onDismissRequest = { showBottomSheet = null },
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = null },
             modifier = Modifier.fillMaxSize(),
             sheetState = sheetState,
             dragHandle = { },
@@ -219,9 +220,9 @@ fun OverviewBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
-            .padding(all = dRes(R.dimen.osbs_padding_all))
+            .padding(all = dRes(R.dimen.bs_padding_all))
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_vertical_spacedBy)),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
     ) {
         Text(
             text = sRes(R.string.osbs_manage, itemList.itemList.name),
@@ -252,7 +253,7 @@ fun OverviewBottomSheetAction(
             .fillMaxWidth()
             .clickable { actionOnClick() },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osbs_horizontal_spacedBy))
+        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))
     ) {
         Icon(
             painter = pRes(action.iconId),

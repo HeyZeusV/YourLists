@@ -6,6 +6,11 @@
     <dimen name="as_padding_all">16.dp</dimen>
     <dimen name="as_query_padding_bottom">12.dp</dimen>
 
+    <!-- BottomSheet (bs) -->
+    <dimen name="bs_padding_all">16.dp</dimen>
+    <dimen name="bs_vertical_spacedBy">16.dp</dimen>
+    <dimen name="bs_horizontal_spacedBy">12.dp</dimen>
+
     <!-- EmptyList (el) -->
     <dimen name="el_icon_size">36.dp</dimen>
     <dimen name="el_padding_horizontal">16.dp</dimen>
@@ -17,14 +22,15 @@
     <dimen name="iad_input_padding_bottom">8.dp</dimen>
     <dimen name="iad_buttons_spacedBy">8.dp</dimen>
 
+    <!-- ItemInfo (if) -->
+    <dimen name="if_height_min">40.dp</dimen>
+    <dimen name="if_padding_horizontal">8.dp</dimen>
+    <dimen name="if_padding_vertical">4.dp</dimen>
+    <dimen name="if_spacedBy">4.dp</dimen>
+
     <!-- ListScreen (ls) -->
     <dimen name="ls_list_padding_all">12.dp</dimen>
     <dimen name="ls_list_spacedBy">8.dp</dimen>
-    <!-- ListScreen.ItemInfo (lsif) -->
-    <dimen name="lsif_height_min">40.dp</dimen>
-    <dimen name="lsif_padding_horizontal">8.dp</dimen>
-    <dimen name="lsif_padding_vertical">4.dp</dimen>
-    <dimen name="lsif_spacedBy">4.dp</dimen>
 
     <!-- OverviewScreen (os) -->
     <dimen name="os_lists_padding_all">8.dp</dimen>
@@ -34,8 +40,4 @@
     <dimen name="osli_padding_all">12.dp</dimen>
     <dimen name="osli_progress_height">8.dp</dimen>
     <dimen name="osli_progress_spacedBy">12.dp</dimen>
-    <!-- OverviewScreen.BottomSheet (osbs) -->
-    <dimen name="osbs_padding_all">16.dp</dimen>
-    <dimen name="osbs_vertical_spacedBy">16.dp</dimen>
-    <dimen name="osbs_horizontal_spacedBy">12.dp</dimen>
 </resources>

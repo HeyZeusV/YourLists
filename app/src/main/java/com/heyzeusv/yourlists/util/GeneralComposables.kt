@@ -76,12 +76,12 @@ fun ItemInfo(
         Row(
             modifier = Modifier
                 .padding(
-                    horizontal = dRes(R.dimen.lsif_padding_horizontal),
-                    vertical = dRes(R.dimen.lsif_padding_vertical)
+                    horizontal = dRes(R.dimen.if_padding_horizontal),
+                    vertical = dRes(R.dimen.if_padding_vertical)
                 )
-                .heightIn(min = dRes(R.dimen.lsif_height_min))
+                .heightIn(min = dRes(R.dimen.if_height_min))
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.lsif_spacedBy)),
+            horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.if_spacedBy)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (item is Item) {

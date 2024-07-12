@@ -1,21 +1,34 @@
 package com.heyzeusv.yourlists.add
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +80,7 @@ fun AddScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
      defaultItemQuery: String,
@@ -76,6 +90,8 @@ fun AddScreen(
 ) {
     val listState = rememberLazyListState()
     val maxLength = iRes(R.integer.name_max_length)
+    var showBottomSheet by remember { mutableStateOf<DefaultItem?>(null) }
+    val sheetState = rememberModalBottomSheetState()
 
     Column(
         modifier = Modifier
@@ -109,6 +125,27 @@ fun AddScreen(
             },
             singleLine = true,
         )
+        if (defaultItemQuery.isNotBlank()) {
+            Surface(
+                modifier = Modifier
+                    .padding(bottom = dRes(R.dimen.if_spacedBy))
+                    .fillMaxWidth()
+                    .heightIn(dRes(R.dimen.if_height_min))
+                    .align(Alignment.CenterHorizontally)
+                    .clickable { },
+            ) {
+                Box(contentAlignment = Alignment.CenterStart) {
+                    Text(
+                        text = sRes(R.string.as_add_new, defaultItemQuery),
+                        modifier = Modifier.padding(
+                            horizontal = dRes(R.dimen.if_padding_horizontal),
+                            vertical = dRes(R.dimen.if_padding_vertical)
+                        ),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            }
+        }
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
@@ -116,6 +153,49 @@ fun AddScreen(
         ) {
             items(defaultItems) {
                 ItemInfo(item = it)
+            }
+        }
+        if (showBottomSheet != null) {
+            ModalBottomSheet(
+                onDismissRequest = { showBottomSheet = null },
+                modifier = Modifier.fillMaxSize(),
+                sheetState = sheetState,
+                dragHandle = { },
+            ) {
+                
+            }
+        }
+    }
+}
+
+@Composable
+fun AddBottomSheetContent(
+
+) {
+    var name by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier
+            .padding(all = dRes(R.dimen.bs_padding_all))
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy))
+    ) {
+        TextField(value = name, onValueChange = { name = it })
+        Column {
+            TextField(value = category, onValueChange = { category = it })
+            DropdownMenu(expanded = false, onDismissRequest = { /*TODO*/ }) {
+                
+            }
+        }
+        Row {
+            TextField(value = quantity, onValueChange = { quantity = it } )
+            Column {
+                TextField(value = unit, onValueChange = { unit = it })
+                DropdownMenu(expanded = false, onDismissRequest = { /*TODO*/ }) {
+                    
+                }
             }
         }
     }
@@ -147,6 +227,18 @@ private fun AddScreenBlankQueryPreview() {
                 defaultItems = defaultItemList,
                 itemLists = emptyList(),
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AddBottomSheetContentPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                AddBottomSheetContent()
+            }
         }
     }
 }

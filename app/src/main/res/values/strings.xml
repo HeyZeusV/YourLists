@@ -8,6 +8,7 @@
     <string name="as_list_title">Add List</string>
     <string name="as_item_query_placeholder">Add Item</string>
     <string name="as_query_clear">Clear query</string>
+    <string name="as_add_new">Add %1$s</string>
 
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>
