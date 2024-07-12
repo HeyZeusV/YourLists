@@ -7,9 +7,11 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
@@ -29,8 +31,9 @@ class AddViewModel @Inject constructor(
         _defaultItemQuery.update { verbatimQuery }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val defaultItems = _defaultItemQuery
+        .debounce(300)
         .flatMapLatest { query ->
             if (query.isBlank()) {
                 repo.getAllDefaultItems()

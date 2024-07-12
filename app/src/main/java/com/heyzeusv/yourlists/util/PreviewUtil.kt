@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
@@ -42,6 +43,14 @@ object PreviewUtil {
         itemList = ItemList(0L, "Empty List"),
         items = emptyList()
     )
+    val defaultItem = DefaultItem(
+        itemId = 0L,
+        name = "DefaultItem DefaultItem DefaultItem DefaultItem DefaultItem",
+        category = "Preview",
+        quantity = 3.33,
+        unit = "Unit",
+    )
+    val defaultItemList = List(10) { defaultItem }
 
     @Composable
     fun Preview(content: @Composable () -> Unit) {

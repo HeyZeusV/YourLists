@@ -150,7 +150,7 @@ fun OverviewScreen(
         display = showRenameAlertDialog != null,
         onDismissRequest = { showRenameAlertDialog = null },
         title = sRes(R.string.os_ad_rename_title),
-        maxLength = iRes(R.integer.title_max_length),
+        maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
             optionRenameOnClick(showRenameAlertDialog!!, input)
             showRenameAlertDialog = null

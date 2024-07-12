@@ -2,6 +2,10 @@
 <resources>
     <dimen name="card_radius">8.dp</dimen>
 
+    <!-- AddScreen (as) -->
+    <dimen name="as_padding_all">16.dp</dimen>
+    <dimen name="as_query_padding_bottom">12.dp</dimen>
+
     <!-- EmptyList (el) -->
     <dimen name="el_icon_size">36.dp</dimen>
     <dimen name="el_padding_horizontal">16.dp</dimen>
