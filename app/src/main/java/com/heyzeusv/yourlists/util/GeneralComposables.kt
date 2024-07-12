@@ -97,10 +97,16 @@ fun ItemInfo(
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium
             )
-            Text(
-                text = "${item.quantity} ${item.unit}",
-                style = MaterialTheme.typography.bodySmall
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = item.category,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "${item.quantity} ${item.unit}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
