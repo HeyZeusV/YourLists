@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
@@ -39,6 +40,7 @@ import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
+import com.heyzeusv.yourlists.util.navigateSingleTopTo
 import com.heyzeusv.yourlists.util.sRes
 
 @Composable
@@ -67,7 +69,7 @@ fun ListScreen(
         fabSetup(
             FabState(
                 isFabDisplayed = itemList.items.isNotEmpty(),
-                fabAction = { },
+                fabAction = { navController.navigateSingleTopTo(AddDestination.route) },
             )
         )
     }
@@ -94,7 +96,7 @@ fun ListScreen(
     )
     ListScreen(
         itemList = itemList,
-        emptyButtonOnClick = { },
+        emptyButtonOnClick = { navController.navigateSingleTopTo(AddDestination.route) },
     )
 }
 

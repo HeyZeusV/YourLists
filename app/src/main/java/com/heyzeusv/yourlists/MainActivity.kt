@@ -35,11 +35,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.heyzeusv.yourlists.add.AddScreen
+import com.heyzeusv.yourlists.add.AddViewModel
 import com.heyzeusv.yourlists.list.ListScreen
 import com.heyzeusv.yourlists.list.ListViewModel
 import com.heyzeusv.yourlists.overview.OverviewScreen
 import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
+import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.Destination
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ListDestination
@@ -104,30 +107,10 @@ fun YourLists(
             navController = navController,
             startDestination = OverviewDestination.route,
             modifier = Modifier.padding(paddingValues),
-            enterTransition = {
-                slideInHorizontally(
-                    animationSpec = tween(transitionDuration),
-                    initialOffsetX = { it }
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    animationSpec = tween(transitionDuration),
-                    targetOffsetX = { -it }
-                )
-            },
-            popEnterTransition = {
-                slideInHorizontally(
-                    animationSpec = tween(transitionDuration),
-                    initialOffsetX = { -it }
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    animationSpec = tween(transitionDuration),
-                    targetOffsetX = { it }
-                )
-            }
+            enterTransition = { slideInHorizontally(tween(transitionDuration)) { it } },
+            exitTransition = { slideOutHorizontally(tween(transitionDuration)) { -it } },
+            popEnterTransition = { slideInHorizontally(tween(transitionDuration)) { -it } },
+            popExitTransition = { slideOutHorizontally(tween(transitionDuration)) { it } }
         ) {
             composable(OverviewDestination.route) {
                 val overviewVM: OverviewViewModel = hiltViewModel()
@@ -142,7 +125,7 @@ fun YourLists(
                 route = ListDestination.routeWithArg,
                 arguments = ListDestination.arguments,
             ) { bse ->
-                val listVM: ListViewModel = hiltViewModel<ListViewModel>()
+                val listVM: ListViewModel = hiltViewModel()
                 val topAppBarTitle = bse.arguments?.getString(ListDestination.NAME_ARG)
                 ListScreen(
                     listVM = listVM,
@@ -150,6 +133,15 @@ fun YourLists(
                     topAppBarSetup = { topAppBarState = it },
                     fabSetup = { fabState = it },
                     topAppBarTitle = topAppBarTitle,
+                )
+            }
+            composable(AddDestination.route) {
+                val addVM: AddViewModel = hiltViewModel()
+                AddScreen(
+                    addVM = addVM,
+                    navController = navController,
+                    topAppBarSetup = { topAppBarState = it },
+                    fabSetup = { fabState = it }
                 )
             }
         }

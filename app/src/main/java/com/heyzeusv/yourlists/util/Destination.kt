@@ -81,6 +81,6 @@ object AddDestination: Destination {
     override val fabText: Int = 0
 }
 
-val Destinations = listOf(OverviewDestination, ListDestination)
+val Destinations = listOf(OverviewDestination, ListDestination, AddDestination)
 
 val Blank: ImageVector get() = materialIcon(name = "Filled.Blank") { materialPath { } }

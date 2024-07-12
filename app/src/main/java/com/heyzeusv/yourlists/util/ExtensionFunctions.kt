@@ -63,8 +63,6 @@ fun iRes(@IntegerRes id: Int): Int = integerResource(id)
  *  @param route [Destination] to navigate to.
  */
 fun NavHostController.navigateSingleTopTo(route: String) = this.navigate(route) {
-    // pressing back from any screen would pop back stack to Overview
-    popUpTo(this@navigateSingleTopTo.graph.findStartDestination().id) { saveState = true }
     // only 1 copy of a destination is ever created
     launchSingleTop = true
     // previous data and state is saved
