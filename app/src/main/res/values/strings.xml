@@ -9,6 +9,12 @@
     <string name="as_item_query_placeholder">Add Item</string>
     <string name="as_query_clear">Clear query</string>
     <string name="as_add_new">Add %1$s</string>
+    <!-- AddScreen.BottomSheet (asbs) -->
+    <string name="asbs_name">Item Name</string>
+    <string name="asbs_category">Category</string>
+    <string name="asbs_quantity">Quantity</string>
+    <string name="asbs_unit">Unit</string>
+    <string name="asbs_memo">Memo</string>
 
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>

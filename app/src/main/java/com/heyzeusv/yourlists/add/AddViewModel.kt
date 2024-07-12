@@ -25,11 +25,7 @@ class AddViewModel @Inject constructor(
 
     private val _defaultItemQuery = MutableStateFlow("")
     val defaultItemQuery = _defaultItemQuery.asStateFlow()
-    fun updateDefaultItemQuery(query: String) {
-        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), ("\"\""))
-        val verbatimQuery = "*\"$queryWithEscapedQuotes\"*"
-        _defaultItemQuery.update { verbatimQuery }
-    }
+    fun updateDefaultItemQuery(query: String) { _defaultItemQuery.update { query } }
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val defaultItems = _defaultItemQuery
@@ -38,7 +34,8 @@ class AddViewModel @Inject constructor(
             if (query.isBlank()) {
                 repo.getAllDefaultItems()
             } else {
-                repo.searchDefaultItems(query)
+                val cleanQuery = cleanQuery(query)
+                repo.searchDefaultItems(cleanQuery)
             }
         }
 
@@ -47,6 +44,12 @@ class AddViewModel @Inject constructor(
 
     init {
         getAllItemLists()
+    }
+
+    private fun cleanQuery(query: String): String {
+        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), ("\"\""))
+        val verbatimQuery = "*\"$queryWithEscapedQuotes\"*"
+        return verbatimQuery
     }
 
     private fun getAllItemLists() {

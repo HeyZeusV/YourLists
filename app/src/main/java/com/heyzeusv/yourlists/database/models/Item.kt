@@ -71,12 +71,12 @@ data class Item(
 )
 data class DefaultItem(
     @PrimaryKey(autoGenerate = true)
-    override val itemId: Long,
-    override val name: String,
-    override val category: String,
-    override val quantity: Double,
-    override val unit: String,
-    override val memo: String,
+    override val itemId: Long = 0L,
+    override val name: String = "",
+    override val category: String = "",
+    override val quantity: Double = 0.0,
+    override val unit: String = "",
+    override val memo: String = "",
 ) : BaseItem
 
 @Fts4(contentEntity = DefaultItem::class)

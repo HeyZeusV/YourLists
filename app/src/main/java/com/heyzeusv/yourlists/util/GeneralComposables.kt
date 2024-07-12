@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.util
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,9 +71,10 @@ fun EmptyList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemInfo(
-    item: BaseItem
+    item: BaseItem,
+    surfaceOnClick: () -> Unit = { },
 ) {
-    Surface {
+    Surface(modifier = Modifier.clickable { surfaceOnClick() }) {
         Row(
             modifier = Modifier
                 .padding(
