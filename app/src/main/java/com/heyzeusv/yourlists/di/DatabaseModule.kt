@@ -2,8 +2,11 @@ package com.heyzeusv.yourlists.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.heyzeusv.yourlists.database.Database
 import com.heyzeusv.yourlists.database.dao.CategoryDao
+import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -20,6 +23,9 @@ object DatabaseModule {
     fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
 
     @Provides
+    fun provideDefaultItemDao(database: Database): DefaultItemDao = database.defaultItemDao()
+
+    @Provides
     fun provideCategoryDao(database: Database): CategoryDao = database.categoryDao()
 
     @Provides
@@ -31,6 +37,12 @@ object DatabaseModule {
             "YourListsDatabase.db"
         )
             .createFromAsset("YourListsInitDatabase.db")
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    db.execSQL("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
+                }
+            })
             .build()
     }
 }

@@ -7,6 +7,7 @@ import com.heyzeusv.yourlists.database.models.Category
 @Dao
 interface CategoryDao {
 
-    @Query("SELECT * FROM Category")
+    @Query("SELECT * " +
+            "FROM Category")
     fun getAllCategories(): List<Category>
 }
