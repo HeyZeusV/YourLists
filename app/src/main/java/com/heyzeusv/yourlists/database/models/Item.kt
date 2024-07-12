@@ -12,6 +12,7 @@ interface BaseItem {
     val category: String
     val quantity: Double
     val unit: String
+    val memo: String
 }
 
 @Entity(
@@ -50,6 +51,7 @@ data class Item(
     override val category: String,
     override val quantity: Double,
     override val unit: String,
+    override val memo: String,
     val parentItemListId: Long,
     val originItemListId: Long?
 ) : BaseItem
@@ -73,7 +75,8 @@ data class DefaultItem(
     override val name: String,
     override val category: String,
     override val quantity: Double,
-    override val unit: String
+    override val unit: String,
+    override val memo: String,
 ) : BaseItem
 
 @Fts4(contentEntity = DefaultItem::class)

@@ -22,6 +22,7 @@ object PreviewUtil {
         category = "Preview",
         quantity = 3.33,
         unit = "Unit",
+        memo = "This is an unchecked item",
         parentItemListId = 0L,
         originItemListId = null
     )
@@ -32,6 +33,7 @@ object PreviewUtil {
         category = "Preview",
         quantity = 3.33,
         unit = "Units",
+        memo = "This is a checked item",
         parentItemListId = 0L,
         originItemListId = null
     )
@@ -49,7 +51,8 @@ object PreviewUtil {
         category = "Preview",
         quantity = 3.33,
         unit = "Unit",
-    )
+        memo = "This is a default item",
+        )
     val defaultItemList = List(10) { defaultItem }
 
     @Composable
