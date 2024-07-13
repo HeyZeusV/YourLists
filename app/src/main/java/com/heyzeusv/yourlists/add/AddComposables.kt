@@ -7,14 +7,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,11 +29,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +54,7 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
+import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -103,8 +107,9 @@ fun AddScreen(
 ) {
     val listState = rememberLazyListState()
     val maxLength = iRes(R.integer.name_max_length)
-    var showBottomSheet by remember { mutableStateOf<DefaultItem?>(null) }
-    val sheetState = rememberModalBottomSheetState()
+    var isBottomSheetDisplayed by remember { mutableStateOf(false) }
+    var selectedDefaultItem by remember { mutableStateOf(DefaultItem()) }
+    val focusManager = LocalFocusManager.current
 
     Column(
         modifier = Modifier
@@ -133,7 +138,7 @@ fun AddScreen(
                     text = "${defaultItemQuery.length}/$maxLength",
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
             },
             singleLine = true,
@@ -145,16 +150,20 @@ fun AddScreen(
                     .fillMaxWidth()
                     .heightIn(dRes(R.dimen.if_height_min))
                     .align(Alignment.CenterHorizontally)
-                    .clickable { showBottomSheet = DefaultItem(name = defaultItemQuery) },
+                    .clickable {
+                        focusManager.clearFocus()
+                        isBottomSheetDisplayed = true
+                        selectedDefaultItem = DefaultItem(name = defaultItemQuery)
+                    },
             ) {
                 Box(contentAlignment = Alignment.CenterStart) {
                     Text(
                         text = sRes(R.string.as_add_new, defaultItemQuery),
                         modifier = Modifier.padding(
                             horizontal = dRes(R.dimen.if_padding_horizontal),
-                            vertical = dRes(R.dimen.if_padding_vertical)
+                            vertical = dRes(R.dimen.if_padding_vertical),
                         ),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
             }
@@ -162,27 +171,27 @@ fun AddScreen(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             items(defaultItems) {
                 ItemInfo(
                     item = it,
-                    surfaceOnClick = { showBottomSheet = it }
+                    surfaceOnClick = {
+                        focusManager.clearFocus()
+                        isBottomSheetDisplayed = true
+                        selectedDefaultItem = it
+                    },
                 )
             }
         }
-        showBottomSheet?.let { itemSelected ->
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = null },
-                modifier = Modifier.fillMaxSize(),
-                sheetState = sheetState,
-                dragHandle = { },
-            ) {
-                AddBottomSheetContent(
-                    defaultItem = itemSelected,
-                )
-            }
-        }
+    }
+    BottomSheet(
+        isVisible = isBottomSheetDisplayed,
+        updateIsVisible = { isBottomSheetDisplayed = it },
+    ) {
+        AddBottomSheetContent(
+            defaultItem = selectedDefaultItem,
+        )
     }
 }
 
@@ -201,7 +210,8 @@ fun AddBottomSheetContent(
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.bs_padding_all))
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.asbs_vertical_spacedBy))
     ) {
         TextFieldWithLimit(
@@ -247,6 +257,7 @@ fun AddBottomSheetContent(
             maxLength = iRes(R.integer.memo_max_length),
             modifier = Modifier.fillMaxWidth(),
         )
+        Spacer(modifier = Modifier.height(dRes(R.dimen.bs_bottom_spacer)))
     }
 }
 

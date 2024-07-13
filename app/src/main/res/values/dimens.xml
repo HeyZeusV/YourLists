@@ -12,6 +12,7 @@
     <dimen name="bs_padding_all">16.dp</dimen>
     <dimen name="bs_vertical_spacedBy">16.dp</dimen>
     <dimen name="bs_horizontal_spacedBy">12.dp</dimen>
+    <dimen name="bs_bottom_spacer">8.dp</dimen>
 
     <!-- EmptyList (el) -->
     <dimen name="el_icon_size">36.dp</dimen>

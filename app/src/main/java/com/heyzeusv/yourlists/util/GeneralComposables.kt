@@ -1,17 +1,29 @@
 package com.heyzeusv.yourlists.util
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -30,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Item
+import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
 
 @Composable
 fun EmptyList(
@@ -155,6 +169,53 @@ fun TextFieldWithLimit(
         isError = isError,
         singleLine = true,
     )
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun BottomSheet(
+    isVisible: Boolean,
+    updateIsVisible: (Boolean) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = EnterTransition.None,
+        exit = ExitTransition.None,
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = { updateIsVisible(false) },
+                )
+                .animateEnterExit(
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ),
+            color = BlackAlpha60,
+        ) { }
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset(y = dRes(R.dimen.bs_bottom_spacer))
+                    .animateEnterExit(
+                        enter = slideInVertically { it },
+                        exit = slideOutVertically { it },
+                    ),
+            ) {
+                content()
+            }
+        }
+    }
 }
 
 @Preview
