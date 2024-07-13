@@ -54,6 +54,7 @@ import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.TextFieldWithLimit
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
@@ -195,31 +196,38 @@ fun AddBottomSheetContent(
     var unit by remember { mutableStateOf("") }
     var memo by remember { mutableStateOf("") }
 
+    var isNameError by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.bs_padding_all))
             .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy))
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.asbs_vertical_spacedBy))
     ) {
-        TextField(
+        TextFieldWithLimit(
             value = name,
             onValueChange = { name = it },
+            label = sRes(R.string.asbs_name),
+            isError = isNameError,
+            maxLength = iRes(R.integer.name_max_length),
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = sRes(R.string.asbs_name)) }
         )
         FullDropDownMenu(
             value = category,
             onValueChanged = { category = it },
             label = sRes(R.string.asbs_category),
             options = listOf(),
+            maxLength = iRes(R.integer.category_max_length),
             optionOnClick = { category = it }
         )
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
-            TextField(
+            TextFieldWithLimit(
                 value = quantity,
                 onValueChange = { quantity = it },
+                label = sRes(R.string.asbs_quantity),
+                isError = false,
+                maxLength = iRes(R.integer.quantity_max_length),
                 modifier = Modifier.weight(1f),
-                label = { Text(text = sRes(R.string.asbs_quantity)) },
             )
             FullDropDownMenu(
                 value = unit,
@@ -227,14 +235,17 @@ fun AddBottomSheetContent(
                 label = sRes(R.string.asbs_unit),
                 options = listOf(),
                 optionOnClick = { unit = it },
+                maxLength = iRes(R.integer.unit_max_length),
                 modifier = Modifier.weight(1f)
             )
         }
-        TextField(
+        TextFieldWithLimit(
             value = memo,
             onValueChange = { memo = it },
+            label = sRes(R.string.asbs_memo),
+            isError = false,
+            maxLength = iRes(R.integer.memo_max_length),
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = sRes(R.string.asbs_memo)) },
         )
     }
 }
@@ -246,6 +257,7 @@ fun FullDropDownMenu(
     label: String,
     options: List<String>,
     optionOnClick: (String) -> Unit,
+    maxLength: Int,
     modifier: Modifier = Modifier,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -256,11 +268,10 @@ fun FullDropDownMenu(
     Box(modifier = modifier) {
         TextField(
             value = value,
-            onValueChange = { onValueChanged(it) },
+            onValueChange = { if (it.length <= maxLength) onValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .onGloballyPositioned { coordinates -> textFieldSize = coordinates.size.toSize() },
-            readOnly = true,
             label = { Text(label) },
             trailingIcon = {
                 Icon(
@@ -277,6 +288,17 @@ fun FullDropDownMenu(
                     }
                 )
             },
+            supportingText = {
+                Row {
+                    Text(
+                        text = "${value.length}/$maxLength",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            },
+            singleLine = true,
             interactionSource = source,
         )
         DropdownMenu(
@@ -286,7 +308,12 @@ fun FullDropDownMenu(
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(text = option) },
+                    text = {
+                        Text(
+                            text = option,
+                            maxLines = 1,
+                        )
+                    },
                     onClick = {
                         optionOnClick(option)
                         expanded = false
@@ -349,7 +376,8 @@ private fun FullDropDownMenuPreview() {
                 onValueChanged = { },
                 label = "Preview Label",
                 options = listOf("Preview1", "Preview2", "Preview3"),
-                optionOnClick = { }
+                optionOnClick = { },
+                maxLength = 999
             )
         }
     }

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="name_max_length">32</integer>
+    <integer name="category_max_length">32</integer>
+    <integer name="quantity_max_length">8</integer>
+    <integer name="unit_max_length">4</integer>
+    <integer name="memo_max_length">512</integer>
 
     <integer name="nav_transition_duration">700</integer>
 </resources>

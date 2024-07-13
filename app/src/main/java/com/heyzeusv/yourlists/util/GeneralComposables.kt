@@ -19,6 +19,7 @@ import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -111,6 +112,49 @@ fun ItemInfo(
             }
         }
     }
+}
+
+@Composable
+fun TextFieldWithLimit(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    isError: Boolean,
+    maxLength: Int,
+    modifier: Modifier = Modifier,
+) {
+    TextField(
+        value = value,
+        onValueChange = { if (it.length <= maxLength) onValueChange(it) },
+        modifier = modifier,
+        label = { Text(text = label) },
+        trailingIcon = {
+            if (isError) {
+                Icon(
+                    painter = pRes(R.drawable.icon_error),
+                    contentDescription = sRes(R.string.iad_cdesc_error),
+                )
+            }
+        },
+        supportingText = {
+            Row {
+                Text(
+                    text = if (isError) sRes(R.string.iad_error) else "",
+                    modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = "${value.length}/$maxLength",
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        },
+        isError = isError,
+        singleLine = true,
+    )
 }
 
 @Preview
