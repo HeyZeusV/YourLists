@@ -2,6 +2,13 @@
     <string name="app_name">Your Lists</string>
     <string name="navigate_back">Navigate Back</string>
     <string name="button_cdesc_options">Displays additional options</string>
+    <string-array name="unit_values">
+        <item>Unit</item>
+        <item>lb</item>
+        <item>gal</item>
+        <item>g</item>
+        <item>l</item>
+    </string-array>
 
     <!-- AddScreen (as) -->
     <string name="as_item_title">Add Item</string>

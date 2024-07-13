@@ -1,8 +1,6 @@
 package com.heyzeusv.yourlists.add
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,21 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,14 +36,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
@@ -64,6 +59,7 @@ import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
+import com.heyzeusv.yourlists.util.saRes
 
 @Composable
 fun AddScreen(
@@ -97,7 +93,6 @@ fun AddScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
      defaultItemQuery: String,
@@ -199,14 +194,20 @@ fun AddScreen(
 fun AddBottomSheetContent(
     defaultItem: DefaultItem,
 ) {
+    val focusManager = LocalFocusManager.current
+    val unitList = saRes(R.array.unit_values).toList()
+
     var name by remember { mutableStateOf(defaultItem.name) }
     var category by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
-    var unit by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf(unitList.first()) }
     var memo by remember { mutableStateOf("") }
 
     var isNameError by remember { mutableStateOf(false) }
 
+    // TODO Update category/unit DropDownMenu to have "Create new" option
+    // TODO New option will change DropDownMenu to TextField with "X" trailing icon to switch back
+    // TODO If user saves with blank Category, use the first Category.
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.bs_padding_all))
@@ -221,6 +222,10 @@ fun AddBottomSheetContent(
             isError = isNameError,
             maxLength = iRes(R.integer.name_max_length),
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
         )
         FullDropDownMenu(
             value = category,
@@ -228,7 +233,11 @@ fun AddBottomSheetContent(
             label = sRes(R.string.asbs_category),
             options = listOf(),
             maxLength = iRes(R.integer.category_max_length),
-            optionOnClick = { category = it }
+            optionOnClick = { category = it },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
             TextFieldWithLimit(
@@ -238,15 +247,23 @@ fun AddBottomSheetContent(
                 isError = false,
                 maxLength = iRes(R.integer.quantity_max_length),
                 modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Right) }
+                ),
             )
             FullDropDownMenu(
                 value = unit,
                 onValueChanged = { unit = it },
                 label = sRes(R.string.asbs_unit),
-                options = listOf(),
+                options = unitList,
                 optionOnClick = { unit = it },
                 maxLength = iRes(R.integer.unit_max_length),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
             )
         }
         TextFieldWithLimit(
@@ -256,11 +273,14 @@ fun AddBottomSheetContent(
             isError = false,
             maxLength = iRes(R.integer.memo_max_length),
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         )
         Spacer(modifier = Modifier.height(dRes(R.dimen.bs_bottom_spacer)))
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FullDropDownMenu(
     value: String,
@@ -270,35 +290,25 @@ fun FullDropDownMenu(
     optionOnClick: (String) -> Unit,
     maxLength: Int,
     modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
-    val source = remember { MutableInteractionSource() }
-    if (source.collectIsPressedAsState().value) expanded = true
 
-    Box(modifier = modifier) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier,
+    ) {
         TextField(
             value = value,
             onValueChange = { if (it.length <= maxLength) onValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .onGloballyPositioned { coordinates -> textFieldSize = coordinates.size.toSize() },
+                .onFocusChanged { if (expanded) expanded = false }
+                .menuAnchor(),
             label = { Text(label) },
-            trailingIcon = {
-                Icon(
-                    imageVector = if (expanded) {
-                        Icons.Filled.KeyboardArrowUp
-                    } else {
-                        Icons.Filled.KeyboardArrowDown
-                    },
-                    contentDescription = null,
-                    tint = if (expanded) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        LocalContentColor.current
-                    }
-                )
-            },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             supportingText = {
                 Row {
                     Text(
@@ -309,13 +319,13 @@ fun FullDropDownMenu(
                     )
                 }
             },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             singleLine = true,
-            interactionSource = source,
         )
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+            onDismissRequest = { }
         ) {
             options.forEach { option ->
                 DropdownMenuItem(

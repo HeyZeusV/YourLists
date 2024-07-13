@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.util
 
+import androidx.annotation.ArrayRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IntegerRes
@@ -10,10 +11,10 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 
@@ -27,6 +28,16 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 @Composable
 @ReadOnlyComposable
 fun sRes(@StringRes id: Int, vararg args: Any): String = stringResource(id, *args)
+
+/**
+ *  Load a string array resource .
+ *
+ *  @param id The resource identifier.
+ *  @return The string array data associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun saRes(@ArrayRes id: Int): Array<String> = stringArrayResource(id)
 
 /**
  *  Create a [Painter] from an Android resource id.
