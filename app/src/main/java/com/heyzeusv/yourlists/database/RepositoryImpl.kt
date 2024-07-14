@@ -3,7 +3,6 @@ package com.heyzeusv.yourlists.database
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
-import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
@@ -47,7 +46,5 @@ class RepositoryImpl @Inject constructor(
     /**
      *  Category Queries
      */
-    override suspend fun getAllCategories(): List<Category> = withContext(Dispatchers.IO) {
-        categoryDao.getAllCategories()
-    }
+    override suspend fun getAllCategories(): Flow<List<String>> = categoryDao.getAllCategories()
 }

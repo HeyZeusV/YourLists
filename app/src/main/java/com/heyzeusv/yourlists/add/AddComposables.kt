@@ -76,6 +76,7 @@ fun AddScreen(
     val defaultItemQuery by addVM.defaultItemQuery.collectAsStateWithLifecycle()
     val defaultItems by addVM.defaultItems.collectAsStateWithLifecycle(initialValue = emptyList())
     val itemLists by addVM.itemLists.collectAsStateWithLifecycle()
+    val categories by addVM.categories.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
@@ -93,7 +94,8 @@ fun AddScreen(
         defaultItemQuery = defaultItemQuery,
         updateDefaultItemQuery = { addVM.updateDefaultItemQuery(it) },
         defaultItems = defaultItems,
-        itemLists = itemLists
+        categories = categories,
+        itemLists = itemLists,
     )
 }
 
@@ -102,6 +104,7 @@ fun AddScreen(
      defaultItemQuery: String,
      updateDefaultItemQuery: (String) -> Unit,
      defaultItems: List<DefaultItem>,
+     categories: List<String>,
      itemLists: List<ItemListWithItems>,
 ) {
     val listState = rememberLazyListState()
@@ -190,6 +193,7 @@ fun AddScreen(
     ) {
         AddBottomSheetContent(
             defaultItem = selectedDefaultItem,
+            categories = categories
         )
     }
 }
@@ -197,6 +201,7 @@ fun AddScreen(
 @Composable
 fun AddBottomSheetContent(
     defaultItem: DefaultItem,
+    categories: List<String>,
 ) {
     val focusManager = LocalFocusManager.current
     val unitList = saRes(R.array.unit_values).toList()
@@ -232,7 +237,7 @@ fun AddBottomSheetContent(
             value = category,
             onValueChanged = { category = it },
             label = sRes(R.string.asbs_category),
-            options = listOf(),
+            options = categories,
             maxLength = iRes(R.integer.category_max_length),
             optionOnClick = {
                 category = it
@@ -397,6 +402,7 @@ private fun AddScreenPreview() {
                 defaultItemQuery = "Preview",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
+                categories = emptyList(),
                 itemLists = emptyList(),
             )
         }
@@ -412,6 +418,7 @@ private fun AddScreenBlankQueryPreview() {
                 defaultItemQuery = "",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
+                categories = emptyList(),
                 itemLists = emptyList(),
             )
         }
@@ -424,7 +431,10 @@ private fun AddBottomSheetContentNewItemPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                AddBottomSheetContent(defaultItem)
+                AddBottomSheetContent(
+                    defaultItem = defaultItem,
+                    categories = emptyList(),
+                )
             }
         }
     }
@@ -436,7 +446,10 @@ private fun AddBottomSheetContentExistingItemPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
-                AddBottomSheetContent(defaultItem.copy(itemId = 10L))
+                AddBottomSheetContent(
+                    defaultItem = defaultItem.copy(itemId = 10L),
+                    categories = emptyList()
+                )
             }
         }
     }
@@ -453,7 +466,7 @@ private fun FilteredDropDownMenuPreview() {
                 label = "Preview Label",
                 options = listOf("Preview1", "Preview2", "Preview3"),
                 optionOnClick = { },
-                maxLength = 999
+                maxLength = 999,
             )
         }
     }

@@ -1,6 +1,5 @@
 package com.heyzeusv.yourlists.database
 
-import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
@@ -30,5 +29,5 @@ interface Repository {
     /**
      *  Category Queries
      */
-    suspend fun getAllCategories(): List<Category>
+    suspend fun getAllCategories(): Flow<List<String>>
 }

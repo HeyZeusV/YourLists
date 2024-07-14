@@ -39,11 +39,15 @@ class AddViewModel @Inject constructor(
             }
         }
 
+    private val _categories = MutableStateFlow(emptyList<String>())
+    val categories = _categories.asStateFlow()
+
     private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
     val itemLists = _itemLists.asStateFlow()
 
     init {
         getAllItemLists()
+        getAllCategories()
     }
 
     private fun cleanQuery(query: String): String {
@@ -56,6 +60,14 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch {
             repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
                 _itemLists.update { lists }
+            }
+        }
+    }
+
+    private fun getAllCategories() {
+        viewModelScope.launch {
+            repo.getAllCategories().flowOn(Dispatchers.IO).collectLatest { list ->
+                _categories.update { list }
             }
         }
     }
