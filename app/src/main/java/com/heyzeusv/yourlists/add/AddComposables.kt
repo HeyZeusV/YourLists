@@ -200,14 +200,11 @@ fun AddBottomSheetContent(
     var name by remember { mutableStateOf(defaultItem.name) }
     var category by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
-    var unit by remember { mutableStateOf(unitList.first()) }
+    var unit by remember { mutableStateOf("") }
     var memo by remember { mutableStateOf("") }
 
     var isNameError by remember { mutableStateOf(false) }
 
-    // TODO Update category/unit DropDownMenu to have "Create new" option
-    // TODO New option will change DropDownMenu to TextField with "X" trailing icon to switch back
-    // TODO If user saves with blank Category, use the first Category.
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.bs_padding_all))
@@ -227,13 +224,16 @@ fun AddBottomSheetContent(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
             ),
         )
-        FullDropDownMenu(
+        FilteredDropDownMenu(
             value = category,
             onValueChanged = { category = it },
             label = sRes(R.string.asbs_category),
             options = listOf(),
             maxLength = iRes(R.integer.category_max_length),
-            optionOnClick = { category = it },
+            optionOnClick = {
+                category = it
+                focusManager.moveFocus(FocusDirection.Down)
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
@@ -252,12 +252,15 @@ fun AddBottomSheetContent(
                     onNext = { focusManager.moveFocus(FocusDirection.Right) }
                 ),
             )
-            FullDropDownMenu(
+            FilteredDropDownMenu(
                 value = unit,
                 onValueChanged = { unit = it },
                 label = sRes(R.string.asbs_unit),
                 options = unitList,
-                optionOnClick = { unit = it },
+                optionOnClick = {
+                    unit = it
+                    focusManager.moveFocus(FocusDirection.Down)
+                },
                 maxLength = iRes(R.integer.unit_max_length),
                 modifier = Modifier.weight(1f),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -282,7 +285,7 @@ fun AddBottomSheetContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FullDropDownMenu(
+fun FilteredDropDownMenu(
     value: String,
     onValueChanged: (String) -> Unit,
     label: String,
@@ -305,7 +308,7 @@ fun FullDropDownMenu(
             onValueChange = { if (it.length <= maxLength) onValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { if (expanded) expanded = false }
+                .onFocusChanged { expanded = it.isFocused }
                 .menuAnchor(),
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -323,23 +326,26 @@ fun FullDropDownMenu(
             keyboardActions = keyboardActions,
             singleLine = true,
         )
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = option,
-                            maxLines = 1,
-                        )
-                    },
-                    onClick = {
-                        optionOnClick(option)
-                        expanded = false
-                    },
-                )
+        val filteredOptions = options.filter { it.contains(value, ignoreCase = true) }
+        if (filteredOptions.isNotEmpty()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { }
+            ) {
+                filteredOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = {
+                            optionOnClick(option)
+                            expanded = false
+                        },
+                    )
+                }
             }
         }
     }
@@ -389,10 +395,10 @@ private fun AddBottomSheetContentPreview() {
 
 @Preview
 @Composable
-private fun FullDropDownMenuPreview() {
+private fun FilteredDropDownMenuPreview() {
     PreviewUtil.run {
         Preview {
-            FullDropDownMenu(
+            FilteredDropDownMenu(
                 value = "Preview",
                 onValueChanged = { },
                 label = "Preview Label",
