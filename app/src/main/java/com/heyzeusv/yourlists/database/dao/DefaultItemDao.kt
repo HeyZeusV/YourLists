@@ -6,7 +6,7 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface DefaultItemDao {
+interface DefaultItemDao : BaseDao<DefaultItem> {
 
     @Query("SELECT * " +
             "FROM DefaultItem")

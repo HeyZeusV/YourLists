@@ -289,7 +289,13 @@ fun AddBottomSheetContent(
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         )
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {
+                if (name.isBlank()) {
+                    isNameError = true
+                } else {
+
+                }
+            },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {
@@ -297,7 +303,13 @@ fun AddBottomSheetContent(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
             OutlinedButton(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    if (name.isBlank()) {
+                        isNameError = true
+                    } else {
+
+                    }
+                },
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.extraSmall,
             ) {

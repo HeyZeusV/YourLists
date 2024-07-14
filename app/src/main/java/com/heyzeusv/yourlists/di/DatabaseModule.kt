@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.heyzeusv.yourlists.database.Database
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
+import com.heyzeusv.yourlists.database.dao.ItemDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -21,6 +22,9 @@ object DatabaseModule {
 
     @Provides
     fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
+
+    @Provides
+    fun provideItemDao(database: Database): ItemDao = database.itemDao()
 
     @Provides
     fun provideDefaultItemDao(database: Database): DefaultItemDao = database.defaultItemDao()

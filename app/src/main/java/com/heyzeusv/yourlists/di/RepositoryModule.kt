@@ -4,6 +4,7 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.RepositoryImpl
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
+import com.heyzeusv.yourlists.database.dao.ItemDao
 import com.heyzeusv.yourlists.database.dao.ItemListDao
 import dagger.Module
 import dagger.Provides
@@ -19,7 +20,8 @@ object RepositoryModule {
     @Provides
     fun provideRepository(
         itemListDao: ItemListDao,
+        itemDao: ItemDao,
         defaultItemDao: DefaultItemDao,
         categoryDao: CategoryDao,
-    ): Repository = RepositoryImpl(itemListDao, defaultItemDao, categoryDao)
+    ): Repository = RepositoryImpl(itemListDao, itemDao, defaultItemDao, categoryDao)
 }

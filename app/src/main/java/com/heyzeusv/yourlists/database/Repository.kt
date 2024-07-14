@@ -1,6 +1,8 @@
 package com.heyzeusv.yourlists.database
 
+import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import kotlinx.coroutines.flow.Flow
@@ -20,8 +22,21 @@ interface Repository {
     suspend fun getItemListWithId(id: Long): ItemListWithItems?
 
     /**
+     *  Item Queries
+     */
+    suspend fun insertItems(vararg items: Item): Long
+
+    suspend fun updateItems(vararg items: Item)
+
+    suspend fun deleteItems(vararg items: Item)
+
+    /**
      *  DefaultItem Queries
      */
+    suspend fun upsertDefaultItems(vararg defaultItems: DefaultItem)
+
+    suspend fun deleteDefaultItems(vararg defaultItems: DefaultItem)
+
     fun getAllDefaultItems(): Flow<List<DefaultItem>>
 
     fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
@@ -29,5 +44,7 @@ interface Repository {
     /**
      *  Category Queries
      */
-    suspend fun getAllCategories(): Flow<List<String>>
+    suspend fun upsertCategories(vararg categories: Category)
+
+    fun getAllCategories(): Flow<List<String>>
 }
