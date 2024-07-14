@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoryDao : BaseDao<Category> {
 
-    @Query("SELECT name " +
-            "FROM Category")
-    fun getAllCategories(): Flow<List<String>>
+    @Query("SELECT * " +
+            "FROM Category " +
+            "ORDER BY name ASC")
+    fun getAllCategories(): Flow<List<Category>>
 }

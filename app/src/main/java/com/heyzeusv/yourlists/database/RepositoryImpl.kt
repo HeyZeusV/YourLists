@@ -71,5 +71,5 @@ class RepositoryImpl @Inject constructor(
     override suspend fun upsertCategories(vararg categories: Category) =
         withContext(Dispatchers.IO) { categoryDao.upsert(*categories) }
 
-    override fun getAllCategories(): Flow<List<String>> = categoryDao.getAllCategories()
+    override fun getAllCategories(): Flow<List<Category>> = categoryDao.getAllCategories()
 }

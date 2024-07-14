@@ -3,6 +3,9 @@ package com.heyzeusv.yourlists.add
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
+import com.heyzeusv.yourlists.database.models.Category
+import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +42,7 @@ class AddViewModel @Inject constructor(
             }
         }
 
-    private val _categories = MutableStateFlow(emptyList<String>())
+    private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
     private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
@@ -70,5 +73,15 @@ class AddViewModel @Inject constructor(
                 _categories.update { list }
             }
         }
+    }
+
+    fun upsertDefaultItemAndSaveItem(itemList: ItemList, defaultItem: DefaultItem) {
+        viewModelScope.launch {
+//            repo.upsertCategories(Category(defaultItem.name))
+        }
+    }
+
+    fun saveItem(itemList: ItemList, defaultItem: DefaultItem) {
+
     }
 }

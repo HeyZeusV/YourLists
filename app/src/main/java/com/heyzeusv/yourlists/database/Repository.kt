@@ -46,5 +46,5 @@ interface Repository {
      */
     suspend fun upsertCategories(vararg categories: Category)
 
-    fun getAllCategories(): Flow<List<String>>
+    fun getAllCategories(): Flow<List<Category>>
 }

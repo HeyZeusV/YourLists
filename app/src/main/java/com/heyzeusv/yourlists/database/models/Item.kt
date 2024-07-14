@@ -35,7 +35,7 @@ interface BaseItem {
     indices = [
         Index(
             value = ["category"],
-            name = "index_category_name"
+            name = "index_item_category_name"
         ),
         Index(
             value = ["parentItemListId"],

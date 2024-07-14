@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
@@ -104,7 +105,7 @@ fun AddScreen(
      defaultItemQuery: String,
      updateDefaultItemQuery: (String) -> Unit,
      defaultItems: List<DefaultItem>,
-     categories: List<String>,
+     categories: List<Category>,
      itemLists: List<ItemListWithItems>,
 ) {
     val listState = rememberLazyListState()
@@ -201,7 +202,7 @@ fun AddScreen(
 @Composable
 fun AddBottomSheetContent(
     defaultItem: DefaultItem,
-    categories: List<String>,
+    categories: List<Category>,
 ) {
     val focusManager = LocalFocusManager.current
     val unitList = saRes(R.array.unit_values).toList()
@@ -237,7 +238,7 @@ fun AddBottomSheetContent(
             value = category,
             onValueChanged = { category = it },
             label = sRes(R.string.asbs_category),
-            options = categories,
+            options = categories.map { it.name },
             maxLength = iRes(R.integer.category_max_length),
             optionOnClick = {
                 category = it
