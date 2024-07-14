@@ -44,7 +44,7 @@ interface Repository {
     /**
      *  Category Queries
      */
-    suspend fun upsertCategories(vararg categories: Category)
+    suspend fun insertCategories(vararg categories: Category): Long
 
     fun getAllCategories(): Flow<List<Category>>
 }

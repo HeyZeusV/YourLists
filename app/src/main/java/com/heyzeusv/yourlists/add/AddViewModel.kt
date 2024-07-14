@@ -75,13 +75,26 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    fun upsertDefaultItemAndSaveItem(itemList: ItemList, defaultItem: DefaultItem) {
+    fun saveDefaultItemAndAddItem(itemList: ItemList, defaultItem: DefaultItem) {
         viewModelScope.launch {
-//            repo.upsertCategories(Category(defaultItem.name))
+            if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
+                repo.insertCategories(Category(id = 0L, name = defaultItem.name))
+            }
+            repo.upsertDefaultItems(defaultItem)
+            repo.insertItems(defaultItem.toItem(itemList.itemListId))
         }
     }
 
-    fun saveItem(itemList: ItemList, defaultItem: DefaultItem) {
+    fun addItem(itemList: ItemList, defaultItem: DefaultItem) {
+        viewModelScope.launch {
+            if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
+                repo.insertCategories(Category(id = 0L, name = defaultItem.name))
+            }
+            repo.insertItems(defaultItem.toItem(itemList.itemListId))
+        }
+    }
 
+    fun deleteDefaultItem(defaultItem: DefaultItem) {
+        viewModelScope.launch { repo.deleteDefaultItems(defaultItem) }
     }
 }

@@ -53,7 +53,7 @@ data class Item(
     override val unit: String,
     override val memo: String,
     val parentItemListId: Long,
-    val originItemListId: Long?
+    val originItemListId: Long? = null
 ) : BaseItem
 
 @Entity(
@@ -77,7 +77,21 @@ data class DefaultItem(
     override val quantity: Double = 0.0,
     override val unit: String = "",
     override val memo: String = "",
-) : BaseItem
+) : BaseItem {
+
+    fun toItem(parentItemListId: Long): Item {
+        return Item(
+            itemId = itemId,
+            name = name,
+            isChecked = false,
+            category = category,
+            quantity = quantity,
+            unit = unit,
+            memo = memo,
+            parentItemListId = parentItemListId
+        )
+    }
+}
 
 @Fts4(contentEntity = DefaultItem::class)
 @Entity

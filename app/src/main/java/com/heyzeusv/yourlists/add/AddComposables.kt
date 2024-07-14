@@ -52,6 +52,7 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.BottomSheet
@@ -92,21 +93,29 @@ fun AddScreen(
         fabSetup(FabState(isFabDisplayed = false))
     }
     AddScreen(
+        selectedItemList = ItemList(0L, ""), // TODO: Hook up navigation argument to get this value
         defaultItemQuery = defaultItemQuery,
         updateDefaultItemQuery = { addVM.updateDefaultItemQuery(it) },
         defaultItems = defaultItems,
         categories = categories,
+        saveAndAddOnClick = addVM::saveDefaultItemAndAddItem,
+        addToListOnClick = addVM::addItem,
+        deleteDefaultItemOnClick = addVM::deleteDefaultItem,
         itemLists = itemLists,
     )
 }
 
 @Composable
 fun AddScreen(
-     defaultItemQuery: String,
-     updateDefaultItemQuery: (String) -> Unit,
-     defaultItems: List<DefaultItem>,
-     categories: List<Category>,
-     itemLists: List<ItemListWithItems>,
+    selectedItemList: ItemList,
+    defaultItemQuery: String,
+    updateDefaultItemQuery: (String) -> Unit,
+    defaultItems: List<DefaultItem>,
+    categories: List<Category>,
+    saveAndAddOnClick: (ItemList, DefaultItem) -> Unit,
+    addToListOnClick: (ItemList, DefaultItem) -> Unit,
+    deleteDefaultItemOnClick: (DefaultItem) -> Unit,
+    itemLists: List<ItemListWithItems>,
 ) {
     val listState = rememberLazyListState()
     val maxLength = iRes(R.integer.name_max_length)
@@ -193,25 +202,34 @@ fun AddScreen(
         updateIsVisible = { isBottomSheetDisplayed = it },
     ) {
         AddBottomSheetContent(
-            defaultItem = selectedDefaultItem,
-            categories = categories
+            selectedItemList = selectedItemList,
+            selectedDefaultItem = selectedDefaultItem,
+            categories = categories,
+            saveAndAddOnClick = saveAndAddOnClick,
+            addToListOnClick = addToListOnClick,
+            deleteDefaultItemOnClick = deleteDefaultItemOnClick,
         )
     }
 }
 
 @Composable
 fun AddBottomSheetContent(
-    defaultItem: DefaultItem,
+    selectedItemList: ItemList,
+    selectedDefaultItem: DefaultItem,
     categories: List<Category>,
+    saveAndAddOnClick: (ItemList, DefaultItem) -> Unit,
+    addToListOnClick: (ItemList, DefaultItem) -> Unit,
+    deleteDefaultItemOnClick: (DefaultItem) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val unitList = saRes(R.array.unit_values).toList()
 
-    var name by remember { mutableStateOf(defaultItem.name) }
-    var category by remember { mutableStateOf("") }
-    var quantity by remember { mutableStateOf("") }
-    var unit by remember { mutableStateOf("") }
-    var memo by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(selectedDefaultItem.name) }
+    var category by remember { mutableStateOf(selectedDefaultItem.category) }
+    // TODO: DecimalFormat
+    var quantity by remember { mutableStateOf(selectedDefaultItem.quantity.toString()) }
+    var unit by remember { mutableStateOf(selectedDefaultItem.unit) }
+    var memo by remember { mutableStateOf(selectedDefaultItem.memo) }
 
     var isNameError by remember { mutableStateOf(false) }
 
@@ -294,7 +312,8 @@ fun AddBottomSheetContent(
                 if (name.isBlank()) {
                     isNameError = true
                 } else {
-
+                    // TODO: create copy of selectedDefaultItem with updated TextField values
+                    saveAndAddOnClick(selectedItemList, selectedDefaultItem)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -308,7 +327,8 @@ fun AddBottomSheetContent(
                     if (name.isBlank()) {
                         isNameError = true
                     } else {
-
+                        // TODO: create copy of selectedDefaultItem with updated TextField values
+                        addToListOnClick(selectedItemList, selectedDefaultItem)
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -316,9 +336,9 @@ fun AddBottomSheetContent(
             ) {
                 Text(text = sRes(R.string.asbs_add).uppercase())
             }
-            if (defaultItem.itemId != 0L) {
+            if (selectedDefaultItem.itemId != 0L) {
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { deleteDefaultItemOnClick(selectedDefaultItem) },
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.extraSmall,
                     colors = ButtonDefaults.buttonColors(
@@ -412,11 +432,15 @@ private fun AddScreenPreview() {
     PreviewUtil.run {
         Preview {
             AddScreen(
+                selectedItemList = ItemList(0L, ""),
                 defaultItemQuery = "Preview",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
                 itemLists = emptyList(),
+                saveAndAddOnClick = { _, _ -> },
+                addToListOnClick = { _, _ -> },
+                deleteDefaultItemOnClick = { },
             )
         }
     }
@@ -428,11 +452,15 @@ private fun AddScreenBlankQueryPreview() {
     PreviewUtil.run {
         Preview {
             AddScreen(
+                selectedItemList = ItemList(0L, ""),
                 defaultItemQuery = "",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
                 itemLists = emptyList(),
+                saveAndAddOnClick = { _, _ -> },
+                addToListOnClick = { _, _ -> },
+                deleteDefaultItemOnClick = { },
             )
         }
     }
@@ -445,8 +473,12 @@ private fun AddBottomSheetContentNewItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
-                    defaultItem = defaultItem,
+                    selectedItemList = ItemList(0L, ""),
+                    selectedDefaultItem = defaultItem,
                     categories = emptyList(),
+                    saveAndAddOnClick = { _, _ -> },
+                    addToListOnClick = { _, _ -> },
+                    deleteDefaultItemOnClick = { },
                 )
             }
         }
@@ -460,8 +492,12 @@ private fun AddBottomSheetContentExistingItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
-                    defaultItem = defaultItem.copy(itemId = 10L),
-                    categories = emptyList()
+                    selectedItemList = ItemList(0L, ""),
+                    selectedDefaultItem = defaultItem.copy(itemId = 10L),
+                    categories = emptyList(),
+                    saveAndAddOnClick = { _, _ -> },
+                    addToListOnClick = { _, _ -> },
+                    deleteDefaultItemOnClick = { },
                 )
             }
         }
