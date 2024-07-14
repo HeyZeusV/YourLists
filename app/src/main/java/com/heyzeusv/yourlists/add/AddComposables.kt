@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -25,6 +28,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -279,6 +283,39 @@ fun AddBottomSheetContent(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         )
+        Button(
+            onClick = { /*TODO*/ },
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraSmall,
+        ) {
+            Text(text = sRes(R.string.asbs_save_add).uppercase())
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
+            OutlinedButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.weight(1f),
+                shape = MaterialTheme.shapes.extraSmall,
+            ) {
+                Text(text = sRes(R.string.asbs_add).uppercase())
+            }
+            if (defaultItem.itemId != 0L) {
+                Button(
+                    onClick = { /*TODO*/ },
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.extraSmall,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                    contentPadding = PaddingValues(
+                        horizontal = dRes(R.dimen.asbs_button_padding_horizontal),
+                        vertical = dRes(R.dimen.asbs_button_padding_vertical)
+                    ),
+                ) {
+                    Text(text = sRes(R.string.asbs_delete).uppercase())
+                }
+            }
+        }
         Spacer(modifier = Modifier.height(dRes(R.dimen.bs_bottom_spacer)))
     }
 }
@@ -383,11 +420,23 @@ private fun AddScreenBlankQueryPreview() {
 
 @Preview
 @Composable
-private fun AddBottomSheetContentPreview() {
+private fun AddBottomSheetContentNewItemPreview() {
     PreviewUtil.run {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(defaultItem)
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AddBottomSheetContentExistingItemPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                AddBottomSheetContent(defaultItem.copy(itemId = 10L))
             }
         }
     }

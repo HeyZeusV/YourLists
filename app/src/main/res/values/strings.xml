@@ -22,6 +22,9 @@
     <string name="asbs_quantity">Quantity</string>
     <string name="asbs_unit">Unit</string>
     <string name="asbs_memo">Memo</string>
+    <string name="asbs_add">Add to list</string>
+    <string name="asbs_save_add">Save as default &amp; add to list</string>
+    <string name="asbs_delete">Delete defaults</string>
 
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>

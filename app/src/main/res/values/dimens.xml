@@ -7,6 +7,8 @@
     <dimen name="as_query_padding_bottom">12.dp</dimen>
     <!-- AddScreen.BottomSheet (asbs) -->
     <dimen name="asbs_vertical_spacedBy">4.dp</dimen>
+    <dimen name="asbs_button_padding_horizontal">16.dp</dimen>
+    <dimen name="asbs_button_padding_vertical">8.dp</dimen>
 
     <!-- BottomSheet (bs) -->
     <dimen name="bs_padding_all">16.dp</dimen>
