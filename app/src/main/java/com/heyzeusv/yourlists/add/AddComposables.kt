@@ -44,6 +44,8 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,10 +63,14 @@ import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TextFieldWithLimit
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
+import com.heyzeusv.yourlists.util.formatTextAsDouble
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
 import com.heyzeusv.yourlists.util.saRes
+import com.heyzeusv.yourlists.util.toDouble
+import com.heyzeusv.yourlists.util.toTextFieldValue
+import java.text.DecimalFormat
 
 @Composable
 fun AddScreen(
@@ -218,13 +224,15 @@ fun AddBottomSheetContent(
 ) {
     val focusManager = LocalFocusManager.current
     val unitList = saRes(R.array.unit_values).toList()
+    val decimalFormat = DecimalFormat("#,##0.00")
 
-    var name by remember { mutableStateOf(selectedDefaultItem.name) }
-    var category by remember { mutableStateOf(selectedDefaultItem.category) }
-    // TODO: DecimalFormat
-    var quantity by remember { mutableStateOf(selectedDefaultItem.quantity.toString()) }
-    var unit by remember { mutableStateOf(selectedDefaultItem.unit) }
-    var memo by remember { mutableStateOf(selectedDefaultItem.memo) }
+    var name by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.name)) }
+    var category by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.category)) }
+    var quantity by remember {
+        mutableStateOf(selectedDefaultItem.quantity.toTextFieldValue(decimalFormat))
+    }
+    var unit by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.unit)) }
+    var memo by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.memo)) }
 
     var isNameError by remember { mutableStateOf(false) }
 
@@ -254,7 +262,7 @@ fun AddBottomSheetContent(
             options = categories.map { it.name },
             maxLength = iRes(R.integer.category_max_length),
             optionOnClick = {
-                category = it
+                category = TextFieldValue(it)
                 focusManager.moveFocus(FocusDirection.Down)
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
@@ -265,12 +273,15 @@ fun AddBottomSheetContent(
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
             TextFieldWithLimit(
                 value = quantity,
-                onValueChange = { quantity = it },
+                onValueChange = { quantity = it.formatTextAsDouble(decimalFormat) },
                 label = sRes(R.string.asbs_quantity),
                 isError = false,
                 maxLength = iRes(R.integer.quantity_max_length),
                 modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next,
+                ),
                 keyboardActions = KeyboardActions(
                     onNext = { focusManager.moveFocus(FocusDirection.Right) }
                 ),
@@ -281,7 +292,7 @@ fun AddBottomSheetContent(
                 label = sRes(R.string.asbs_unit),
                 options = unitList,
                 optionOnClick = {
-                    unit = it
+                    unit = TextFieldValue(it)
                     focusManager.moveFocus(FocusDirection.Down)
                 },
                 maxLength = iRes(R.integer.unit_max_length),
@@ -304,15 +315,15 @@ fun AddBottomSheetContent(
         )
         Button(
             onClick = {
-                if (name.isBlank()) {
+                if (name.text.isBlank()) {
                     isNameError = true
                 } else {
                     val updatedSelectedDefaultItem = selectedDefaultItem.copy(
-                        name = name,
-                        category = category,
+                        name = name.text,
+                        category = category.text.ifBlank { categories.first().name },
                         quantity = quantity.toDouble(),
-                        unit = unit,
-                        memo = memo,
+                        unit = unit.text.ifBlank { unitList.first() },
+                        memo = memo.text,
                     )
                     saveAndAddOnClick(updatedSelectedDefaultItem)
                 }
@@ -325,15 +336,15 @@ fun AddBottomSheetContent(
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
             OutlinedButton(
                 onClick = {
-                    if (name.isBlank()) {
+                    if (name.text.isBlank()) {
                         isNameError = true
                     } else {
                         val updatedSelectedDefaultItem = selectedDefaultItem.copy(
-                            name = name,
-                            category = category,
+                            name = name.text,
+                            category = category.text.ifBlank { categories.first().name },
                             quantity = quantity.toDouble(),
-                            unit = unit,
-                            memo = memo,
+                            unit = unit.text.ifBlank { unitList.first() },
+                            memo = memo.text,
                         )
                         addToListOnClick(updatedSelectedDefaultItem)
                     }
@@ -368,8 +379,8 @@ fun AddBottomSheetContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilteredDropDownMenu(
-    value: String,
-    onValueChanged: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
     label: String,
     options: List<String>,
     optionOnClick: (String) -> Unit,
@@ -387,7 +398,7 @@ fun FilteredDropDownMenu(
     ) {
         TextField(
             value = value,
-            onValueChange = { if (it.length <= maxLength) onValueChanged(it) },
+            onValueChange = { if (it.text.length <= maxLength) onValueChanged(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { expanded = it.isFocused }
@@ -397,7 +408,7 @@ fun FilteredDropDownMenu(
             supportingText = {
                 Row {
                     Text(
-                        text = "${value.length}/$maxLength",
+                        text = "${value.text.length}/$maxLength",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
                         style = MaterialTheme.typography.bodySmall
@@ -408,7 +419,7 @@ fun FilteredDropDownMenu(
             keyboardActions = keyboardActions,
             singleLine = true,
         )
-        val filteredOptions = options.filter { it.contains(value, ignoreCase = true) }
+        val filteredOptions = options.filter { it.contains(value.text, ignoreCase = true) }
         if (filteredOptions.isNotEmpty()) {
             ExposedDropdownMenu(
                 expanded = expanded,
@@ -513,7 +524,7 @@ private fun FilteredDropDownMenuPreview() {
     PreviewUtil.run {
         Preview {
             FilteredDropDownMenu(
-                value = "Preview",
+                value = TextFieldValue("Preview"),
                 onValueChanged = { },
                 label = "Preview Label",
                 options = listOf("Preview1", "Preview2", "Preview3"),

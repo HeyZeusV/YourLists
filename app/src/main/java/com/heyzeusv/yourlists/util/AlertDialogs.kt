@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
 
@@ -31,7 +32,7 @@ fun InputAlertDialog(
     onConfirm: (String) -> Unit,
     onDismiss: (() -> Unit)? = null,
 ) {
-    var input by remember { mutableStateOf("") }
+    var input by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
 
     if (display) {
@@ -65,8 +66,8 @@ fun InputAlertDialog(
                         }
                         TextButton(
                             onClick = {
-                                if (input.isNotBlank()) {
-                                    onConfirm(input)
+                                if (input.text.isNotBlank()) {
+                                    onConfirm(input.text)
                                 } else {
                                     isError = true
                                 }

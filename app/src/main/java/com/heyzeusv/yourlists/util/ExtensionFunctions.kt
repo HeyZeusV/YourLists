@@ -13,10 +13,15 @@ import androidx.compose.ui.res.integerResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 /**
  *  Load a string resource with formatting.
@@ -115,4 +120,24 @@ fun NavBackStackEntry?.currentDestination(): Destination {
     return Destinations.find {
         this?.destination?.route?.contains(it.route) ?: false
     } ?: OverviewDestination
+}
+
+fun TextFieldValue.toDouble(): Double {
+    var chars = ""
+    for (c: Char in this.text) { if (c.isDigit()) chars += c }
+
+    return BigDecimal(chars).divide(BigDecimal(100), 2, RoundingMode.HALF_UP).toDouble()
+}
+
+fun TextFieldValue.formatTextAsDouble(decimalFormat: DecimalFormat): TextFieldValue {
+    val textAsDouble = toDouble()
+    return textAsDouble.toTextFieldValue(decimalFormat)
+}
+
+fun Double.toTextFieldValue(decimalFormat: DecimalFormat): TextFieldValue {
+    val formattedString = decimalFormat.format(this)
+    return TextFieldValue(
+        text = formattedString,
+        selection = TextRange(formattedString.length)
+    )
 }

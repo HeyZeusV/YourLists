@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
@@ -132,8 +133,8 @@ fun ItemInfo(
 
 @Composable
 fun TextFieldWithLimit(
-    value: String,
-    onValueChange: (String) -> Unit,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     label: String,
     isError: Boolean,
     maxLength: Int,
@@ -143,7 +144,7 @@ fun TextFieldWithLimit(
 ) {
     TextField(
         value = value,
-        onValueChange = { if (it.length <= maxLength) onValueChange(it) },
+        onValueChange = { if (it.text.length <= maxLength) onValueChange(it) },
         modifier = modifier,
         label = { Text(text = label) },
         trailingIcon = {
@@ -163,7 +164,7 @@ fun TextFieldWithLimit(
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
-                    text = "${value.length}/$maxLength",
+                    text = "${value.text.length}/$maxLength",
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.End,
                     style = MaterialTheme.typography.bodySmall
