@@ -205,6 +205,7 @@ fun AddScreen(
         updateIsVisible = { isBottomSheetDisplayed = it },
     ) {
         AddBottomSheetContent(
+            closeBottomSheet = { isBottomSheetDisplayed = false },
             selectedDefaultItem = selectedDefaultItem,
             categories = categories,
             saveAndAddOnClick = saveAndAddOnClick,
@@ -216,6 +217,7 @@ fun AddScreen(
 
 @Composable
 fun AddBottomSheetContent(
+    closeBottomSheet: () -> Unit,
     selectedDefaultItem: DefaultItem,
     categories: List<Category>,
     saveAndAddOnClick: (DefaultItem) -> Unit,
@@ -326,6 +328,7 @@ fun AddBottomSheetContent(
                         memo = memo.text,
                     )
                     saveAndAddOnClick(updatedSelectedDefaultItem)
+                    closeBottomSheet()
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -347,6 +350,7 @@ fun AddBottomSheetContent(
                             memo = memo.text,
                         )
                         addToListOnClick(updatedSelectedDefaultItem)
+                        closeBottomSheet()
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -356,7 +360,10 @@ fun AddBottomSheetContent(
             }
             if (selectedDefaultItem.itemId != 0L) {
                 Button(
-                    onClick = { deleteDefaultItemOnClick(selectedDefaultItem) },
+                    onClick = {
+                        deleteDefaultItemOnClick(selectedDefaultItem)
+                        closeBottomSheet()
+                    },
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.extraSmall,
                     colors = ButtonDefaults.buttonColors(
@@ -489,6 +496,7 @@ private fun AddBottomSheetContentNewItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
+                    closeBottomSheet = { },
                     selectedDefaultItem = defaultItem,
                     categories = emptyList(),
                     saveAndAddOnClick = { },
@@ -507,6 +515,7 @@ private fun AddBottomSheetContentExistingItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
+                    closeBottomSheet = { },
                     selectedDefaultItem = defaultItem.copy(itemId = 10L),
                     categories = emptyList(),
                     saveAndAddOnClick = { },
