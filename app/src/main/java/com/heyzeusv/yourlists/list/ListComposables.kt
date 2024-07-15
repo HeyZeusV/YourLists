@@ -103,7 +103,10 @@ fun ListScreen(
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
         ) {
             items(itemList.items) {
-                ItemInfo(item = it)
+                ItemInfo(
+                    item = it,
+                    surfaceOnClick = { },
+                )
             }
         }
     } else {

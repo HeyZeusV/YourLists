@@ -48,8 +48,8 @@ object PreviewUtil {
     val defaultItem = DefaultItem(
         itemId = 0L,
         name = "DefaultItem DefaultItem DefaultItem DefaultItem DefaultItem",
-        category = "Preview",
-        quantity = 3.33,
+        category = "Mega Preview Category",
+        quantity = 3333.33,
         unit = "Unit",
         memo = "This is a default item",
         )

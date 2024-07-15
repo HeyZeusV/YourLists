@@ -42,11 +42,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
+import java.text.DecimalFormat
 
 @Composable
 fun EmptyList(
@@ -90,8 +92,11 @@ fun EmptyList(
 @Composable
 fun ItemInfo(
     item: BaseItem,
-    surfaceOnClick: () -> Unit = { },
+    surfaceOnClick: () -> Unit,
+    checkboxOnClick: () -> Unit = { },
 ) {
+    val decimalFormat = DecimalFormat("#,##0.00")
+
     Surface(modifier = Modifier.clickable { surfaceOnClick() }) {
         Row(
             modifier = Modifier
@@ -101,30 +106,40 @@ fun ItemInfo(
                 )
                 .heightIn(min = dRes(R.dimen.if_height_min))
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.if_spacedBy)),
+            horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.if_spacedBy_horizontal)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (item is Item) {
                 CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                     Checkbox(
                         checked = item.isChecked,
-                        onCheckedChange = { },
+                        onCheckedChange = { checkboxOnClick() },
                     )
                 }
             }
             Text(
                 text = item.name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium
+                modifier = Modifier.weight(.80f),
+                style = MaterialTheme.typography.titleMedium,
             )
-            Column(horizontalAlignment = Alignment.End) {
+            Column(
+                modifier = Modifier.weight(.20f),
+                verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.if_spacedBy_vertical)),
+                horizontalAlignment = Alignment.End,
+            ) {
                 Text(
                     text = item.category,
-                    style = MaterialTheme.typography.bodySmall
+                    textAlign = TextAlign.End,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
+                    style = MaterialTheme.typography.bodySmall,
                 )
                 Text(
-                    text = "${item.quantity} ${item.unit}",
-                    style = MaterialTheme.typography.bodySmall
+                    text = "${decimalFormat.format(item.quantity)} ${item.unit}",
+                    textAlign = TextAlign.End,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 2,
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
         }
@@ -246,8 +261,14 @@ private fun ItemInfoPreview() {
     PreviewUtil.run {
         Preview {
             Column {
-                ItemInfo(item = itemChecked)
-                ItemInfo(item = itemUnchecked)
+                ItemInfo(
+                    item = itemChecked,
+                    surfaceOnClick = { },
+                )
+                ItemInfo(
+                    item = itemUnchecked,
+                    surfaceOnClick = { },
+                )
             }
         }
     }
@@ -259,8 +280,14 @@ private fun DefaultItemInfoPreview() {
     PreviewUtil.run {
         Preview {
             Column {
-                ItemInfo(item = defaultItem)
-                ItemInfo(item = defaultItem)
+                ItemInfo(
+                    item = defaultItem,
+                    surfaceOnClick = { },
+                )
+                ItemInfo(
+                    item = defaultItem,
+                    surfaceOnClick = { },
+                )
             }
         }
     }

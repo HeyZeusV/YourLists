@@ -82,7 +82,7 @@ fun AddScreen(
     val topAppBarTitle = sRes(AddDestination.title)
     val defaultItemQuery by addVM.defaultItemQuery.collectAsStateWithLifecycle()
     val defaultItems by addVM.defaultItems.collectAsStateWithLifecycle(initialValue = emptyList())
-    val itemLists by addVM.itemLists.collectAsStateWithLifecycle()
+//    val itemLists by addVM.itemLists.collectAsStateWithLifecycle()
     val categories by addVM.categories.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
@@ -105,7 +105,7 @@ fun AddScreen(
         saveAndAddOnClick = addVM::saveDefaultItemAndAddItem,
         addToListOnClick = addVM::addItem,
         deleteDefaultItemOnClick = addVM::deleteDefaultItem,
-        itemLists = itemLists,
+//        itemLists = itemLists,
     )
 }
 
@@ -118,7 +118,7 @@ fun AddScreen(
     saveAndAddOnClick: (DefaultItem) -> Unit,
     addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
-    itemLists: List<ItemListWithItems>,
+//    itemLists: List<ItemListWithItems>,
 ) {
     val listState = rememberLazyListState()
     val maxLength = iRes(R.integer.name_max_length)
@@ -161,7 +161,7 @@ fun AddScreen(
         if (defaultItemQuery.isNotBlank()) {
             Surface(
                 modifier = Modifier
-                    .padding(bottom = dRes(R.dimen.if_spacedBy))
+                    .padding(bottom = dRes(R.dimen.if_spacedBy_horizontal))
                     .fillMaxWidth()
                     .heightIn(dRes(R.dimen.if_height_min))
                     .align(Alignment.CenterHorizontally)
@@ -461,7 +461,7 @@ private fun AddScreenPreview() {
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
-                itemLists = emptyList(),
+//                itemLists = emptyList(),
                 saveAndAddOnClick = { },
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
@@ -480,7 +480,7 @@ private fun AddScreenBlankQueryPreview() {
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
-                itemLists = emptyList(),
+//                itemLists = emptyList(),
                 saveAndAddOnClick = { },
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },

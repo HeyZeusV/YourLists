@@ -31,7 +31,8 @@
     <dimen name="if_height_min">40.dp</dimen>
     <dimen name="if_padding_horizontal">8.dp</dimen>
     <dimen name="if_padding_vertical">4.dp</dimen>
-    <dimen name="if_spacedBy">4.dp</dimen>
+    <dimen name="if_spacedBy_horizontal">4.dp</dimen>
+    <dimen name="if_spacedBy_vertical">4.dp</dimen>
 
     <!-- ListScreen (ls) -->
     <dimen name="ls_list_padding_all">12.dp</dimen>
