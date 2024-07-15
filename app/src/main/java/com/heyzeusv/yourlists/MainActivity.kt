@@ -135,7 +135,10 @@ fun YourLists(
                     topAppBarTitle = topAppBarTitle,
                 )
             }
-            composable(AddDestination.route) {
+            composable(
+                route = AddDestination.routeWithArg,
+                arguments = AddDestination.arguments,
+            ) {
                 val addVM: AddViewModel = hiltViewModel()
                 AddScreen(
                     addVM = addVM,

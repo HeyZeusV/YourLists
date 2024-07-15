@@ -52,7 +52,6 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
-import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.BottomSheet
@@ -93,7 +92,6 @@ fun AddScreen(
         fabSetup(FabState(isFabDisplayed = false))
     }
     AddScreen(
-        selectedItemList = ItemList(0L, ""), // TODO: Hook up navigation argument to get this value
         defaultItemQuery = defaultItemQuery,
         updateDefaultItemQuery = { addVM.updateDefaultItemQuery(it) },
         defaultItems = defaultItems,
@@ -107,13 +105,12 @@ fun AddScreen(
 
 @Composable
 fun AddScreen(
-    selectedItemList: ItemList,
     defaultItemQuery: String,
     updateDefaultItemQuery: (String) -> Unit,
     defaultItems: List<DefaultItem>,
     categories: List<Category>,
-    saveAndAddOnClick: (ItemList, DefaultItem) -> Unit,
-    addToListOnClick: (ItemList, DefaultItem) -> Unit,
+    saveAndAddOnClick: (DefaultItem) -> Unit,
+    addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
     itemLists: List<ItemListWithItems>,
 ) {
@@ -202,7 +199,6 @@ fun AddScreen(
         updateIsVisible = { isBottomSheetDisplayed = it },
     ) {
         AddBottomSheetContent(
-            selectedItemList = selectedItemList,
             selectedDefaultItem = selectedDefaultItem,
             categories = categories,
             saveAndAddOnClick = saveAndAddOnClick,
@@ -214,11 +210,10 @@ fun AddScreen(
 
 @Composable
 fun AddBottomSheetContent(
-    selectedItemList: ItemList,
     selectedDefaultItem: DefaultItem,
     categories: List<Category>,
-    saveAndAddOnClick: (ItemList, DefaultItem) -> Unit,
-    addToListOnClick: (ItemList, DefaultItem) -> Unit,
+    saveAndAddOnClick: (DefaultItem) -> Unit,
+    addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
@@ -312,8 +307,14 @@ fun AddBottomSheetContent(
                 if (name.isBlank()) {
                     isNameError = true
                 } else {
-                    // TODO: create copy of selectedDefaultItem with updated TextField values
-                    saveAndAddOnClick(selectedItemList, selectedDefaultItem)
+                    val updatedSelectedDefaultItem = selectedDefaultItem.copy(
+                        name = name,
+                        category = category,
+                        quantity = quantity.toDouble(),
+                        unit = unit,
+                        memo = memo,
+                    )
+                    saveAndAddOnClick(updatedSelectedDefaultItem)
                 }
             },
             modifier = Modifier.fillMaxWidth(),
@@ -327,8 +328,14 @@ fun AddBottomSheetContent(
                     if (name.isBlank()) {
                         isNameError = true
                     } else {
-                        // TODO: create copy of selectedDefaultItem with updated TextField values
-                        addToListOnClick(selectedItemList, selectedDefaultItem)
+                        val updatedSelectedDefaultItem = selectedDefaultItem.copy(
+                            name = name,
+                            category = category,
+                            quantity = quantity.toDouble(),
+                            unit = unit,
+                            memo = memo,
+                        )
+                        addToListOnClick(updatedSelectedDefaultItem)
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -432,14 +439,13 @@ private fun AddScreenPreview() {
     PreviewUtil.run {
         Preview {
             AddScreen(
-                selectedItemList = ItemList(0L, ""),
                 defaultItemQuery = "Preview",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
                 itemLists = emptyList(),
-                saveAndAddOnClick = { _, _ -> },
-                addToListOnClick = { _, _ -> },
+                saveAndAddOnClick = { },
+                addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
             )
         }
@@ -452,14 +458,13 @@ private fun AddScreenBlankQueryPreview() {
     PreviewUtil.run {
         Preview {
             AddScreen(
-                selectedItemList = ItemList(0L, ""),
                 defaultItemQuery = "",
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
                 itemLists = emptyList(),
-                saveAndAddOnClick = { _, _ -> },
-                addToListOnClick = { _, _ -> },
+                saveAndAddOnClick = { },
+                addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
             )
         }
@@ -473,11 +478,10 @@ private fun AddBottomSheetContentNewItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
-                    selectedItemList = ItemList(0L, ""),
                     selectedDefaultItem = defaultItem,
                     categories = emptyList(),
-                    saveAndAddOnClick = { _, _ -> },
-                    addToListOnClick = { _, _ -> },
+                    saveAndAddOnClick = { },
+                    addToListOnClick = { },
                     deleteDefaultItemOnClick = { },
                 )
             }
@@ -492,11 +496,10 @@ private fun AddBottomSheetContentExistingItemPreview() {
         Preview {
             Surface(modifier = Modifier.fillMaxWidth()) {
                 AddBottomSheetContent(
-                    selectedItemList = ItemList(0L, ""),
                     selectedDefaultItem = defaultItem.copy(itemId = 10L),
                     categories = emptyList(),
-                    saveAndAddOnClick = { _, _ -> },
-                    addToListOnClick = { _, _ -> },
+                    saveAndAddOnClick = { },
+                    addToListOnClick = { },
                     deleteDefaultItemOnClick = { },
                 )
             }

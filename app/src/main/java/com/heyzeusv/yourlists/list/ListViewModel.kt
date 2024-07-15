@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ListViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val repo: Repository
+    private val repo: Repository,
 ) : ViewModel() {
 
     private val _itemList = MutableStateFlow(ItemListWithItems(ItemList(-1L, "")))

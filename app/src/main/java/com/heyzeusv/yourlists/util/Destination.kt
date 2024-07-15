@@ -79,6 +79,12 @@ object AddDestination: Destination {
     override val actionRightDescription: Int = 0
     override val fabIcon: ImageVector = Blank
     override val fabText: Int = 0
+
+    const val ID_ARG = "listId"
+    var arguments = listOf(
+        navArgument(ID_ARG) { type = NavType.LongType }
+    )
+    val routeWithArg = "$route/{$ID_ARG}"
 }
 
 val Destinations = listOf(OverviewDestination, ListDestination, AddDestination)

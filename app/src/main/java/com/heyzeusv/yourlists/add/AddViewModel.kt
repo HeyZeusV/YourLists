@@ -1,12 +1,13 @@
 package com.heyzeusv.yourlists.add
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
-import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,8 +24,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddViewModel @Inject constructor(
-    private val repo: Repository
+    savedStateHandle: SavedStateHandle,
+    private val repo: Repository,
 ) : ViewModel() {
+
+    private val itemListId = savedStateHandle[AddDestination.ID_ARG] ?: 0L
 
     private val _defaultItemQuery = MutableStateFlow("")
     val defaultItemQuery = _defaultItemQuery.asStateFlow()
@@ -75,22 +79,22 @@ class AddViewModel @Inject constructor(
         }
     }
 
-    fun saveDefaultItemAndAddItem(itemList: ItemList, defaultItem: DefaultItem) {
+    fun saveDefaultItemAndAddItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
             if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
                 repo.insertCategories(Category(id = 0L, name = defaultItem.name))
             }
             repo.upsertDefaultItems(defaultItem)
-            repo.insertItems(defaultItem.toItem(itemList.itemListId))
+            repo.insertItems(defaultItem.toItem(itemListId))
         }
     }
 
-    fun addItem(itemList: ItemList, defaultItem: DefaultItem) {
+    fun addItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
             if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
                 repo.insertCategories(Category(id = 0L, name = defaultItem.name))
             }
-            repo.insertItems(defaultItem.toItem(itemList.itemListId))
+            repo.insertItems(defaultItem.toItem(itemListId))
         }
     }
 

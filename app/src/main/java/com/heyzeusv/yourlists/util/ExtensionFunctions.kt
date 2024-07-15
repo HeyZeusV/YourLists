@@ -94,6 +94,18 @@ fun NavHostController.navigateToItemList(listId: Long, listName: String?) {
 }
 
 /**
+ *  Navigates to [AddDestination] while also passing an id and name to determine which
+ *  [ItemListWithItems] to display.
+ *
+ *  @param listId Id of ItemList to add items to.
+ */
+fun NavHostController.navigateToAdd(listId: Long) {
+    AddDestination.let {
+        this.navigateSingleTopTo("${it.route}/$listId")
+    }
+}
+
+/**
  *  Searches for the currently displayed [Destination] by comparing the current route in back stack
  *  to all available routes.
  *
