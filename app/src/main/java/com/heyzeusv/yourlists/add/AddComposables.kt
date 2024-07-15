@@ -4,23 +4,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -28,7 +21,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -40,11 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,23 +43,17 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.PreviewUtil
-import com.heyzeusv.yourlists.util.TextFieldWithLimit
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
-import com.heyzeusv.yourlists.util.formatTextAsDouble
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
-import com.heyzeusv.yourlists.util.saRes
-import com.heyzeusv.yourlists.util.toDouble
-import com.heyzeusv.yourlists.util.toTextFieldValue
-import java.text.DecimalFormat
 
 @Composable
 fun AddScreen(
@@ -204,182 +187,14 @@ fun AddScreen(
         isVisible = isBottomSheetDisplayed,
         updateIsVisible = { isBottomSheetDisplayed = it },
     ) {
-        AddBottomSheetContent(
+        EditItemBottomSheetContent(
             closeBottomSheet = { isBottomSheetDisplayed = false },
-            selectedDefaultItem = selectedDefaultItem,
+            selectedItem = selectedDefaultItem,
             categories = categories,
-            saveAndAddOnClick = saveAndAddOnClick,
-            addToListOnClick = addToListOnClick,
-            deleteDefaultItemOnClick = deleteDefaultItemOnClick,
+            saveAndAddOnClick = { saveAndAddOnClick(it as DefaultItem) },
+            addToListOnClick = { addToListOnClick(it as DefaultItem) },
+            deleteDefaultItemOnClick = { deleteDefaultItemOnClick(it as DefaultItem) },
         )
-    }
-}
-
-@Composable
-fun AddBottomSheetContent(
-    closeBottomSheet: () -> Unit,
-    selectedDefaultItem: DefaultItem,
-    categories: List<Category>,
-    saveAndAddOnClick: (DefaultItem) -> Unit,
-    addToListOnClick: (DefaultItem) -> Unit,
-    deleteDefaultItemOnClick: (DefaultItem) -> Unit,
-) {
-    val focusManager = LocalFocusManager.current
-    val unitList = saRes(R.array.unit_values).toList()
-    val decimalFormat = DecimalFormat("#,##0.00")
-
-    var name by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.name)) }
-    var category by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.category)) }
-    var quantity by remember {
-        mutableStateOf(selectedDefaultItem.quantity.toTextFieldValue(decimalFormat))
-    }
-    var unit by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.unit)) }
-    var memo by remember { mutableStateOf(TextFieldValue(selectedDefaultItem.memo)) }
-
-    var isNameError by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .padding(all = dRes(R.dimen.bs_padding_all))
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.asbs_vertical_spacedBy))
-    ) {
-        TextFieldWithLimit(
-            value = name,
-            onValueChange = { name = it },
-            label = sRes(R.string.asbs_name),
-            isError = isNameError,
-            maxLength = iRes(R.integer.name_max_length),
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-        )
-        FilteredDropDownMenu(
-            value = category,
-            onValueChanged = { category = it },
-            label = sRes(R.string.asbs_category),
-            options = categories.map { it.name },
-            maxLength = iRes(R.integer.category_max_length),
-            optionOnClick = {
-                category = TextFieldValue(it)
-                focusManager.moveFocus(FocusDirection.Down)
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
-            TextFieldWithLimit(
-                value = quantity,
-                onValueChange = { quantity = it.formatTextAsDouble(decimalFormat) },
-                label = sRes(R.string.asbs_quantity),
-                isError = false,
-                maxLength = iRes(R.integer.quantity_max_length),
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Right) }
-                ),
-            )
-            FilteredDropDownMenu(
-                value = unit,
-                onValueChanged = { unit = it },
-                label = sRes(R.string.asbs_unit),
-                options = unitList,
-                optionOnClick = {
-                    unit = TextFieldValue(it)
-                    focusManager.moveFocus(FocusDirection.Down)
-                },
-                maxLength = iRes(R.integer.unit_max_length),
-                modifier = Modifier.weight(1f),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                ),
-            )
-        }
-        TextFieldWithLimit(
-            value = memo,
-            onValueChange = { memo = it },
-            label = sRes(R.string.asbs_memo),
-            isError = false,
-            maxLength = iRes(R.integer.memo_max_length),
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-        )
-        Button(
-            onClick = {
-                if (name.text.isBlank()) {
-                    isNameError = true
-                } else {
-                    val updatedSelectedDefaultItem = selectedDefaultItem.copy(
-                        name = name.text,
-                        category = category.text.ifBlank { categories.first().name },
-                        quantity = quantity.toDouble(),
-                        unit = unit.text.ifBlank { unitList.first() },
-                        memo = memo.text,
-                    )
-                    saveAndAddOnClick(updatedSelectedDefaultItem)
-                    closeBottomSheet()
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraSmall,
-        ) {
-            Text(text = sRes(R.string.asbs_save_add).uppercase())
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
-            OutlinedButton(
-                onClick = {
-                    if (name.text.isBlank()) {
-                        isNameError = true
-                    } else {
-                        val updatedSelectedDefaultItem = selectedDefaultItem.copy(
-                            name = name.text,
-                            category = category.text.ifBlank { categories.first().name },
-                            quantity = quantity.toDouble(),
-                            unit = unit.text.ifBlank { unitList.first() },
-                            memo = memo.text,
-                        )
-                        addToListOnClick(updatedSelectedDefaultItem)
-                        closeBottomSheet()
-                    }
-                },
-                modifier = Modifier.weight(1f),
-                shape = MaterialTheme.shapes.extraSmall,
-            ) {
-                Text(text = sRes(R.string.asbs_add).uppercase())
-            }
-            if (selectedDefaultItem.itemId != 0L) {
-                Button(
-                    onClick = {
-                        deleteDefaultItemOnClick(selectedDefaultItem)
-                        closeBottomSheet()
-                    },
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.extraSmall,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    ),
-                    contentPadding = PaddingValues(
-                        horizontal = dRes(R.dimen.asbs_button_padding_horizontal),
-                        vertical = dRes(R.dimen.asbs_button_padding_vertical)
-                    ),
-                ) {
-                    Text(text = sRes(R.string.asbs_delete).uppercase())
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(dRes(R.dimen.bs_bottom_spacer)))
     }
 }
 
@@ -485,44 +300,6 @@ private fun AddScreenBlankQueryPreview() {
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
             )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun AddBottomSheetContentNewItemPreview() {
-    PreviewUtil.run {
-        Preview {
-            Surface(modifier = Modifier.fillMaxWidth()) {
-                AddBottomSheetContent(
-                    closeBottomSheet = { },
-                    selectedDefaultItem = defaultItem,
-                    categories = emptyList(),
-                    saveAndAddOnClick = { },
-                    addToListOnClick = { },
-                    deleteDefaultItemOnClick = { },
-                )
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun AddBottomSheetContentExistingItemPreview() {
-    PreviewUtil.run {
-        Preview {
-            Surface(modifier = Modifier.fillMaxWidth()) {
-                AddBottomSheetContent(
-                    closeBottomSheet = { },
-                    selectedDefaultItem = defaultItem.copy(itemId = 10L),
-                    categories = emptyList(),
-                    saveAndAddOnClick = { },
-                    addToListOnClick = { },
-                    deleteDefaultItemOnClick = { },
-                )
-            }
         }
     }
 }
