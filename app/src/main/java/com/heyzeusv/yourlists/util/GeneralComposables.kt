@@ -261,9 +261,12 @@ fun EditItemBottomSheetContent(
     closeBottomSheet: () -> Unit,
     selectedItem: BaseItem,
     categories: List<Category>,
-    saveAndAddOnClick: (BaseItem) -> Unit,
-    addToListOnClick: (BaseItem) -> Unit,
-    deleteDefaultItemOnClick: (BaseItem) -> Unit,
+    primaryLabel: String,
+    primaryOnClick: (BaseItem) -> Unit,
+    secondaryLabel: String?,
+    secondaryOnClick: ((BaseItem) -> Unit)?,
+    deleteLabel: String,
+    deleteOnClick: (BaseItem) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val unitList = saRes(R.array.unit_values).toList()
@@ -369,42 +372,48 @@ fun EditItemBottomSheetContent(
                         unit = unit.text.ifBlank { unitList.first() },
                         memo = memo.text,
                     )
-                    saveAndAddOnClick(updatedSelectedDefaultItem)
+                    primaryOnClick(updatedSelectedDefaultItem)
                     closeBottomSheet()
                 }
             },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {
-            Text(text = sRes(R.string.asbs_save_add).uppercase())
+            Text(text = primaryLabel.uppercase())
         }
         Row(horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))) {
-            OutlinedButton(
-                onClick = {
-                    if (name.text.isBlank()) {
-                        isNameError = true
-                    } else {
-                        val updatedQuantity = quantity.toDouble()
-                        val updatedSelectedDefaultItem = selectedItem.editCopy(
-                            name = name.text,
-                            category = category.text.ifBlank { categories.first().name },
-                            quantity = if (updatedQuantity == 0.0) 1.0 else updatedQuantity,
-                            unit = unit.text.ifBlank { unitList.first() },
-                            memo = memo.text,
-                        )
-                        addToListOnClick(updatedSelectedDefaultItem)
-                        closeBottomSheet()
-                    }
-                },
-                modifier = Modifier.weight(1f),
-                shape = MaterialTheme.shapes.extraSmall,
-            ) {
-                Text(text = sRes(R.string.asbs_add).uppercase())
+            if (secondaryOnClick != null) {
+                OutlinedButton(
+                    onClick = {
+                        if (name.text.isBlank()) {
+                            isNameError = true
+                        } else {
+                            val updatedQuantity = quantity.toDouble()
+                            val updatedSelectedDefaultItem = selectedItem.editCopy(
+                                name = name.text,
+                                category = category.text.ifBlank { categories.first().name },
+                                quantity = if (updatedQuantity == 0.0) 1.0 else updatedQuantity,
+                                unit = unit.text.ifBlank { unitList.first() },
+                                memo = memo.text,
+                            )
+                            secondaryOnClick(updatedSelectedDefaultItem)
+                            closeBottomSheet()
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.extraSmall,
+                    contentPadding = PaddingValues(
+                        horizontal = dRes(R.dimen.asbs_button_padding_horizontal),
+                        vertical = dRes(R.dimen.asbs_button_padding_vertical)
+                    ),
+                ) {
+                    Text(text = secondaryLabel!!.uppercase())
+                }
             }
             if (selectedItem.itemId != 0L) {
                 Button(
                     onClick = {
-                        deleteDefaultItemOnClick(selectedItem)
+                        deleteOnClick(selectedItem)
                         closeBottomSheet()
                     },
                     modifier = Modifier.weight(1f),
@@ -418,7 +427,7 @@ fun EditItemBottomSheetContent(
                         vertical = dRes(R.dimen.asbs_button_padding_vertical)
                     ),
                 ) {
-                    Text(text = sRes(R.string.asbs_delete).uppercase())
+                    Text(text = deleteLabel.uppercase())
                 }
             }
         }
@@ -489,9 +498,12 @@ private fun EditItemBottomSheetContentNewItemPreview() {
                     closeBottomSheet = { },
                     selectedItem = defaultItem,
                     categories = emptyList(),
-                    saveAndAddOnClick = { },
-                    addToListOnClick = { },
-                    deleteDefaultItemOnClick = { },
+                    primaryLabel = "Primary Button",
+                    primaryOnClick = { },
+                    secondaryLabel = "Secondary Button",
+                    secondaryOnClick = { },
+                    deleteLabel = "Delete Button",
+                    deleteOnClick = { },
                 )
             }
         }
@@ -508,9 +520,34 @@ private fun EditItemSheetContentExistingItemPreview() {
                     closeBottomSheet = { },
                     selectedItem = defaultItem.editCopy(itemId = 10L),
                     categories = emptyList(),
-                    saveAndAddOnClick = { },
-                    addToListOnClick = { },
-                    deleteDefaultItemOnClick = { },
+                    primaryLabel = "Primary Button",
+                    primaryOnClick = { },
+                    secondaryLabel = "Secondary Button",
+                    secondaryOnClick = { },
+                    deleteLabel = "Delete Button",
+                    deleteOnClick = { },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun EditItemSheetContentNullAddPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                EditItemBottomSheetContent(
+                    closeBottomSheet = { },
+                    selectedItem = defaultItem.editCopy(itemId = 10L),
+                    categories = emptyList(),
+                    primaryLabel = "Primary Button",
+                    primaryOnClick = { },
+                    secondaryLabel = null,
+                    secondaryOnClick = null,
+                    deleteLabel = "Delete Button",
+                    deleteOnClick = { },
                 )
             }
         }

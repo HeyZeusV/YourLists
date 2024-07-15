@@ -17,7 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.database.models.Category
+import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.BottomSheet
+import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
@@ -39,6 +43,8 @@ fun ListScreen(
     topAppBarTitle: String?,
 ) {
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
+    val categories by listVM.categories.collectAsStateWithLifecycle()
+
     var isNewList by remember { mutableStateOf(topAppBarTitle == null) }
     val newListTitle = sRes(ListDestination.title)
 
@@ -83,6 +89,7 @@ fun ListScreen(
     )
     ListScreen(
         itemList = itemList,
+        categories = categories,
         emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
     )
 }
@@ -90,9 +97,12 @@ fun ListScreen(
 @Composable
 fun ListScreen(
     itemList: ItemListWithItems,
+    categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
 ) {
     val listState = rememberLazyListState()
+    var isBottomSheetDisplayed by remember { mutableStateOf(false) }
+    var selectedItem by remember { mutableStateOf(Item()) }
 
     if (itemList.items.isNotEmpty()) {
         LazyColumn(
@@ -105,7 +115,7 @@ fun ListScreen(
             items(itemList.items) {
                 ItemInfo(
                     item = it,
-                    surfaceOnClick = { },
+                    surfaceOnClick = { selectedItem = it },
                 )
             }
         }
@@ -117,6 +127,22 @@ fun ListScreen(
             buttonText = sRes(ListDestination.fabText)
         )
     }
+    BottomSheet(
+        isVisible = isBottomSheetDisplayed,
+        updateIsVisible = { isBottomSheetDisplayed = it },
+    ) {
+        EditItemBottomSheetContent(
+            closeBottomSheet = { isBottomSheetDisplayed = false },
+            selectedItem = selectedItem,
+            categories = categories,
+            primaryLabel = sRes(R.string.lsbs_update),
+            primaryOnClick = { },
+            secondaryLabel = null,
+            secondaryOnClick = null,
+            deleteLabel = sRes(R.string.lsbs_delete),
+            deleteOnClick = { }
+        )
+    }
 }
 
 @Preview
@@ -126,7 +152,8 @@ fun ListScreenPreview() {
         Preview {
             ListScreen(
                 itemList = halfCheckedItemList,
-                emptyButtonOnClick = { }
+                categories = emptyList(),
+                emptyButtonOnClick = { },
             )
         }
     }
@@ -139,6 +166,7 @@ fun ListScreenEmptyPreview() {
         Preview {
             ListScreen(
                 itemList = emptyItemList,
+                categories = emptyList(),
                 emptyButtonOnClick = { }
             )
         }

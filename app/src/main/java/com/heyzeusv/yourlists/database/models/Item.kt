@@ -35,14 +35,14 @@ import androidx.room.PrimaryKey
 )
 data class Item(
     @PrimaryKey(autoGenerate = true)
-    override val itemId: Long,
-    override val name: String,
-    val isChecked: Boolean,
-    override val category: String,
-    override val quantity: Double,
-    override val unit: String,
-    override val memo: String,
-    val parentItemListId: Long,
+    override val itemId: Long = 0L,
+    override val name: String = "",
+    val isChecked: Boolean = false,
+    override val category: String = "",
+    override val quantity: Double = 0.0,
+    override val unit: String = "",
+    override val memo: String = "",
+    val parentItemListId: Long = 0L,
     val originItemListId: Long? = null,
 ) : BaseItem {
 

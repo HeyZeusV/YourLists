@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -49,11 +49,11 @@ class AddViewModel @Inject constructor(
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
-    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
-    val itemLists = _itemLists.asStateFlow()
+//    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
+//    val itemLists = _itemLists.asStateFlow()
 
     init {
-        getAllItemLists()
+//        getAllItemLists()
         getAllCategories()
     }
 
@@ -63,13 +63,13 @@ class AddViewModel @Inject constructor(
         return verbatimQuery
     }
 
-    private fun getAllItemLists() {
-        viewModelScope.launch {
-            repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
-                _itemLists.update { lists }
-            }
-        }
-    }
+//    private fun getAllItemLists() {
+//        viewModelScope.launch {
+//            repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
+//                _itemLists.update { lists }
+//            }
+//        }
+//    }
 
     private fun getAllCategories() {
         viewModelScope.launch {
@@ -82,7 +82,9 @@ class AddViewModel @Inject constructor(
     fun saveDefaultItemAndAddItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
             if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
-                repo.insertCategories(Category(id = 0L, name = defaultItem.name))
+                runBlocking {
+                    repo.insertCategories(Category(id = 0L, name = defaultItem.name))
+                }
             }
             repo.upsertDefaultItems(defaultItem)
             repo.insertItems(defaultItem.toItem(itemListId))

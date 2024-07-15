@@ -194,9 +194,12 @@ fun AddScreen(
             },
             selectedItem = selectedDefaultItem,
             categories = categories,
-            saveAndAddOnClick = { saveAndAddOnClick(it as DefaultItem) },
-            addToListOnClick = { addToListOnClick(it as DefaultItem) },
-            deleteDefaultItemOnClick = { deleteDefaultItemOnClick(it as DefaultItem) },
+            primaryLabel = sRes(R.string.asbs_save_add),
+            primaryOnClick = { saveAndAddOnClick(it as DefaultItem) },
+            secondaryLabel = sRes(R.string.asbs_add),
+            secondaryOnClick = { addToListOnClick(it as DefaultItem) },
+            deleteLabel = sRes(R.string.asbs_delete),
+            deleteOnClick = { deleteDefaultItemOnClick(it as DefaultItem) },
         )
     }
 }

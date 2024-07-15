@@ -35,9 +35,13 @@
 
     <!-- ListScreen (ls) -->
     <string name="ls_title">New List</string>
-    <string name="ls_empty">Add a single item or an existing list!</string>
+<!--    <string name="ls_empty">Add a single item or an existing list!</string>-->
+    <string name="ls_empty">Add an item using the button below!</string>
     <string name="ls_ad_title">New List</string>
     <string name="ls_fab">Add</string>
+    <!-- ListScreen.BottomSheet (lsbs) -->
+    <string name="lsbs_update">Update Item</string>
+    <string name="lsbs_delete">Delete Item</string>
 
     <!-- OverviewScreen (os) -->
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>

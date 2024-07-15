@@ -4,14 +4,20 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
+import com.heyzeusv.yourlists.database.models.Category
+import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +28,14 @@ class ListViewModel @Inject constructor(
 
     private val _itemList = MutableStateFlow(ItemListWithItems(ItemList(-1L, "")))
     val itemList = _itemList.asStateFlow()
+
+    private val _categories = MutableStateFlow(emptyList<Category>())
+    val categories = _categories.asStateFlow()
+
+    init {
+        getItemListWithId(checkNotNull(savedStateHandle[ListDestination.ID_ARG]))
+        getAllCategories()
+    }
 
     fun insertItemList(name: String) {
         viewModelScope.launch {
@@ -37,7 +51,26 @@ class ListViewModel @Inject constructor(
         }
     }
 
-    init {
-        getItemListWithId(checkNotNull(savedStateHandle[ListDestination.ID_ARG]))
+    private fun getAllCategories() {
+        viewModelScope.launch {
+            repo.getAllCategories().flowOn(Dispatchers.IO).collectLatest { list ->
+                _categories.update { list }
+            }
+        }
+    }
+
+    fun updateItem(item: Item) {
+        viewModelScope.launch {
+            if (_categories.value.firstOrNull { it.name == item.name } == null) {
+                runBlocking {
+                    repo.insertCategories(Category(id = 0L, name = item.name))
+                }
+            }
+            repo.updateItems(item)
+        }
+    }
+
+    fun deleteItem(item: Item) {
+        viewModelScope.launch { repo.deleteItems(item) }
     }
 }
