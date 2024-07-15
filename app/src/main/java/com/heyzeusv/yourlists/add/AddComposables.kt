@@ -188,7 +188,10 @@ fun AddScreen(
         updateIsVisible = { isBottomSheetDisplayed = it },
     ) {
         EditItemBottomSheetContent(
-            closeBottomSheet = { isBottomSheetDisplayed = false },
+            closeBottomSheet = {
+                updateDefaultItemQuery("")
+                isBottomSheetDisplayed = false
+            },
             selectedItem = selectedDefaultItem,
             categories = categories,
             saveAndAddOnClick = { saveAndAddOnClick(it as DefaultItem) },

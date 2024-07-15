@@ -62,7 +62,6 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.add.FilteredDropDownMenu
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Category
-import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
 import java.text.DecimalFormat
