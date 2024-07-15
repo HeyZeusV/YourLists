@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @HiltViewModel
@@ -61,10 +60,8 @@ class ListViewModel @Inject constructor(
 
     fun updateItem(item: Item) {
         viewModelScope.launch {
-            if (_categories.value.firstOrNull { it.name == item.name } == null) {
-                runBlocking {
-                    repo.insertCategories(Category(id = 0L, name = item.name))
-                }
+            if (_categories.value.firstOrNull { it.name == item.category } == null) {
+                repo.insertCategories(Category(id = 0L, name = item.category))
             }
             repo.updateItems(item)
         }
