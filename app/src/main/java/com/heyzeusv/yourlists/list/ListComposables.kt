@@ -58,7 +58,6 @@ fun ListScreen(
         )
     }
     LaunchedEffect(key1 = itemList.items) {
-        // TODO Check this again once Items are able to be added
         fabSetup(
             FabState(
                 isFabDisplayed = itemList.items.isNotEmpty(),
@@ -91,6 +90,8 @@ fun ListScreen(
         itemList = itemList,
         categories = categories,
         emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
+        updateOnClick = listVM::updateItem,
+        deleteOnClick = listVM::deleteItem
     )
 }
 
@@ -99,6 +100,8 @@ fun ListScreen(
     itemList: ItemListWithItems,
     categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
+    updateOnClick: (Item) -> Unit,
+    deleteOnClick: (Item) -> Unit,
 ) {
     val listState = rememberLazyListState()
     var isBottomSheetDisplayed by remember { mutableStateOf(false) }
@@ -115,7 +118,10 @@ fun ListScreen(
             items(itemList.items) {
                 ItemInfo(
                     item = it,
-                    surfaceOnClick = { selectedItem = it },
+                    surfaceOnClick = {
+                        selectedItem = it
+                        isBottomSheetDisplayed = true
+                    },
                 )
             }
         }
@@ -136,11 +142,11 @@ fun ListScreen(
             selectedItem = selectedItem,
             categories = categories,
             primaryLabel = sRes(R.string.lsbs_update),
-            primaryOnClick = { },
+            primaryOnClick = { updateOnClick(it as Item) },
             secondaryLabel = null,
             secondaryOnClick = null,
             deleteLabel = sRes(R.string.lsbs_delete),
-            deleteOnClick = { }
+            deleteOnClick = { deleteOnClick(it as Item) }
         )
     }
 }
@@ -154,6 +160,8 @@ fun ListScreenPreview() {
                 itemList = halfCheckedItemList,
                 categories = emptyList(),
                 emptyButtonOnClick = { },
+                updateOnClick = { },
+                deleteOnClick = { },
             )
         }
     }
@@ -167,7 +175,9 @@ fun ListScreenEmptyPreview() {
             ListScreen(
                 itemList = emptyItemList,
                 categories = emptyList(),
-                emptyButtonOnClick = { }
+                emptyButtonOnClick = { },
+                updateOnClick = { },
+                deleteOnClick = { },
             )
         }
     }

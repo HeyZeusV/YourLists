@@ -19,5 +19,5 @@ interface ItemListDao : BaseDao<ItemList> {
     @Query("SELECT * " +
             "FROM ItemList " +
             "WHERE itemListId=(:id)")
-    suspend fun getItemListWithId(id: Long): ItemListWithItems?
+    fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
 }

@@ -176,8 +176,8 @@ fun AddScreen(
                     item = it,
                     surfaceOnClick = {
                         focusManager.clearFocus()
-                        isBottomSheetDisplayed = true
                         selectedDefaultItem = it
+                        isBottomSheetDisplayed = true
                     },
                 )
             }

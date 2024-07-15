@@ -46,7 +46,9 @@ class ListViewModel @Inject constructor(
 
     private fun getItemListWithId(id: Long) {
         viewModelScope.launch {
-            _itemList.update { repo.getItemListWithId(id) ?: ItemListWithItems() }
+            repo.getItemListWithId(id).flowOn(Dispatchers.IO).collectLatest { list ->
+                _itemList.update { list ?: ItemListWithItems() }
+            }
         }
     }
 
