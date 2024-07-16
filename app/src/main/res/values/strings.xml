@@ -24,6 +24,7 @@
     <string name="asbs_memo">Memo</string>
     <string name="asbs_add">Add to list</string>
     <string name="asbs_save_add">Save as default &amp; add to list</string>
+    <string name="asbs_update_add">Update defaults &amp; add to list</string>
     <string name="asbs_delete">Delete defaults</string>
 
     <!-- InputAlertDialog (iad) -->

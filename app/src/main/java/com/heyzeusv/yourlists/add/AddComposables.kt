@@ -194,7 +194,11 @@ fun AddScreen(
             },
             selectedItem = selectedDefaultItem,
             categories = categories,
-            primaryLabel = sRes(R.string.asbs_save_add),
+            primaryLabel = if (selectedDefaultItem.itemId == 0L) {
+                sRes(R.string.asbs_save_add)
+            } else {
+                sRes(R.string.asbs_update_add)
+            },
             primaryOnClick = { saveAndAddOnClick(it as DefaultItem) },
             secondaryLabel = sRes(R.string.asbs_add),
             secondaryOnClick = { addToListOnClick(it as DefaultItem) },
