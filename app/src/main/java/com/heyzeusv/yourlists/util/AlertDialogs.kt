@@ -12,12 +12,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
@@ -35,7 +38,12 @@ fun InputAlertDialog(
     var input by remember { mutableStateOf(TextFieldValue("")) }
     var isError by remember { mutableStateOf(false) }
 
+    val focusRequester = FocusRequester()
+
     if (display) {
+        LaunchedEffect(key1 = Unit) {
+            focusRequester.requestFocus()
+        }
         BasicAlertDialog(onDismissRequest = onDismissRequest) {
             Card(shape = MaterialTheme.shapes.medium) {
                 Column(modifier = Modifier.padding(all = dRes(R.dimen.iad_padding_all)) ) {
@@ -50,7 +58,9 @@ fun InputAlertDialog(
                         label = sRes(R.string.iad_label),
                         isError = isError,
                         maxLength = maxLength,
-                        modifier = Modifier.padding(bottom = dRes(R.dimen.iad_input_padding_bottom)),
+                        modifier = Modifier
+                            .padding(bottom = dRes(R.dimen.iad_input_padding_bottom))
+                            .focusRequester(focusRequester),
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
