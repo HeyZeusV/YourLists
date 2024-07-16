@@ -24,13 +24,11 @@ import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
-import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
-import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToAdd
 import com.heyzeusv.yourlists.util.sRes
 
@@ -40,19 +38,16 @@ fun ListScreen(
     navController: NavHostController,
     topAppBarSetup: (TopAppBarState) -> Unit,
     fabSetup: (FabState) -> Unit,
-    topAppBarTitle: String?,
+    topAppBarTitle: String,
 ) {
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     val categories by listVM.categories.collectAsStateWithLifecycle()
 
-    var isNewList by remember { mutableStateOf(topAppBarTitle == null) }
-    val newListTitle = sRes(ListDestination.title)
-
-    LaunchedEffect(key1 = itemList.itemList.name) {
+    LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
             TopAppBarState(
                 destination = ListDestination,
-                title = itemList.itemList.name.ifBlank { newListTitle },
+                title = topAppBarTitle,
                 onNavPressed = { navController.navigateUp() },
             )
         )
@@ -65,20 +60,6 @@ fun ListScreen(
             )
         )
     }
-    InputAlertDialog(
-        display = isNewList,
-        onDismissRequest = { },
-        title = sRes(R.string.ls_ad_title),
-        maxLength = iRes(R.integer.name_max_length),
-        onConfirm = { input ->
-            listVM.insertItemList(input)
-            isNewList = false
-        },
-        onDismiss = {
-            navController.navigateUp()
-            isNewList = false
-        }
-    )
     ListScreen(
         itemList = itemList,
         categories = categories,

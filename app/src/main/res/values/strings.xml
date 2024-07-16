@@ -38,7 +38,6 @@
     <string name="ls_title">New List</string>
 <!--    <string name="ls_empty">Add a single item or an existing list!</string>-->
     <string name="ls_empty">Add an item using the button below!</string>
-    <string name="ls_ad_title">New List</string>
     <string name="ls_fab">Add</string>
     <!-- ListScreen.BottomSheet (lsbs) -->
     <string name="lsbs_update">Update Item</string>
@@ -47,6 +46,7 @@
     <!-- OverviewScreen (os) -->
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
+    <string name="os_ad_new_title">New List</string>
     <string name="os_ad_rename_title">Rename List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->
     <string name="osbs_manage">Manage %1$s</string>

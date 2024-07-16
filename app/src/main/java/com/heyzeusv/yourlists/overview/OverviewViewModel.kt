@@ -45,6 +45,12 @@ class OverviewViewModel @Inject constructor(
         }
     }
 
+    fun insertItemList(name: String) {
+        viewModelScope.launch {
+            repo.insertItemList(ItemList(nextItemListId.value, name))
+        }
+    }
+
     fun copyItemList(itemList: ItemListWithItems) {
         viewModelScope.launch {
             val copyName = "${itemList.itemList.name} - Copy"

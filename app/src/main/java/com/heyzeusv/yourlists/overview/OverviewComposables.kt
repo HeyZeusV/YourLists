@@ -57,6 +57,8 @@ fun OverviewScreen(
 ) {
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     val nextItemListId by overviewVM.nextItemListId.collectAsStateWithLifecycle()
+    var displayNewListAlertDialog by remember { mutableStateOf(false) }
+
     val topAppBarTitle = sRes(OverviewDestination.title)
 
     LaunchedEffect(key1 = Unit) {
@@ -71,17 +73,29 @@ fun OverviewScreen(
         fabSetup(
             FabState(
                 isFabDisplayed = itemLists.isNotEmpty(),
-                fabAction = { navController.navigateToItemList(nextItemListId, null) },
+                fabAction = { displayNewListAlertDialog = true },
             )
         )
     }
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { id, name -> navController.navigateToItemList(id, name) },
-        emptyButtonOnClick = { navController.navigateToItemList(nextItemListId, null) },
+        emptyButtonOnClick = { displayNewListAlertDialog = true },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
+    )
+    InputAlertDialog(
+        display = displayNewListAlertDialog,
+        onDismissRequest = { displayNewListAlertDialog = false },
+        title = sRes(R.string.os_ad_new_title),
+        maxLength = iRes(R.integer.name_max_length),
+        onConfirm = { input ->
+            overviewVM.insertItemList(input)
+            navController.navigateToItemList(nextItemListId, input)
+            displayNewListAlertDialog = false
+        },
+        onDismiss = { displayNewListAlertDialog = false }
     )
 }
 

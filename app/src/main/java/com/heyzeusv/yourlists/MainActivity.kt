@@ -127,7 +127,7 @@ fun YourLists(
                 arguments = ListDestination.arguments,
             ) { bse ->
                 val listVM: ListViewModel = hiltViewModel()
-                val topAppBarTitle = bse.arguments?.getString(ListDestination.NAME_ARG)
+                val topAppBarTitle = bse.arguments?.getString(ListDestination.NAME_ARG) ?: ""
                 ListScreen(
                     listVM = listVM,
                     navController = navController,

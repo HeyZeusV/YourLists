@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
-import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,13 +47,6 @@ class ListViewModel @Inject constructor(
 
     init {
         getAllCategories()
-    }
-
-    fun insertItemList(name: String) {
-        viewModelScope.launch {
-            repo.insertItemList(ItemList(itemListId.value, name))
-//            savedStateHandle[ListDestination.ID_ARG] = id
-        }
     }
 
     private fun getAllCategories() {
