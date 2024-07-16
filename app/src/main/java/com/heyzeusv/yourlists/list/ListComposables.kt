@@ -90,6 +90,7 @@ fun ListScreen(
         itemList = itemList,
         categories = categories,
         emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
+        checkboxOnClick = listVM::updateItemIsChecked,
         updateOnClick = listVM::updateItem,
         deleteOnClick = listVM::deleteItem
     )
@@ -100,6 +101,7 @@ fun ListScreen(
     itemList: ItemListWithItems,
     categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
+    checkboxOnClick: (Item, (Boolean) -> Unit) -> Unit,
     updateOnClick: (Item) -> Unit,
     deleteOnClick: (Item) -> Unit,
 ) {
@@ -122,6 +124,7 @@ fun ListScreen(
                         selectedItem = it
                         isBottomSheetDisplayed = true
                     },
+                    checkboxOnClick = checkboxOnClick,
                 )
             }
         }
@@ -160,6 +163,7 @@ fun ListScreenPreview() {
                 itemList = halfCheckedItemList,
                 categories = emptyList(),
                 emptyButtonOnClick = { },
+                checkboxOnClick = { _, _ -> },
                 updateOnClick = { },
                 deleteOnClick = { },
             )
@@ -176,6 +180,7 @@ fun ListScreenEmptyPreview() {
                 itemList = emptyItemList,
                 categories = emptyList(),
                 emptyButtonOnClick = { },
+                checkboxOnClick = { _, _ -> },
                 updateOnClick = { },
                 deleteOnClick = { },
             )

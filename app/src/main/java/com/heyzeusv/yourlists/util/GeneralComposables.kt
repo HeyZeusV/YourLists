@@ -33,6 +33,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -109,8 +110,9 @@ fun EmptyList(
 fun ItemInfo(
     item: BaseItem,
     surfaceOnClick: () -> Unit,
-    checkboxOnClick: () -> Unit = { },
+    checkboxOnClick: (Item, (Boolean) -> Unit) -> Unit = { _, _ -> },
 ) {
+    var isCheckboxEnabled by remember { mutableStateOf(true) }
     val decimalFormat = DecimalFormat("#,##0.00")
 
     Surface(modifier = Modifier.clickable { surfaceOnClick() }) {
@@ -129,10 +131,16 @@ fun ItemInfo(
                 CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                     Checkbox(
                         checked = item.isChecked,
-                        onCheckedChange = { checkboxOnClick() },
+                        onCheckedChange = { checkboxOnClick(item) { isCheckboxEnabled = it } },
+                        enabled = isCheckboxEnabled,
+                        colors = CheckboxDefaults.colors(
+                            disabledCheckedColor = MaterialTheme.colorScheme.primary,
+                            disabledUncheckedColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }
+            CheckboxDefaults.colors()
             Text(
                 text = item.name,
                 modifier = Modifier.weight(.80f),

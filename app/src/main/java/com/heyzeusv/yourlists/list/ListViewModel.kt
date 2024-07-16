@@ -60,6 +60,17 @@ class ListViewModel @Inject constructor(
         }
     }
 
+    fun updateItemIsChecked(
+        item: Item,
+        updateCheckboxEnabled: (Boolean) -> Unit,
+    ) {
+        viewModelScope.launch {
+            updateCheckboxEnabled(false)
+            repo.updateItems(item.copy(isChecked = !item.isChecked))
+            updateCheckboxEnabled(true)
+        }
+    }
+
     fun updateItem(item: Item) {
         viewModelScope.launch {
             if (_categories.value.firstOrNull { it.name == item.category } == null) {
