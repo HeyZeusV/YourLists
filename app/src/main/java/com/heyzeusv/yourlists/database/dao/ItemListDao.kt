@@ -20,4 +20,8 @@ interface ItemListDao : BaseDao<ItemList> {
             "FROM ItemList " +
             "WHERE itemListId=(:id)")
     fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
+
+    @Query("SELECT MAX(itemListId) " +
+            "FROM ItemList")
+    fun getMaxItemListId(): Flow<Long?>
 }

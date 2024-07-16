@@ -11,10 +11,15 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,30 +30,30 @@ class ListViewModel @Inject constructor(
     private val repo: Repository,
 ) : ViewModel() {
 
-    private val _itemList = MutableStateFlow(ItemListWithItems(ItemList(-1L, "")))
-    val itemList = _itemList.asStateFlow()
+    private val itemListId = savedStateHandle.getStateFlow(ListDestination.ID_ARG, 0L)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val itemList = itemListId
+        .flatMapLatest { id -> repo.getItemListWithId(id) }
+        .filterNotNull()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ItemListWithItems()
+        )
+
 
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
     init {
-        getItemListWithId(checkNotNull(savedStateHandle[ListDestination.ID_ARG]))
         getAllCategories()
     }
 
     fun insertItemList(name: String) {
         viewModelScope.launch {
-            _itemList.update { it.copy(itemList = ItemList(0L, name)) }
-            val id = repo.insertItemList(_itemList.value.itemList)
-            _itemList.update { it.copy(itemList = ItemList(id, name)) }
-        }
-    }
-
-    private fun getItemListWithId(id: Long) {
-        viewModelScope.launch {
-            repo.getItemListWithId(id).flowOn(Dispatchers.IO).collectLatest { list ->
-                _itemList.update { list ?: ItemListWithItems() }
-            }
+            repo.insertItemList(ItemList(itemListId.value, name))
+//            savedStateHandle[ListDestination.ID_ARG] = id
         }
     }
 

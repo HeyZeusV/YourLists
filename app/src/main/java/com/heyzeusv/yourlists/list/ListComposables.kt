@@ -48,11 +48,11 @@ fun ListScreen(
     var isNewList by remember { mutableStateOf(topAppBarTitle == null) }
     val newListTitle = sRes(ListDestination.title)
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(key1 = itemList.itemList.name) {
         topAppBarSetup(
             TopAppBarState(
                 destination = ListDestination,
-                title = topAppBarTitle ?: newListTitle,
+                title = itemList.itemList.name.ifBlank { newListTitle },
                 onNavPressed = { navController.navigateUp() },
             )
         )
@@ -72,13 +72,6 @@ fun ListScreen(
         maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
             listVM.insertItemList(input)
-            topAppBarSetup(
-                TopAppBarState(
-                    destination = ListDestination,
-                    title = input,
-                    onNavPressed = { navController.navigateUp() },
-                )
-            )
             isNewList = false
         },
         onDismiss = {

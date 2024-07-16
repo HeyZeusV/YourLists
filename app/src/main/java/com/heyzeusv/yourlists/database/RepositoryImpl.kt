@@ -38,6 +38,8 @@ class RepositoryImpl @Inject constructor(
     override fun getItemListWithId(id: Long): Flow<ItemListWithItems?> =
         itemListDao.getItemListWithId(id)
 
+    override fun getMaxItemListId(): Flow<Long?> = itemListDao.getMaxItemListId()
+
     /**
      *  Item Queries
      */

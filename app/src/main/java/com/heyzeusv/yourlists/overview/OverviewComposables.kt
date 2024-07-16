@@ -56,6 +56,7 @@ fun OverviewScreen(
     fabSetup: (FabState) -> Unit,
 ) {
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
+    val nextItemListId by overviewVM.nextItemListId.collectAsStateWithLifecycle()
     val topAppBarTitle = sRes(OverviewDestination.title)
 
     LaunchedEffect(key1 = Unit) {
@@ -70,14 +71,14 @@ fun OverviewScreen(
         fabSetup(
             FabState(
                 isFabDisplayed = itemLists.isNotEmpty(),
-                fabAction = { navController.navigateToItemList(-1, null) },
+                fabAction = { navController.navigateToItemList(nextItemListId, null) },
             )
         )
     }
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { id, name -> navController.navigateToItemList(id, name) },
-        emptyButtonOnClick = { navController.navigateToItemList(-1, null) },
+        emptyButtonOnClick = { navController.navigateToItemList(nextItemListId, null) },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,

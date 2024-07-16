@@ -8,9 +8,12 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -22,6 +25,14 @@ class OverviewViewModel @Inject constructor(
 
     private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
     val itemLists = _itemLists.asStateFlow()
+
+    val nextItemListId = repo.getMaxItemListId()
+        .map { (it ?: 0L) + 1 }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0L
+        )
 
     init {
         getAllItemLists()
