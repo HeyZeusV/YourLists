@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.list
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,6 +47,9 @@ fun ListScreen(
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    BackHandler(enabled = showBottomSheet) {
+        showBottomSheet = false
+    }
     LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
             TopAppBarState(

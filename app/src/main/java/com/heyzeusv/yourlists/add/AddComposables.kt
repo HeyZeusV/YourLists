@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.add
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -105,10 +106,13 @@ fun AddScreen(
 ) {
     val listState = rememberLazyListState()
     val maxLength = iRes(R.integer.name_max_length)
-    var isBottomSheetDisplayed by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDefaultItem by remember { mutableStateOf(DefaultItem()) }
     val focusManager = LocalFocusManager.current
 
+    BackHandler(enabled = showBottomSheet) {
+        showBottomSheet = false
+    }
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.as_padding_all))
@@ -150,7 +154,7 @@ fun AddScreen(
                     .align(Alignment.CenterHorizontally)
                     .clickable {
                         focusManager.clearFocus()
-                        isBottomSheetDisplayed = true
+                        showBottomSheet = true
                         selectedDefaultItem = DefaultItem(name = defaultItemQuery)
                     },
             ) {
@@ -177,20 +181,20 @@ fun AddScreen(
                     surfaceOnClick = {
                         focusManager.clearFocus()
                         selectedDefaultItem = it
-                        isBottomSheetDisplayed = true
+                        showBottomSheet = true
                     },
                 )
             }
         }
     }
     BottomSheet(
-        isVisible = isBottomSheetDisplayed,
-        updateIsVisible = { isBottomSheetDisplayed = it },
+        isVisible = showBottomSheet,
+        updateIsVisible = { showBottomSheet = it },
     ) {
         EditItemBottomSheetContent(
             closeBottomSheet = {
                 updateDefaultItemQuery("")
-                isBottomSheetDisplayed = false
+                showBottomSheet = false
             },
             selectedItem = selectedDefaultItem,
             categories = categories,

@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.overview
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,6 +62,9 @@ fun OverviewScreen(
 
     val topAppBarTitle = sRes(OverviewDestination.title)
 
+    BackHandler(enabled = showBottomSheet) {
+        showBottomSheet = false
+    }
     LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
             TopAppBarState(
