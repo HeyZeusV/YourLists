@@ -59,18 +59,14 @@ fun ListScreen(
             )
         )
     }
-    LaunchedEffect(key1 = itemList.items) {
+    LaunchedEffect(key1 = itemList.items, key2 = showBottomSheet) {
+        val isFabDisplayed = when {
+            itemList.items.isEmpty() || showBottomSheet -> false
+            else -> true
+        }
         fabSetup(
             FabState(
-                isFabDisplayed = itemList.items.isNotEmpty(),
-                fabAction = { navController.navigateToAdd(itemList.itemList.itemListId) },
-            )
-        )
-    }
-    LaunchedEffect(key1 = showBottomSheet) {
-        fabSetup(
-            FabState(
-                isFabDisplayed = !showBottomSheet,
+                isFabDisplayed = isFabDisplayed,
                 fabAction = { navController.navigateToAdd(itemList.itemList.itemListId) },
             )
         )

@@ -73,18 +73,14 @@ fun OverviewScreen(
             )
         )
     }
-    LaunchedEffect(key1 = itemLists) {
+    LaunchedEffect(key1 = itemLists, key2 = showBottomSheet) {
+        val isFabDisplayed = when {
+            itemLists.isEmpty() || showBottomSheet -> false
+            else -> true
+        }
         fabSetup(
             FabState(
-                isFabDisplayed = itemLists.isNotEmpty(),
-                fabAction = { displayNewListAlertDialog = true },
-            )
-        )
-    }
-    LaunchedEffect(key1 = showBottomSheet) {
-        fabSetup(
-            FabState(
-                isFabDisplayed = !showBottomSheet,
+                isFabDisplayed = isFabDisplayed,
                 fabAction = { displayNewListAlertDialog = true },
             )
         )
