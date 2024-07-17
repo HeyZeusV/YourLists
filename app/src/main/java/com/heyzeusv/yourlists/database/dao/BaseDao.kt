@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import androidx.room.Transaction
 import androidx.room.Update
+import androidx.room.Upsert
 
 @Dao
 interface BaseDao<T> {
@@ -18,15 +18,6 @@ interface BaseDao<T> {
     @Delete
     suspend fun delete(vararg entities: T)
 
-    @Transaction
-    suspend fun upsert(vararg entities: T) {
-        val insertResult: List<Long> = insert(*entities)
-        val updateList = mutableListOf<T>()
-
-        for (i in insertResult.indices) {
-            if (insertResult[i] == -1L) updateList.add(entities[i])
-        }
-
-        updateList.forEach { update(it) }
-    }
+    @Upsert
+    suspend fun upsert(vararg entities: T)
 }
