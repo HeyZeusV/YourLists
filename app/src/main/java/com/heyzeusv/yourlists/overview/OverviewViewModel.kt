@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.overview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
+import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,12 +55,22 @@ class OverviewViewModel @Inject constructor(
     fun copyItemList(itemList: ItemListWithItems) {
         viewModelScope.launch {
             val copyName = "${itemList.itemList.name} - Copy"
-            val copy = itemList.itemList.copy(
-                itemListId = 0L,
+            val copyItemList = itemList.itemList.copy(
+                itemListId = nextItemListId.value,
                 name = copyName.take(32)
             )
-            repo.insertItemList(copy)
-            // TODO: copy items once DAO is set up for it
+            val copyItems = mutableListOf<Item>()
+            itemList.items.forEach {
+                copyItems.add(
+                    it.copy(
+                        itemId = 0L,
+                        parentItemListId = nextItemListId.value
+                    )
+                )
+            }
+
+            repo.insertItemList(copyItemList)
+            repo.insertItems(*copyItems.toTypedArray())
         }
     }
 
