@@ -1,3 +1,59 @@
 <resources>
-    <string name="app_name">YourLists</string>
+    <string name="app_name">Your Lists</string>
+    <string name="navigate_back">Navigate Back</string>
+    <string name="button_cdesc_options">Displays additional options</string>
+    <string-array name="unit_values">
+        <item>Unit</item>
+        <item>lb</item>
+        <item>gal</item>
+        <item>g</item>
+        <item>l</item>
+    </string-array>
+
+    <!-- AddScreen (as) -->
+    <string name="as_item_title">Add Item</string>
+    <string name="as_list_title">Add List</string>
+    <string name="as_item_query_placeholder">Add Item</string>
+    <string name="as_query_clear">Clear query</string>
+    <string name="as_add_new">Add %1$s</string>
+    <!-- AddScreen.BottomSheet (asbs) -->
+    <string name="asbs_name">Item Name</string>
+    <string name="asbs_category">Category</string>
+    <string name="asbs_quantity">Quantity</string>
+    <string name="asbs_unit">Unit</string>
+    <string name="asbs_memo">Memo</string>
+    <string name="asbs_add">Add to list</string>
+    <string name="asbs_save_add">Save as default &amp; add to list</string>
+    <string name="asbs_update_add">Update defaults &amp; add to list</string>
+    <string name="asbs_delete">Delete defaults</string>
+
+    <!-- InputAlertDialog (iad) -->
+    <string name="iad_label">Enter a name</string>
+    <string name="iad_confirm">Save</string>
+    <string name="iad_cancel">Cancel</string>
+    <string name="iad_cdesc_error">Input Error</string>
+    <string name="iad_error">Can\'t be blank!</string>
+
+    <!-- ListScreen (ls) -->
+    <string name="ls_title">New List</string>
+<!--    <string name="ls_empty">Add a single item or an existing list!</string>-->
+    <string name="ls_empty">Add an item using the button below!</string>
+    <string name="ls_fab">Add</string>
+    <!-- ListScreen.BottomSheet (lsbs) -->
+    <string name="lsbs_update">Update Item</string>
+    <string name="lsbs_delete">Delete Item</string>
+
+    <!-- OverviewScreen (os) -->
+    <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
+    <string name="os_fab">New List</string>
+    <string name="os_ad_new_title">New List</string>
+    <string name="os_ad_rename_title">Rename List</string>
+    <!-- OverviewScreen.BottomSheet (osbs) -->
+    <string name="osbs_manage">Manage %1$s</string>
+    <string name="osbs_rename">Rename</string>
+    <string name="osbs_cdesc_rename">Rename this list.</string>
+    <string name="osbs_copy">Copy</string>
+    <string name="osbs_cdesc_copy">Create a copy of this list.</string>
+    <string name="osbs_delete">Delete</string>
+    <string name="osbs_cdesc_delete">Delete this list.</string>
 </resources>
