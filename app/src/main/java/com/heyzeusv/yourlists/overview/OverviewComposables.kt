@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.overview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -120,6 +121,7 @@ fun OverviewScreen(
                 .padding(all = dRes(R.dimen.os_lists_padding_all))
                 .fillMaxSize(),
             state = listState,
+            contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
         ) {
             items(itemLists.reversed()) {

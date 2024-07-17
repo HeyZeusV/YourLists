@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="card_radius">8.dp</dimen>
+    <dimen name="fab_padding_bottom">72.dp</dimen>
 
     <!-- AddScreen (as) -->
     <dimen name="as_padding_all">16.dp</dimen>

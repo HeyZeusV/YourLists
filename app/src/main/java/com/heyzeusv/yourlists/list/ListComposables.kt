@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.list
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -89,6 +90,7 @@ fun ListScreen(
                 .padding(all = dRes(R.dimen.ls_list_padding_all))
                 .fillMaxSize(),
             state = listState,
+            contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
         ) {
             items(itemList.items) {
