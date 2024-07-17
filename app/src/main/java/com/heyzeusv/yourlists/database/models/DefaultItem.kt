@@ -49,7 +49,7 @@ data class DefaultItem(
 
     fun toItem(parentItemListId: Long): Item {
         return Item(
-            itemId = itemId,
+            itemId = 0L,
             name = name,
             isChecked = false,
             category = category,

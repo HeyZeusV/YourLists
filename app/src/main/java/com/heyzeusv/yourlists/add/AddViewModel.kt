@@ -90,8 +90,8 @@ class AddViewModel @Inject constructor(
 
     fun addItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
-            if (_categories.value.firstOrNull { it.name == defaultItem.name } == null) {
-                repo.insertCategories(Category(id = 0L, name = defaultItem.name))
+            if (_categories.value.firstOrNull { it.name == defaultItem.category } == null) {
+                repo.insertCategories(Category(id = 0L, name = defaultItem.category))
             }
             repo.insertItems(defaultItem.toItem(itemListId))
         }
