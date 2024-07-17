@@ -57,9 +57,8 @@ class AddViewModel @Inject constructor(
     }
 
     private fun cleanQuery(query: String): String {
-        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), ("\"\""))
-        val verbatimQuery = "*\"$queryWithEscapedQuotes\"*"
-        return verbatimQuery
+        val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), "\"\"")
+        return "\"*$queryWithEscapedQuotes*\""
     }
 
 //    private fun getAllItemLists() {
