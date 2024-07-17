@@ -42,6 +42,8 @@
     <!-- OverviewScreen (os) -->
     <dimen name="os_lists_padding_all">8.dp</dimen>
     <dimen name="os_lists_spacedBy">12.dp</dimen>
+    <!-- OverviewScreen.BottomSheet (osbs) -->
+    <dimen name="osbs_padding_bottom">100.dp</dimen>
     <!-- OverviewScreen.ListInfo (osli) -->
     <dimen name="osli_options_padding_top">5.dp</dimen>
     <dimen name="osli_padding_all">12.dp</dimen>

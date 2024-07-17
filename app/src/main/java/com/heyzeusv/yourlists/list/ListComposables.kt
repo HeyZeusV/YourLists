@@ -44,6 +44,8 @@ fun ListScreen(
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     val categories by listVM.categories.collectAsStateWithLifecycle()
 
+    var showBottomSheet by remember { mutableStateOf(false) }
+
     LaunchedEffect(key1 = Unit) {
         topAppBarSetup(
             TopAppBarState(
@@ -61,13 +63,23 @@ fun ListScreen(
             )
         )
     }
+    LaunchedEffect(key1 = showBottomSheet) {
+        fabSetup(
+            FabState(
+                isFabDisplayed = !showBottomSheet,
+                fabAction = { navController.navigateToAdd(itemList.itemList.itemListId) },
+            )
+        )
+    }
     ListScreen(
         itemList = itemList,
         categories = categories,
         emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
         checkboxOnClick = listVM::updateItemIsChecked,
+        showBottomSheet = showBottomSheet,
+        updateShowBottomSheet = { showBottomSheet = it },
         updateOnClick = listVM::updateItem,
-        deleteOnClick = listVM::deleteItem
+        deleteOnClick = listVM::deleteItem,
     )
 }
 
@@ -77,11 +89,12 @@ fun ListScreen(
     categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
     checkboxOnClick: (Item, (Boolean) -> Unit) -> Unit,
+    showBottomSheet: Boolean,
+    updateShowBottomSheet: (Boolean) -> Unit,
     updateOnClick: (Item) -> Unit,
     deleteOnClick: (Item) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    var isBottomSheetDisplayed by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf(Item()) }
 
     if (itemList.items.isNotEmpty()) {
@@ -98,7 +111,7 @@ fun ListScreen(
                     item = it,
                     surfaceOnClick = {
                         selectedItem = it
-                        isBottomSheetDisplayed = true
+                        updateShowBottomSheet(true)
                     },
                     checkboxOnClick = checkboxOnClick,
                 )
@@ -113,11 +126,11 @@ fun ListScreen(
         )
     }
     BottomSheet(
-        isVisible = isBottomSheetDisplayed,
-        updateIsVisible = { isBottomSheetDisplayed = it },
+        isVisible = showBottomSheet,
+        updateIsVisible = { updateShowBottomSheet(it) },
     ) {
         EditItemBottomSheetContent(
-            closeBottomSheet = { isBottomSheetDisplayed = false },
+            closeBottomSheet = { updateShowBottomSheet(false) },
             selectedItem = selectedItem,
             categories = categories,
             primaryLabel = sRes(R.string.lsbs_update),
@@ -140,6 +153,8 @@ fun ListScreenPreview() {
                 categories = emptyList(),
                 emptyButtonOnClick = { },
                 checkboxOnClick = { _, _ -> },
+                showBottomSheet = false,
+                updateShowBottomSheet = { },
                 updateOnClick = { },
                 deleteOnClick = { },
             )
@@ -157,6 +172,8 @@ fun ListScreenEmptyPreview() {
                 categories = emptyList(),
                 emptyButtonOnClick = { },
                 checkboxOnClick = { _, _ -> },
+                showBottomSheet = false,
+                updateShowBottomSheet = { },
                 updateOnClick = { },
                 deleteOnClick = { },
             )

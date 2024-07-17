@@ -14,14 +14,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +34,7 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
@@ -59,6 +57,7 @@ fun OverviewScreen(
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     val nextItemListId by overviewVM.nextItemListId.collectAsStateWithLifecycle()
     var displayNewListAlertDialog by remember { mutableStateOf(false) }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val topAppBarTitle = sRes(OverviewDestination.title)
 
@@ -78,10 +77,20 @@ fun OverviewScreen(
             )
         )
     }
+    LaunchedEffect(key1 = showBottomSheet) {
+        fabSetup(
+            FabState(
+                isFabDisplayed = !showBottomSheet,
+                fabAction = { displayNewListAlertDialog = true },
+            )
+        )
+    }
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { id, name -> navController.navigateToItemList(id, name) },
         emptyButtonOnClick = { displayNewListAlertDialog = true },
+        showBottomSheet = showBottomSheet,
+        updateShowBottomSheet = { showBottomSheet = it },
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
@@ -100,19 +109,19 @@ fun OverviewScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (Long, String) -> Unit,
     emptyButtonOnClick: () -> Unit,
+    showBottomSheet: Boolean,
+    updateShowBottomSheet: (Boolean) -> Unit,
     optionRenameOnClick: (ItemList, String) -> Unit,
     optionCopyOnClick: (ItemListWithItems) -> Unit,
     optionDeleteOnClick: (ItemList) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    var showBottomSheet by remember { mutableStateOf<ItemListWithItems?>(null) }
-    val sheetState = rememberModalBottomSheetState()
+    var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
     var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
 
     if (itemLists.isNotEmpty()) {
@@ -128,7 +137,10 @@ fun OverviewScreen(
                 ListInfo(
                     itemList = it,
                     itemListOnClick = itemListOnClick,
-                    optionOnClick = { selected -> showBottomSheet = selected },
+                    optionOnClick = { selected ->
+                        selectedItemList = selected
+                        updateShowBottomSheet(true)
+                    },
                 )
             }
         }
@@ -140,29 +152,25 @@ fun OverviewScreen(
             buttonText = sRes(OverviewDestination.fabText)
         )
     }
-    if (showBottomSheet != null) {
-        ModalBottomSheet(
-            onDismissRequest = { showBottomSheet = null },
-            modifier = Modifier.fillMaxSize(),
-            sheetState = sheetState,
-            dragHandle = { },
-        ) {
-            OverviewBottomSheetContent(
-                itemList = showBottomSheet!!,
-                renameOnClick = {
-                    showRenameAlertDialog = showBottomSheet!!.itemList
-                    showBottomSheet = null
-                },
-                copyOnClick = {
-                    optionCopyOnClick(showBottomSheet!!)
-                    showBottomSheet = null
-                },
-                deleteOnClick = {
-                    optionDeleteOnClick(showBottomSheet!!.itemList)
-                    showBottomSheet = null
-                },
-            )
-        }
+    BottomSheet(
+        isVisible = showBottomSheet,
+        updateIsVisible = { updateShowBottomSheet(it) },
+    ) {
+        OverviewBottomSheetContent(
+            itemList = selectedItemList,
+            renameOnClick = {
+                showRenameAlertDialog = selectedItemList.itemList
+                updateShowBottomSheet(false)
+            },
+            copyOnClick = {
+                optionCopyOnClick(selectedItemList)
+                updateShowBottomSheet(false)
+            },
+            deleteOnClick = {
+                optionDeleteOnClick(selectedItemList.itemList)
+                updateShowBottomSheet(false)
+            },
+        )
     }
     InputAlertDialog(
         display = showRenameAlertDialog != null,
@@ -237,6 +245,7 @@ fun OverviewBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
+            .padding(bottom = dRes(R.dimen.osbs_padding_bottom))
             .padding(all = dRes(R.dimen.bs_padding_all))
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
@@ -295,6 +304,8 @@ private fun OverviewScreenPreview() {
                 itemLists = List(15) { halfCheckedItemList },
                 itemListOnClick = { _, _ -> },
                 emptyButtonOnClick = { },
+                showBottomSheet = false,
+                updateShowBottomSheet = { },
                 optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
                 optionDeleteOnClick = { },
@@ -312,6 +323,8 @@ private fun OverviewScreenEmptyPreview() {
                 itemLists = emptyList(),
                 itemListOnClick = { _, _ -> },
                 emptyButtonOnClick = { },
+                showBottomSheet = false,
+                updateShowBottomSheet = { },
                 optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
                 optionDeleteOnClick = { },
