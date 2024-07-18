@@ -84,7 +84,9 @@ fun OverviewScreen(
     }
     OverviewScreen(
         itemLists = itemLists,
-        itemListOnClick = { id, name -> navController.navigateToItemList(id, name) },
+        itemListOnClick = { itemList ->
+            itemList.itemList.let { navController.navigateToItemList(it.itemListId, it.name) }
+        },
         emptyButtonOnClick = { displayNewListAlertDialog = true },
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
@@ -109,7 +111,7 @@ fun OverviewScreen(
 @Composable
 fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
-    itemListOnClick: (Long, String) -> Unit,
+    itemListOnClick: (ItemListWithItems) -> Unit,
     emptyButtonOnClick: () -> Unit,
     showBottomSheet: Boolean,
     updateShowBottomSheet: (Boolean) -> Unit,
@@ -249,7 +251,7 @@ private fun OverviewScreenPreview() {
         Preview {
             OverviewScreen(
                 itemLists = itemLists,
-                itemListOnClick = { _, _ -> },
+                itemListOnClick = { },
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },
@@ -268,7 +270,7 @@ private fun OverviewScreenEmptyPreview() {
         Preview {
             OverviewScreen(
                 itemLists = emptyList(),
-                itemListOnClick = { _, _ -> },
+                itemListOnClick = { },
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },

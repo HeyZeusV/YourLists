@@ -118,6 +118,7 @@ fun AddScreen(
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDefaultItem by remember { mutableStateOf(DefaultItem()) }
+    var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
 
     BackHandler(enabled = showBottomSheet) {
         showBottomSheet = false
@@ -147,7 +148,13 @@ fun AddScreen(
                     )
                 }
                 1 -> {
-                    AddListPage(itemLists = itemLists)
+                    AddListPage(
+                        itemLists = itemLists,
+                        itemListOnClick = {
+                            selectedItemList = it
+                            showBottomSheet = true
+                        }
+                    )
                 }
             }
         }
@@ -270,6 +277,7 @@ fun AddItemPage(
 @Composable
 fun AddListPage(
     itemLists: List<ItemListWithItems>,
+    itemListOnClick: (ItemListWithItems) -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -281,7 +289,7 @@ fun AddListPage(
         items(itemLists) {
             ListInfo(
                 itemList = it,
-                itemListOnClick = { _, _ -> },
+                itemListOnClick = itemListOnClick,
                 displayOptions = false,
             )
         }
@@ -415,7 +423,10 @@ private fun AddItemPagePreview() {
 private fun AddListPagePreview() {
     PreviewUtil.run {
         Preview {
-            AddListPage(itemLists = itemLists)
+            AddListPage(
+                itemLists = itemLists,
+                itemListOnClick = { }
+            )
         }
     }
 }

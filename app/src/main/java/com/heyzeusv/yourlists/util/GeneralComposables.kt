@@ -177,14 +177,14 @@ fun ItemInfo(
 @Composable
 fun ListInfo(
     itemList: ItemListWithItems,
-    itemListOnClick: (Long, String) -> Unit,
+    itemListOnClick: (ItemListWithItems) -> Unit,
     displayOptions: Boolean,
     optionOnClick: (ItemListWithItems) -> Unit = { },
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { itemListOnClick(itemList.itemList.itemListId, itemList.itemList.name) },
+            .clickable { itemListOnClick(itemList) },
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
     ) {
         Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
@@ -561,7 +561,7 @@ private fun ListInfoPreview() {
         Preview {
             ListInfo(
                 itemList = halfCheckedItemList,
-                itemListOnClick = { _, _ -> },
+                itemListOnClick = { },
                 displayOptions = true,
                 optionOnClick = { },
             )
@@ -576,7 +576,7 @@ private fun ListInfoNoOptionsPreview() {
         Preview {
             ListInfo(
                 itemList = emptyItemList,
-                itemListOnClick = { _, _ -> },
+                itemListOnClick = { },
                 displayOptions = false,
                 optionOnClick = { },
             )
