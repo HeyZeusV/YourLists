@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -48,8 +49,8 @@ class AddViewModel @Inject constructor(
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
-//    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
-//    val itemLists = _itemLists.asStateFlow()
+    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
+    val itemLists = _itemLists.asStateFlow()
 
     init {
 //        getAllItemLists()

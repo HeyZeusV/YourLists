@@ -44,17 +44,18 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
+import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
@@ -73,7 +74,7 @@ fun AddScreen(
     val topAppBarTitle = sRes(AddDestination.title)
     val defaultItemQuery by addVM.defaultItemQuery.collectAsStateWithLifecycle()
     val defaultItems by addVM.defaultItems.collectAsStateWithLifecycle(initialValue = emptyList())
-//    val itemLists by addVM.itemLists.collectAsStateWithLifecycle()
+    val itemLists by addVM.itemLists.collectAsStateWithLifecycle()
     val categories by addVM.categories.collectAsStateWithLifecycle()
 
     LaunchedEffect(key1 = Unit) {
@@ -96,7 +97,7 @@ fun AddScreen(
         saveAndAddOnClick = addVM::saveDefaultItemAndAddItem,
         addToListOnClick = addVM::addItem,
         deleteDefaultItemOnClick = addVM::deleteDefaultItem,
-//        itemLists = itemLists,
+        itemLists = itemLists,
     )
 }
 
@@ -110,7 +111,7 @@ fun AddScreen(
     saveAndAddOnClick: (DefaultItem) -> Unit,
     addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
-//    itemLists: List<ItemListWithItems>,
+    itemLists: List<ItemListWithItems>,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
@@ -144,6 +145,9 @@ fun AddScreen(
                         updateSelectedDefaultItem = { selectedDefaultItem = it },
                         updateShowBottomSheet = { showBottomSheet = it },
                     )
+                }
+                1 -> {
+                    AddListPage(itemLists = itemLists)
                 }
             }
         }
@@ -247,7 +251,7 @@ fun AddItemPage(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             state = listState,
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
         ) {
             items(defaultItems) {
                 ItemInfo(
@@ -259,6 +263,27 @@ fun AddItemPage(
                     },
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun AddListPage(
+    itemLists: List<ItemListWithItems>,
+) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
+    ) {
+        items(itemLists) {
+            ListInfo(
+                itemList = it,
+                itemListOnClick = { _, _ -> },
+                displayOptions = false,
+            )
         }
     }
 }
@@ -341,7 +366,7 @@ private fun AddScreenPreview() {
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
-//                itemLists = emptyList(),
+                itemLists = emptyList(),
                 saveAndAddOnClick = { },
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
@@ -360,11 +385,37 @@ private fun AddScreenBlankQueryPreview() {
                 updateDefaultItemQuery = { },
                 defaultItems = defaultItemList,
                 categories = emptyList(),
-//                itemLists = emptyList(),
+                itemLists = emptyList(),
                 saveAndAddOnClick = { },
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AddItemPagePreview() {
+    PreviewUtil.run {
+        Preview {
+            AddItemPage(
+                defaultItemQuery = "Preview",
+                updateDefaultItemQuery = { },
+                defaultItems = emptyList(),
+                updateSelectedDefaultItem = { },
+                updateShowBottomSheet = { },
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AddListPagePreview() {
+    PreviewUtil.run {
+        Preview {
+            AddListPage(itemLists = itemLists)
         }
     }
 }

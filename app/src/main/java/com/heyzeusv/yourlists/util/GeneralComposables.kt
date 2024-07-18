@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -36,6 +37,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -51,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -64,6 +67,7 @@ import com.heyzeusv.yourlists.add.FilteredDropDownMenu
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
 import java.text.DecimalFormat
 
@@ -165,6 +169,60 @@ fun ItemInfo(
                     maxLines = 2,
                     style = MaterialTheme.typography.bodySmall,
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun ListInfo(
+    itemList: ItemListWithItems,
+    itemListOnClick: (Long, String) -> Unit,
+    displayOptions: Boolean,
+    optionOnClick: (ItemListWithItems) -> Unit = { },
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { itemListOnClick(itemList.itemList.itemListId, itemList.itemList.name) },
+        shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
+    ) {
+        Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = itemList.itemList.name,
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                if (displayOptions) {
+                    Icon(
+                        painter = pRes(R.drawable.icon_options),
+                        contentDescription = sRes(R.string.button_cdesc_options),
+                        modifier = Modifier
+                            .align(Alignment.Top)
+                            .padding(top = dRes(R.dimen.osli_options_padding_top))
+                            .clickable { optionOnClick(itemList) },
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osli_progress_spacedBy)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                LinearProgressIndicator(
+                    progress = { itemList.progress.first },
+                    modifier = Modifier
+                        .height(dRes(R.dimen.osli_progress_height))
+                        .weight(1f),
+                    trackColor = MaterialTheme.colorScheme.background,
+                    strokeCap = StrokeCap.Round
+                )
+                Text(text = itemList.progress.second)
             }
         }
     }
@@ -492,6 +550,36 @@ private fun DefaultItemInfoPreview() {
                     surfaceOnClick = { },
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListInfoPreview() {
+    PreviewUtil.run {
+        Preview {
+            ListInfo(
+                itemList = halfCheckedItemList,
+                itemListOnClick = { _, _ -> },
+                displayOptions = true,
+                optionOnClick = { },
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListInfoNoOptionsPreview() {
+    PreviewUtil.run {
+        Preview {
+            ListInfo(
+                itemList = emptyItemList,
+                itemListOnClick = { _, _ -> },
+                displayOptions = false,
+                optionOnClick = { },
+            )
         }
     }
 }

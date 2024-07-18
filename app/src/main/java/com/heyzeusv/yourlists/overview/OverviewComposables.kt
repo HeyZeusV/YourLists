@@ -13,10 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -39,6 +35,7 @@ import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.InputAlertDialog
+import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
@@ -137,6 +134,7 @@ fun OverviewScreen(
                 ListInfo(
                     itemList = it,
                     itemListOnClick = itemListOnClick,
+                    displayOptions = true,
                     optionOnClick = { selected ->
                         selectedItemList = selected
                         updateShowBottomSheet(true)
@@ -183,57 +181,6 @@ fun OverviewScreen(
         },
         onDismiss = { showRenameAlertDialog = null }
     )
-}
-
-@Composable
-fun ListInfo(
-    itemList: ItemListWithItems,
-    itemListOnClick: (Long, String) -> Unit,
-    optionOnClick: (ItemListWithItems) -> Unit,
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { itemListOnClick(itemList.itemList.itemListId, itemList.itemList.name) },
-        shape = RoundedCornerShape(dRes(R.dimen.card_radius)),
-    ) {
-        Column(modifier = Modifier.padding(all = dRes(R.dimen.osli_padding_all))) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = itemList.itemList.name,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-                Icon(
-                    painter = pRes(R.drawable.icon_options),
-                    contentDescription = sRes(R.string.button_cdesc_options),
-                    modifier = Modifier
-                        .align(Alignment.Top)
-                        .padding(top = dRes(R.dimen.osli_options_padding_top))
-                        .clickable { optionOnClick(itemList) },
-                )
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.osli_progress_spacedBy)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                LinearProgressIndicator(
-                    progress = { itemList.progress.first },
-                    modifier = Modifier
-                        .height(dRes(R.dimen.osli_progress_height))
-                        .weight(1f),
-                    trackColor = MaterialTheme.colorScheme.background,
-                    strokeCap = StrokeCap.Round
-                )
-                Text(text = itemList.progress.second)
-            }
-        }
-    }
 }
 
 @Composable
@@ -301,7 +248,7 @@ private fun OverviewScreenPreview() {
     PreviewUtil.run {
         Preview {
             OverviewScreen(
-                itemLists = List(15) { halfCheckedItemList },
+                itemLists = itemLists,
                 itemListOnClick = { _, _ -> },
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
@@ -328,20 +275,6 @@ private fun OverviewScreenEmptyPreview() {
                 optionRenameOnClick = { _, _ -> },
                 optionCopyOnClick = { },
                 optionDeleteOnClick = { },
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun ListInfoPreview() {
-    PreviewUtil.run {
-        Preview {
-            ListInfo(
-                itemList = halfCheckedItemList,
-                itemListOnClick = { _, _ -> },
-                optionOnClick = { },
             )
         }
     }
