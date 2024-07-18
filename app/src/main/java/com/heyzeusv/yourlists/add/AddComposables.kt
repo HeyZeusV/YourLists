@@ -26,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -33,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +61,7 @@ import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddScreen(
@@ -109,22 +113,38 @@ fun AddScreen(
 //    itemLists: List<ItemListWithItems>,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
+    val coroutineScope = rememberCoroutineScope()
+
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDefaultItem by remember { mutableStateOf(DefaultItem()) }
 
     BackHandler(enabled = showBottomSheet) {
         showBottomSheet = false
     }
-    HorizontalPager(state = pagerState) { page ->
-        when (page) {
-            0 -> {
-                AddItemPage(
-                    defaultItemQuery = defaultItemQuery,
-                    updateDefaultItemQuery = updateDefaultItemQuery,
-                    defaultItems = defaultItems,
-                    updateSelectedDefaultItem = { selectedDefaultItem = it },
-                    updateShowBottomSheet = { showBottomSheet = it }
+    Column {
+        TabRow(
+            selectedTabIndex = pagerState.currentPage,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            AddTabs.entries.forEachIndexed { index, addTabs ->
+                Tab(
+                    selected = index == pagerState.currentPage,
+                    onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                    text = { Text(text = sRes(addTabs.nameId)) },
                 )
+            }
+        }
+        HorizontalPager(state = pagerState) { page ->
+            when (page) {
+                0 -> {
+                    AddItemPage(
+                        defaultItemQuery = defaultItemQuery,
+                        updateDefaultItemQuery = updateDefaultItemQuery,
+                        defaultItems = defaultItems,
+                        updateSelectedDefaultItem = { selectedDefaultItem = it },
+                        updateShowBottomSheet = { showBottomSheet = it },
+                    )
+                }
             }
         }
     }

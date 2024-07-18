@@ -70,7 +70,7 @@ object ListDestination: Destination {
 
 object AddDestination: Destination {
     override val route: String = "add"
-    override val title: Int = R.string.as_item_title
+    override val title: Int = R.string.as_title
     override val navIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowBack
     override val navDescription: Int = R.string.navigate_back
     override val actionLeftIcon: ImageVector = Blank
