@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.add
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
@@ -93,6 +96,7 @@ fun AddScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddScreen(
     defaultItemQuery: String,
@@ -104,15 +108,65 @@ fun AddScreen(
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
 //    itemLists: List<ItemListWithItems>,
 ) {
-    val listState = rememberLazyListState()
-    val maxLength = iRes(R.integer.name_max_length)
+    val pagerState = rememberPagerState(pageCount = { 2 })
     var showBottomSheet by remember { mutableStateOf(false) }
     var selectedDefaultItem by remember { mutableStateOf(DefaultItem()) }
-    val focusManager = LocalFocusManager.current
 
     BackHandler(enabled = showBottomSheet) {
         showBottomSheet = false
     }
+    HorizontalPager(state = pagerState) { page ->
+        when (page) {
+            0 -> {
+                AddItemPage(
+                    defaultItemQuery = defaultItemQuery,
+                    updateDefaultItemQuery = updateDefaultItemQuery,
+                    defaultItems = defaultItems,
+                    updateSelectedDefaultItem = { selectedDefaultItem = it },
+                    updateShowBottomSheet = { showBottomSheet = it }
+                )
+            }
+        }
+    }
+    BottomSheet(
+        isVisible = showBottomSheet,
+        updateIsVisible = { showBottomSheet = it },
+    ) {
+        EditItemBottomSheetContent(
+            closeBottomSheet = {
+                updateDefaultItemQuery("")
+                showBottomSheet = false
+            },
+            selectedItem = selectedDefaultItem,
+            categories = categories,
+            primaryLabel = if (selectedDefaultItem.itemId == 0L) {
+                sRes(R.string.asbs_save_add)
+            } else {
+                sRes(R.string.asbs_update_add)
+            },
+            primaryOnClick = { saveAndAddOnClick(it as DefaultItem) },
+            secondaryLabel = sRes(R.string.asbs_add),
+            secondaryOnClick = { addToListOnClick(it as DefaultItem) },
+            deleteLabel = sRes(R.string.asbs_delete),
+            deleteOnClick = { deleteDefaultItemOnClick(it as DefaultItem) },
+        )
+    }
+}
+
+
+@Composable
+fun AddItemPage(
+    defaultItemQuery: String,
+    updateDefaultItemQuery: (String) -> Unit,
+    defaultItems: List<DefaultItem>,
+    updateSelectedDefaultItem: (DefaultItem) -> Unit,
+    updateShowBottomSheet: (Boolean) -> Unit,
+) {
+    val listState = rememberLazyListState()
+
+    val maxLength = iRes(R.integer.name_max_length)
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.as_padding_all))
@@ -154,8 +208,8 @@ fun AddScreen(
                     .align(Alignment.CenterHorizontally)
                     .clickable {
                         focusManager.clearFocus()
-                        showBottomSheet = true
-                        selectedDefaultItem = DefaultItem(name = defaultItemQuery)
+                        updateShowBottomSheet(true)
+                        updateSelectedDefaultItem(DefaultItem(name = defaultItemQuery))
                     },
             ) {
                 Box(contentAlignment = Alignment.CenterStart) {
@@ -180,35 +234,12 @@ fun AddScreen(
                     item = it,
                     surfaceOnClick = {
                         focusManager.clearFocus()
-                        selectedDefaultItem = it
-                        showBottomSheet = true
+                        updateSelectedDefaultItem(it)
+                        updateShowBottomSheet(true)
                     },
                 )
             }
         }
-    }
-    BottomSheet(
-        isVisible = showBottomSheet,
-        updateIsVisible = { showBottomSheet = it },
-    ) {
-        EditItemBottomSheetContent(
-            closeBottomSheet = {
-                updateDefaultItemQuery("")
-                showBottomSheet = false
-            },
-            selectedItem = selectedDefaultItem,
-            categories = categories,
-            primaryLabel = if (selectedDefaultItem.itemId == 0L) {
-                sRes(R.string.asbs_save_add)
-            } else {
-                sRes(R.string.asbs_update_add)
-            },
-            primaryOnClick = { saveAndAddOnClick(it as DefaultItem) },
-            secondaryLabel = sRes(R.string.asbs_add),
-            secondaryOnClick = { addToListOnClick(it as DefaultItem) },
-            deleteLabel = sRes(R.string.asbs_delete),
-            deleteOnClick = { deleteDefaultItemOnClick(it as DefaultItem) },
-        )
     }
 }
 
