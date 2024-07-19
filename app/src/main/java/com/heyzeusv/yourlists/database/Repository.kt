@@ -11,7 +11,7 @@ interface Repository {
     /**
      *  ItemList Queries
      */
-    suspend fun insertItemList(vararg itemLists: ItemList): Long
+    suspend fun insertItemList(vararg itemLists: ItemList)
 
     suspend fun updateItemList(vararg itemLists: ItemList)
 
@@ -28,7 +28,7 @@ interface Repository {
     /**
      *  Item Queries
      */
-    suspend fun insertItems(vararg items: Item): Long
+    suspend fun insertItems(vararg items: Item)
 
     suspend fun updateItems(vararg items: Item)
 
@@ -48,7 +48,7 @@ interface Repository {
     /**
      *  Category Queries
      */
-    suspend fun insertCategories(vararg categories: Category): Long
+    suspend fun insertCategories(vararg categories: Category)
 
     fun getAllCategories(): Flow<List<Category>>
 }
