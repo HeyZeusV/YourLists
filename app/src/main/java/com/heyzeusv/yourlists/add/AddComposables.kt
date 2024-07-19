@@ -201,7 +201,7 @@ fun AddItemPage(
     Column(
         modifier = Modifier
             .padding(all = dRes(R.dimen.as_padding_all))
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         TextField(
             value = defaultItemQuery ,
@@ -279,20 +279,32 @@ fun AddListPage(
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (ItemListWithItems) -> Unit,
 ) {
-    // TODO: Add 'warning' about limitation of list not having parent and child list at same time
     val listState = rememberLazyListState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
+    Column(
+        modifier = Modifier
+            .padding(all = dRes(R.dimen.as_padding_all))
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy))
     ) {
-        items(itemLists) {
-            ListInfo(
-                itemList = it,
-                itemListOnClick = itemListOnClick,
-                displayOptions = false,
-            )
+        Text(
+            text = sRes(R.string.as_list_warning),
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleSmall
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
+        ) {
+            items(itemLists) {
+                ListInfo(
+                    itemList = it,
+                    itemListOnClick = itemListOnClick,
+                    displayOptions = false,
+                )
+            }
         }
     }
 }
