@@ -8,16 +8,13 @@ import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -48,8 +45,12 @@ class AddViewModel @Inject constructor(
             }
         }
 
-    private val _categories = MutableStateFlow(emptyList<Category>())
-    val categories = _categories.asStateFlow()
+    val categories = repo.getAllCategories()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList(),
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val itemLists = itemListId
@@ -67,26 +68,14 @@ class AddViewModel @Inject constructor(
             initialValue = emptyList(),
         )
 
-    init {
-        getAllCategories()
-    }
-
     private fun cleanQuery(query: String): String {
         val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), "\"\"")
         return "\"*$queryWithEscapedQuotes*\""
     }
 
-    private fun getAllCategories() {
-        viewModelScope.launch {
-            repo.getAllCategories().flowOn(Dispatchers.IO).collectLatest { list ->
-                _categories.update { list }
-            }
-        }
-    }
-
     fun saveDefaultItemAndAddItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
-            if (_categories.value.firstOrNull { it.name == defaultItem.category } == null) {
+            if (categories.value.find { it.name == defaultItem.category } == null) {
                 repo.insertCategories(Category(id = 0L, name = defaultItem.category))
             }
             repo.upsertDefaultItems(defaultItem)
@@ -96,7 +85,7 @@ class AddViewModel @Inject constructor(
 
     fun addItem(defaultItem: DefaultItem) {
         viewModelScope.launch {
-            if (_categories.value.firstOrNull { it.name == defaultItem.category } == null) {
+            if (categories.value.find { it.name == defaultItem.category } == null) {
                 repo.insertCategories(Category(id = 0L, name = defaultItem.category))
             }
             repo.insertItems(defaultItem.toItem(itemListId.value))
