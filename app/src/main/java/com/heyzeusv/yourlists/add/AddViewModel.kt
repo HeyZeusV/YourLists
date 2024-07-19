@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -58,9 +59,8 @@ class AddViewModel @Inject constructor(
         .flatMapLatest { id -> repo.getAllItemListsWithoutId(id) }
         .map { allList ->
             allList.filter { itemList ->
-                !itemList.items.any { item ->
-                    item.originItemListId != null
-                }
+                itemList.items.isNotEmpty() &&
+                !itemList.items.any { item -> item.originItemListId != null }
             }
         }
         .stateIn(
@@ -98,6 +98,20 @@ class AddViewModel @Inject constructor(
     }
 
     fun addListWithOption(itemList: ItemListWithItems, option: AddListOptions) {
-
+        viewModelScope.launch {
+            val itemsToAdd: List<Item> = when (option) {
+                AddListOptions.ALL_AS_UNCHECKED -> itemList.items.map { it.copy(isChecked = false) }
+                AddListOptions.ALL_AS_IS -> itemList.items
+                AddListOptions.ONLY_UNCHECKED -> itemList.items.filter { !it.isChecked }
+            }
+            val itemsToAddEdited = itemsToAdd.map {
+                it.copy(
+                    itemId = 0L,
+                    parentItemListId = itemListId.value,
+                    originItemListId = itemList.itemList.itemListId
+                )
+            }
+            repo.insertItems(*itemsToAddEdited.toTypedArray())
+        }
     }
 }
