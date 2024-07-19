@@ -279,6 +279,7 @@ fun AddListPage(
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (ItemListWithItems) -> Unit,
 ) {
+    // TODO: Add 'warning' about limitation of list not having parent and child list at same time
     val listState = rememberLazyListState()
 
     LazyColumn(

@@ -35,6 +35,9 @@ class RepositoryImpl @Inject constructor(
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
+    override fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>> =
+        itemListDao.getAllItemListsWithoutId(id)
+
     override fun getItemListWithId(id: Long): Flow<ItemListWithItems?> =
         itemListDao.getItemListWithId(id)
 

@@ -6,18 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,7 +30,7 @@ class AddViewModel @Inject constructor(
     private val repo: Repository,
 ) : ViewModel() {
 
-    private val itemListId = savedStateHandle[AddDestination.ID_ARG] ?: 0L
+    private val itemListId = savedStateHandle.getStateFlow(AddDestination.ID_ARG, 0L)
 
     private val _defaultItemQuery = MutableStateFlow("")
     val defaultItemQuery = _defaultItemQuery.asStateFlow()
@@ -49,11 +51,23 @@ class AddViewModel @Inject constructor(
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()
 
-    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
-    val itemLists = _itemLists.asStateFlow()
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val itemLists = itemListId
+        .flatMapLatest { id -> repo.getAllItemListsWithoutId(id) }
+        .map { allList ->
+            allList.filter { itemList ->
+                !itemList.items.any { item ->
+                    item.originItemListId != null
+                }
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList(),
+        )
 
     init {
-//        getAllItemLists()
         getAllCategories()
     }
 
@@ -61,14 +75,6 @@ class AddViewModel @Inject constructor(
         val queryWithEscapedQuotes = query.replace(Regex.fromLiteral("\""), "\"\"")
         return "\"*$queryWithEscapedQuotes*\""
     }
-
-//    private fun getAllItemLists() {
-//        viewModelScope.launch {
-//            repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
-//                _itemLists.update { lists }
-//            }
-//        }
-//    }
 
     private fun getAllCategories() {
         viewModelScope.launch {
@@ -84,7 +90,7 @@ class AddViewModel @Inject constructor(
                 repo.insertCategories(Category(id = 0L, name = defaultItem.category))
             }
             repo.upsertDefaultItems(defaultItem)
-            repo.insertItems(defaultItem.toItem(itemListId))
+            repo.insertItems(defaultItem.toItem(itemListId.value))
         }
     }
 
@@ -93,7 +99,7 @@ class AddViewModel @Inject constructor(
             if (_categories.value.firstOrNull { it.name == defaultItem.category } == null) {
                 repo.insertCategories(Category(id = 0L, name = defaultItem.category))
             }
-            repo.insertItems(defaultItem.toItem(itemListId))
+            repo.insertItems(defaultItem.toItem(itemListId.value))
         }
     }
 

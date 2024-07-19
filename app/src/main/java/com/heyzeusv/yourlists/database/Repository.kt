@@ -19,6 +19,8 @@ interface Repository {
 
     fun getAllItemLists(): Flow<List<ItemListWithItems>>
 
+    fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>>
+
     fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
 
     fun getMaxItemListId(): Flow<Long?>
