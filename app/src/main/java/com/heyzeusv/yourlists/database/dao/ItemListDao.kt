@@ -18,6 +18,12 @@ interface ItemListDao : BaseDao<ItemList> {
     @Transaction
     @Query("SELECT * " +
             "FROM ItemList " +
+            "WHERE itemListId IS NOT (:id)")
+    fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>>
+
+    @Transaction
+    @Query("SELECT * " +
+            "FROM ItemList " +
             "WHERE itemListId=(:id)")
     fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
 

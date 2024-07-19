@@ -45,6 +45,7 @@ object PreviewUtil {
         itemList = ItemList(0L, "Empty List"),
         items = emptyList()
     )
+    val itemLists = List(10) { if (it % 2 == 0) halfCheckedItemList else emptyItemList }
     val defaultItem = DefaultItem(
         itemId = 0L,
         name = "DefaultItem DefaultItem DefaultItem DefaultItem DefaultItem",

@@ -10,7 +10,7 @@ import androidx.room.Upsert
 @Dao
 interface BaseDao<T> {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(vararg entities: T): List<Long>
+    suspend fun insert(vararg entities: T)
 
     @Update
     suspend fun update(vararg entities: T)
