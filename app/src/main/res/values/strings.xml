@@ -11,11 +11,13 @@
     </string-array>
 
     <!-- AddScreen (as) -->
-    <string name="as_item_title">Add Item</string>
-    <string name="as_list_title">Add List</string>
+    <string name="as_title">Add</string>
+    <string name="as_item_tab">Item</string>
+    <string name="as_list_tab">List</string>
     <string name="as_item_query_placeholder">Add Item</string>
     <string name="as_query_clear">Clear query</string>
     <string name="as_add_new">Add %1$s</string>
+    <string name="as_list_warning">Can\'t find a list? You cannot add a list to itself and you cannot add a list that already has a list within it.</string>
     <!-- AddScreen.BottomSheet (asbs) -->
     <string name="asbs_name">Item Name</string>
     <string name="asbs_category">Category</string>
@@ -26,6 +28,9 @@
     <string name="asbs_save_add">Save as default &amp; add to list</string>
     <string name="asbs_update_add">Update defaults &amp; add to list</string>
     <string name="asbs_delete">Delete defaults</string>
+    <string name="asbs_add_all_unchecked">Add all items as unchecked</string>
+    <string name="asbs_add_all_as_is">Add all items as is</string>
+    <string name="asbs_add_only_uncheck">Add only unchecked items</string>
 
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>

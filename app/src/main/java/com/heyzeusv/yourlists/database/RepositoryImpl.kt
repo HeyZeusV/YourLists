@@ -23,8 +23,8 @@ class RepositoryImpl @Inject constructor(
     /**
      *  ItemList Queries
      */
-    override suspend fun insertItemList(vararg itemLists: ItemList): Long =
-        withContext(Dispatchers.IO) { itemListDao.insert(*itemLists).first() }
+    override suspend fun insertItemList(vararg itemLists: ItemList) =
+        withContext(Dispatchers.IO) { itemListDao.insert(*itemLists) }
 
     override suspend fun updateItemList(vararg itemLists: ItemList) =
         withContext(Dispatchers.IO) { itemListDao.update(*itemLists) }
@@ -35,6 +35,9 @@ class RepositoryImpl @Inject constructor(
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
+    override fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>> =
+        itemListDao.getAllItemListsWithoutId(id)
+
     override fun getItemListWithId(id: Long): Flow<ItemListWithItems?> =
         itemListDao.getItemListWithId(id)
 
@@ -43,8 +46,8 @@ class RepositoryImpl @Inject constructor(
     /**
      *  Item Queries
      */
-    override suspend fun insertItems(vararg items: Item): Long =
-        withContext(Dispatchers.IO) { itemDao.insert(*items).first() }
+    override suspend fun insertItems(vararg items: Item) =
+        withContext(Dispatchers.IO) { itemDao.insert(*items) }
 
     override suspend fun updateItems(vararg items: Item) =
         withContext(Dispatchers.IO) { itemDao.update(*items) }
@@ -70,8 +73,8 @@ class RepositoryImpl @Inject constructor(
     /**
      *  Category Queries
      */
-    override suspend fun insertCategories(vararg categories: Category): Long =
-        withContext(Dispatchers.IO) { categoryDao.insert(*categories).first() }
+    override suspend fun insertCategories(vararg categories: Category) =
+        withContext(Dispatchers.IO) { categoryDao.insert(*categories) }
 
     override fun getAllCategories(): Flow<List<Category>> = categoryDao.getAllCategories()
 }
