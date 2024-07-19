@@ -35,7 +35,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -53,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -63,7 +67,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.heyzeusv.yourlists.R
-import com.heyzeusv.yourlists.add.FilteredDropDownMenu
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
@@ -501,6 +504,74 @@ fun EditItemBottomSheetContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilteredDropDownMenu(
+    value: TextFieldValue,
+    onValueChanged: (TextFieldValue) -> Unit,
+    label: String,
+    options: List<String>,
+    optionOnClick: (String) -> Unit,
+    maxLength: Int,
+    modifier: Modifier = Modifier,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier,
+    ) {
+        TextField(
+            value = value,
+            onValueChange = { if (it.text.length <= maxLength) onValueChanged(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { expanded = it.isFocused }
+                .menuAnchor(),
+            label = { Text(label) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            supportingText = {
+                Row {
+                    Text(
+                        text = "${value.text.length}/$maxLength",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = true,
+        )
+        val filteredOptions = options.filter { it.contains(value.text, ignoreCase = true) }
+        if (filteredOptions.isNotEmpty()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { }
+            ) {
+                filteredOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option,
+                                maxLines = 1,
+                            )
+                        },
+                        onClick = {
+                            optionOnClick(option)
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview
 @Composable
 private fun EmptyListPreview() {
@@ -646,6 +717,23 @@ private fun EditItemSheetContentNullAddPreview() {
                     deleteOnClick = { },
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun FilteredDropDownMenuPreview() {
+    PreviewUtil.run {
+        Preview {
+            FilteredDropDownMenu(
+                value = TextFieldValue("Preview"),
+                onValueChanged = { },
+                label = "Preview Label",
+                options = listOf("Preview1", "Preview2", "Preview3"),
+                optionOnClick = { },
+                maxLength = 999,
+            )
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
+import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -94,5 +95,9 @@ class AddViewModel @Inject constructor(
 
     fun deleteDefaultItem(defaultItem: DefaultItem) {
         viewModelScope.launch { repo.deleteDefaultItems(defaultItem) }
+    }
+
+    fun addListWithOption(itemList: ItemListWithItems, option: AddListOptions) {
+
     }
 }

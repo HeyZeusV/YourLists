@@ -28,6 +28,9 @@
     <string name="asbs_save_add">Save as default &amp; add to list</string>
     <string name="asbs_update_add">Update defaults &amp; add to list</string>
     <string name="asbs_delete">Delete defaults</string>
+    <string name="asbs_add_all_unchecked">Add all items as unchecked</string>
+    <string name="asbs_add_all_as_is">Add all items as is</string>
+    <string name="asbs_add_only_uncheck">Add only unchecked items</string>
 
     <!-- InputAlertDialog (iad) -->
     <string name="iad_label">Enter a name</string>
