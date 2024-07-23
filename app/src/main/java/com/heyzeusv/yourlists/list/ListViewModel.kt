@@ -7,7 +7,7 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.util.FilterOption
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
@@ -34,21 +33,20 @@ class ListViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val itemList = itemListId
-        .flatMapLatest { id -> repo.getItemListWithItemsWithId(id) }
-        .filterNotNull()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = ItemListWithItems()
-        )
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val newItemList = itemListId
         .flatMapLatest { id -> repo.getItemListWithId(id) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = ItemList(itemListId = 0L, name = "")
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val items = itemListId
+        .flatMapLatest { id -> repo.getSortedItemsWithParentId(id, ListFilter(FilterOption.ASC, FilterOption.ASC, FilterOption.ASC)) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
         )
 
     private val _categories = MutableStateFlow(emptyList<Category>())

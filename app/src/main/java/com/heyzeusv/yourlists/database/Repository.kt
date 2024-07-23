@@ -5,6 +5,7 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.list.ListFilter
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
@@ -35,6 +36,8 @@ interface Repository {
     suspend fun updateItems(vararg items: Item)
 
     suspend fun deleteItems(vararg items: Item)
+
+    fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>>
 
     /**
      *  DefaultItem Queries

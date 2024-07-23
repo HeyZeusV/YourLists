@@ -44,6 +44,7 @@ fun ListScreen(
 ) {
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     val categories by listVM.categories.collectAsStateWithLifecycle()
+    val items by listVM.items.collectAsStateWithLifecycle()
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -59,22 +60,22 @@ fun ListScreen(
             )
         )
     }
-    LaunchedEffect(key1 = itemList.items, key2 = showBottomSheet) {
+    LaunchedEffect(key1 = items, key2 = showBottomSheet) {
         val isFabDisplayed = when {
-            itemList.items.isEmpty() || showBottomSheet -> false
+            items.isEmpty() || showBottomSheet -> false
             else -> true
         }
         fabSetup(
             FabState(
                 isFabDisplayed = isFabDisplayed,
-                fabAction = { navController.navigateToAdd(itemList.itemList.itemListId) },
+                fabAction = { navController.navigateToAdd(itemList.itemListId) },
             )
         )
     }
     ListScreen(
-        itemList = itemList,
+        itemList = ItemListWithItems(itemList, items),
         categories = categories,
-        emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
+        emptyButtonOnClick = { navController.navigateToAdd(itemList.itemListId) },
         checkboxOnClick = listVM::updateItemIsChecked,
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },

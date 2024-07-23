@@ -9,6 +9,7 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.list.ListFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -56,6 +57,14 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun deleteItems(vararg items: Item) =
         withContext(Dispatchers.IO) { itemDao.delete(*items) }
+
+    override fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>> =
+        itemDao.getSortedItemsWithParentId(
+            id = id,
+            byIsChecked = filter.byIsChecked.value,
+            byName = filter.byName.value,
+            byCategory = filter.byCategory.value
+        )
 
     /**
      *  DefaultItem Queries
