@@ -17,11 +17,13 @@ interface Repository {
 
     suspend fun deleteItemList(vararg itemLists: ItemList)
 
+    fun getItemListWithId(id: Long): Flow<ItemList>
+
     fun getAllItemLists(): Flow<List<ItemListWithItems>>
 
     fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>>
 
-    fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
+    fun getItemListWithItemsWithId(id: Long): Flow<ItemListWithItems?>
 
     fun getMaxItemListId(): Flow<Long?>
 

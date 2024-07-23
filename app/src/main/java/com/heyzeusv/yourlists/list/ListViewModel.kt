@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
+import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,7 @@ class ListViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val itemList = itemListId
-        .flatMapLatest { id -> repo.getItemListWithId(id) }
+        .flatMapLatest { id -> repo.getItemListWithItemsWithId(id) }
         .filterNotNull()
         .stateIn(
             scope = viewModelScope,
@@ -41,6 +42,14 @@ class ListViewModel @Inject constructor(
             initialValue = ItemListWithItems()
         )
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val newItemList = itemListId
+        .flatMapLatest { id -> repo.getItemListWithId(id) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = ItemList(itemListId = 0L, name = "")
+        )
 
     private val _categories = MutableStateFlow(emptyList<Category>())
     val categories = _categories.asStateFlow()

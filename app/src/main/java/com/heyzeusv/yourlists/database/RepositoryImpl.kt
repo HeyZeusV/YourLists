@@ -32,14 +32,16 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteItemList(vararg itemLists: ItemList) =
         withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
 
+    override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
+
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
 
     override fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithoutId(id)
 
-    override fun getItemListWithId(id: Long): Flow<ItemListWithItems?> =
-        itemListDao.getItemListWithId(id)
+    override fun getItemListWithItemsWithId(id: Long): Flow<ItemListWithItems?> =
+        itemListDao.getItemListWithItemsWithId(id)
 
     override fun getMaxItemListId(): Flow<Long?> = itemListDao.getMaxItemListId()
 

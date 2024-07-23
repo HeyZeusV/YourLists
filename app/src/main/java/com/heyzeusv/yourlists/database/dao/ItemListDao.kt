@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ItemListDao : BaseDao<ItemList> {
 
+    @Query("SELECT * " +
+            "FROM ItemList " +
+            "WHERE itemListId=(:id)")
+    fun getItemListWithId(id: Long): Flow<ItemList>
+
     @Transaction
     @Query("SELECT * " +
             "FROM ItemList")
@@ -25,7 +30,7 @@ interface ItemListDao : BaseDao<ItemList> {
     @Query("SELECT * " +
             "FROM ItemList " +
             "WHERE itemListId=(:id)")
-    fun getItemListWithId(id: Long): Flow<ItemListWithItems?>
+    fun getItemListWithItemsWithId(id: Long): Flow<ItemListWithItems?>
 
     @Query("SELECT MAX(itemListId) " +
             "FROM ItemList")
