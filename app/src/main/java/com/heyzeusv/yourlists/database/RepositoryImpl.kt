@@ -61,9 +61,9 @@ class RepositoryImpl @Inject constructor(
     override fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>> =
         itemDao.getSortedItemsWithParentId(
             id = id,
-            byIsChecked = filter.byIsChecked.value,
-            byName = filter.byName.value,
-            byCategory = filter.byCategory.value
+            byIsChecked = filter.byIsCheckedOption.value,
+            byName = filter.byNameOption.value,
+            byCategory = filter.byCategoryOption.value
         )
 
     /**

@@ -12,6 +12,17 @@
     <dimen name="asbs_button_padding_horizontal">16.dp</dimen>
     <dimen name="asbs_button_padding_vertical">8.dp</dimen>
 
+    <!-- AlertDialog (ad) -->
+    <dimen name="ad_padding_all">24.dp</dimen>
+    <dimen name="ad_title_padding_bottom">16.dp</dimen>
+    <dimen name="ad_buttons_padding_top">24.dp</dimen>
+    <dimen name="ad_buttons_spacedBy">8.dp</dimen>
+    <!-- AlertDialog.Filter (fad) -->
+    <dimen name="fad_option_spacedBy_horizontal">16.dp</dimen>
+    <dimen name="fad_option_padding_start">36.dp</dimen>
+    <!-- AlertDialog.Input (iad) -->
+    <dimen name="iad_input_padding_bottom">8.dp</dimen>
+
     <!-- BottomSheet (bs) -->
     <dimen name="bs_padding_all">16.dp</dimen>
     <dimen name="bs_vertical_spacedBy">16.dp</dimen>
@@ -22,12 +33,6 @@
     <dimen name="el_icon_size">36.dp</dimen>
     <dimen name="el_padding_horizontal">16.dp</dimen>
     <dimen name="el_text_padding_bottom">12.dp</dimen>
-
-    <!-- InputAlertDialog (iad) -->
-    <dimen name="iad_padding_all">24.dp</dimen>
-    <dimen name="iad_title_padding_bottom">16.dp</dimen>
-    <dimen name="iad_input_padding_bottom">8.dp</dimen>
-    <dimen name="iad_buttons_spacedBy">8.dp</dimen>
 
     <!-- ItemInfo (if) -->
     <dimen name="if_height_min">40.dp</dimen>

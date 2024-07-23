@@ -26,6 +26,7 @@ import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
+import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
@@ -46,6 +47,7 @@ fun ListScreen(
     val categories by listVM.categories.collectAsStateWithLifecycle()
     val items by listVM.items.collectAsStateWithLifecycle()
 
+    var showFilterDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
 
     BackHandler(enabled = showBottomSheet) {
@@ -57,6 +59,7 @@ fun ListScreen(
                 destination = ListDestination,
                 title = topAppBarTitle,
                 onNavPressed = { navController.navigateUp() },
+                onActionRightPressed = { showFilterDialog = true },
             )
         )
     }
@@ -82,6 +85,16 @@ fun ListScreen(
         updateOnClick = listVM::updateItem,
         deleteOnClick = listVM::deleteItem,
     )
+    FilterAlertDialog(
+        display = showFilterDialog,
+        title = sRes(R.string.fad_title),
+        onConfirm = {
+            showFilterDialog = false
+        },
+        onDismiss = { showFilterDialog = false },
+    ) {
+
+    }
 }
 
 @Composable

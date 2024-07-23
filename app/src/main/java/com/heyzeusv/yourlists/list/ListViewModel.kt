@@ -42,7 +42,19 @@ class ListViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val items = itemListId
-        .flatMapLatest { id -> repo.getSortedItemsWithParentId(id, ListFilter(FilterOption.ASC, FilterOption.ASC, FilterOption.ASC)) }
+        .flatMapLatest { id ->
+            repo.getSortedItemsWithParentId(
+                id = id,
+                filter = ListFilter(
+                    byIsChecked = false,
+                    byIsCheckedOption = FilterOption.ASC,
+                    byName = false,
+                    byNameOption = FilterOption.ASC,
+                    byCategory = false,
+                    byCategoryOption = FilterOption.ASC,
+                ),
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
