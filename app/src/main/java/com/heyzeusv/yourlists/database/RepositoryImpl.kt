@@ -10,6 +10,7 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
+import com.heyzeusv.yourlists.overview.OverviewFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -37,6 +38,12 @@ class RepositoryImpl @Inject constructor(
 
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
+
+    override fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>> =
+        itemListDao.getSortedItemListsWithItems(
+            byName = filter.byName,
+            byNameOption = filter.byNameOption.value,
+        )
 
     override fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithoutId(id)

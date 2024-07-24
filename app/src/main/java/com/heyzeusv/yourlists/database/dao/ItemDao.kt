@@ -19,8 +19,7 @@ interface ItemDao : BaseDao<Item> {
             "CASE WHEN :byCategory = 1 AND :byCategoryOption = '$ASC' THEN category END ASC, " +
             "CASE WHEN :byCategory = 1 AND :byCategoryOption = '$DESC' THEN category END DESC," +
             "CASE WHEN :byName = 1 AND :byNameOption = '$ASC' THEN name END ASC, " +
-            "CASE WHEN :byName = 1 AND :byNameOption = '$DESC' THEN name END DESC"
-    )
+            "CASE WHEN :byName = 1 AND :byNameOption = '$DESC' THEN name END DESC")
     fun getSortedItemsWithParentId(
         id: Long,
         byIsChecked: Boolean,

@@ -6,6 +6,7 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
+import com.heyzeusv.yourlists.overview.OverviewFilter
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
@@ -21,6 +22,8 @@ interface Repository {
     fun getItemListWithId(id: Long): Flow<ItemList>
 
     fun getAllItemLists(): Flow<List<ItemListWithItems>>
+
+    fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>>
 
     fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>>
 
