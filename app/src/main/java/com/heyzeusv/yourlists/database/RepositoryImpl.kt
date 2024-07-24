@@ -63,10 +63,10 @@ class RepositoryImpl @Inject constructor(
             id = id,
             byIsChecked = filter.byIsChecked,
             byIsCheckedOption = filter.byIsCheckedOption.value,
+            byCategory = filter.byCategory,
+            byCategoryOption = filter.byCategoryOption.value,
             byName = filter.byName,
             byNameOption = filter.byNameOption.value,
-            byCategory = filter.byCategory,
-            byCategoryOption = filter.byCategoryOption.value
         )
 
     /**

@@ -33,19 +33,19 @@ class SettingsManager @Inject constructor(
             .setIsSelected(listFilter.byIsChecked)
             .setFilterOption(listFilter.byIsCheckedOption.sFilterOption)
             .build()
-        val byNameFilter = SettingsFilter
-            .newBuilder()
-            .setName(ListFilterNames.BY_NAME)
-            .setIsSelected(listFilter.byName)
-            .setFilterOption(listFilter.byNameOption.sFilterOption)
-            .build()
         val byCategoryFilter = SettingsFilter
             .newBuilder()
             .setName(ListFilterNames.BY_CATEGORY)
             .setIsSelected(listFilter.byCategory)
             .setFilterOption(listFilter.byCategoryOption.sFilterOption)
             .build()
-        val filterList = listOf(byIsCheckedFilter, byNameFilter, byCategoryFilter)
+        val byNameFilter = SettingsFilter
+            .newBuilder()
+            .setName(ListFilterNames.BY_NAME)
+            .setIsSelected(listFilter.byName)
+            .setFilterOption(listFilter.byNameOption.sFilterOption)
+            .build()
+        val filterList = listOf(byIsCheckedFilter, byCategoryFilter, byNameFilter)
         settings.updateData { settings ->
             settings
                 .toBuilder()
