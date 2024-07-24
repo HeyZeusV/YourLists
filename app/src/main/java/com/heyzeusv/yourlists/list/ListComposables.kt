@@ -2,12 +2,14 @@ package com.heyzeusv.yourlists.list
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,6 +32,7 @@ import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.SingleFilterSelection
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.navigateToAdd
@@ -44,9 +47,10 @@ fun ListScreen(
     topAppBarTitle: String,
 ) {
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
-    val categories by listVM.categories.collectAsStateWithLifecycle()
     val items by listVM.items.collectAsStateWithLifecycle()
+    val categories by listVM.categories.collectAsStateWithLifecycle()
 
+    var filter by remember { mutableStateOf(ListFilter()) }
     var showFilterDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -93,7 +97,10 @@ fun ListScreen(
         },
         onDismiss = { showFilterDialog = false },
     ) {
-
+        ListFilters(
+            filter = filter,
+            updateFilter = { filter = it },
+        )
     }
 }
 
@@ -157,6 +164,36 @@ fun ListScreen(
     }
 }
 
+@Composable
+fun ListFilters(
+    filter: ListFilter,
+    updateFilter: (ListFilter) -> Unit,
+) {
+    Column {
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byIsChecked),
+            isSelected = filter.byIsChecked,
+            updateIsSelected = { updateFilter(filter.copy(byIsChecked = !filter.byIsChecked))},
+            filterOption = filter.byIsCheckedOption,
+            updateFilterOption = { updateFilter(filter.copy(byIsCheckedOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byName),
+            isSelected = filter.byName,
+            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName))},
+            filterOption = filter.byNameOption,
+            updateFilterOption = { updateFilter(filter.copy(byNameOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byCategory),
+            isSelected = filter.byCategory,
+            updateIsSelected = { updateFilter(filter.copy(byCategory = !filter.byCategory))},
+            filterOption = filter.byCategoryOption,
+            updateFilterOption = { updateFilter(filter.copy(byCategoryOption = it)) },
+        )
+    }
+}
+
 @Preview
 @Composable
 fun ListScreenPreview() {
@@ -191,6 +228,21 @@ fun ListScreenEmptyPreview() {
                 updateOnClick = { },
                 deleteOnClick = { },
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListFiltersPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                ListFilters(
+                    filter = ListFilter(),
+                    updateFilter = { },
+                )
+            }
         }
     }
 }

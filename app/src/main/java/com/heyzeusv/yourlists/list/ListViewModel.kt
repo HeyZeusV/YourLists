@@ -7,7 +7,6 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
-import com.heyzeusv.yourlists.util.FilterOption
 import com.heyzeusv.yourlists.util.ListDestination
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -45,14 +44,7 @@ class ListViewModel @Inject constructor(
         .flatMapLatest { id ->
             repo.getSortedItemsWithParentId(
                 id = id,
-                filter = ListFilter(
-                    byIsChecked = false,
-                    byIsCheckedOption = FilterOption.ASC,
-                    byName = false,
-                    byNameOption = FilterOption.ASC,
-                    byCategory = false,
-                    byCategoryOption = FilterOption.ASC,
-                ),
+                filter = ListFilter(),
             )
         }
         .stateIn(
