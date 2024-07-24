@@ -20,6 +20,7 @@
     <!-- AlertDialog.Filter (fad) -->
     <dimen name="fad_option_spacedBy_horizontal">16.dp</dimen>
     <dimen name="fad_option_padding_start">36.dp</dimen>
+    <dimen name="fad_option_height">32.dp</dimen>
     <!-- AlertDialog.Input (iad) -->
     <dimen name="iad_input_padding_bottom">8.dp</dimen>
 

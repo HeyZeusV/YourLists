@@ -3,7 +3,9 @@ package com.heyzeusv.yourlists.util
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.BasicAlertDialog
@@ -29,6 +31,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.util.FilterOption.ASC
 import com.heyzeusv.yourlists.util.FilterOption.DESC
@@ -179,6 +183,7 @@ fun SelectionWithText(
 ) {
     Row(
         modifier = modifier
+            .height(dRes(R.dimen.fad_option_height))
             .fillMaxWidth()
             .toggleable(
                 value = isSelected,
@@ -204,7 +209,10 @@ fun SelectionWithText(
         }
         Text(
             text = name,
-            modifier = Modifier.alpha(if (enabled) 1f else 0.38f)
+            modifier = Modifier.alpha(if (enabled) 1f else 0.38f),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontSize = TextUnit(18f, TextUnitType.Sp)
+            ),
         )
     }
 }
@@ -248,6 +256,7 @@ private fun InputAlertDialogNullDismissPreview() {
 private fun FilterAlertDialogPreview() {
     PreviewUtil.run {
         Preview {
+            Surface(modifier = Modifier.fillMaxSize()) { }
             FilterAlertDialog(
                 display = true,
                 title = "FilterAlertDialogPreview",
@@ -256,14 +265,21 @@ private fun FilterAlertDialogPreview() {
                 filters = {
                     Column {
                         SingleFilterSelection(
-                            name = "SingleFilterSelectionPreview",
+                            name = "By selected",
                             isSelected = true,
                             updateIsSelected = { },
                             filterOption = ASC,
                             updateFilterOption = { }
                         )
                         SingleFilterSelection(
-                            name = "SingleFilterSelectionPreview",
+                            name = "By category",
+                            isSelected = true,
+                            updateIsSelected = { },
+                            filterOption = ASC,
+                            updateFilterOption = { }
+                        )
+                        SingleFilterSelection(
+                            name = "By name",
                             isSelected = false,
                             updateIsSelected = { },
                             filterOption = DESC,
