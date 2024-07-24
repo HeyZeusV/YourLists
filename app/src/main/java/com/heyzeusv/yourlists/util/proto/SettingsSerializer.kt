@@ -9,7 +9,7 @@ import java.io.OutputStream
 import javax.inject.Inject
 
 class SettingsSerializer @Inject constructor() : Serializer<Settings> {
-    override val defaultValue: Settings = Settings.getDefaultInstance()
+    override val defaultValue: Settings = getCustomSettingsDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): Settings {
         try {

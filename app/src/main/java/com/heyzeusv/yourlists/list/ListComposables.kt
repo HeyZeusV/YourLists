@@ -49,6 +49,7 @@ fun ListScreen(
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
     val items by listVM.items.collectAsStateWithLifecycle()
     val categories by listVM.categories.collectAsStateWithLifecycle()
+    val settings by listVM.settings.collectAsStateWithLifecycle()
 
     var filter by remember { mutableStateOf(ListFilter()) }
     var showFilterDialog by remember { mutableStateOf(false) }
@@ -79,6 +80,9 @@ fun ListScreen(
             )
         )
     }
+    LaunchedEffect(key1 = settings) {
+        filter = ListFilter.settingsFilterToListFilter(settings.listFiltersList)
+    }
     ListScreen(
         itemList = ItemListWithItems(itemList, items),
         categories = categories,
@@ -94,6 +98,7 @@ fun ListScreen(
         title = sRes(R.string.fad_title),
         onConfirm = {
             showFilterDialog = false
+            listVM.updateFilter(filter)
         },
         onDismiss = { showFilterDialog = false },
     ) {

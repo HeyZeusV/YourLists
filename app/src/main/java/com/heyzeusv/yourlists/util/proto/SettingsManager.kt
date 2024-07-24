@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import com.heyzeusv.yourlists.Settings
 import com.heyzeusv.yourlists.SettingsFilter
 import com.heyzeusv.yourlists.list.ListFilter
+import com.heyzeusv.yourlists.list.ListFilterNames
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import java.io.IOException
@@ -20,33 +21,51 @@ class SettingsManager @Inject constructor(
             // DataStore.data throws an IOException when an error is encountered when reading data
             if (exception is IOException) {
                 Log.e("Your Lists", "Error reading settings.", exception)
-                emit(Settings.getDefaultInstance())
+                emit(getCustomSettingsDefaultInstance())
             } else {
                 throw exception
             }
         }
-    suspend fun updateListFilters(listFilter: ListFilter) {
-        val byIsCheckedFilter = SettingsFilter.newBuilder()
-            .setName("byIsChecked")
+    suspend fun updateListFilter(listFilter: ListFilter) {
+        val byIsCheckedFilter = SettingsFilter
+            .newBuilder()
+            .setName(ListFilterNames.BY_IS_CHECKED)
             .setIsSelected(listFilter.byIsChecked)
             .setFilterOption(listFilter.byIsCheckedOption.sFilterOption)
             .build()
-        val byNameFilter = SettingsFilter.newBuilder()
-            .setName("byName")
+        val byNameFilter = SettingsFilter
+            .newBuilder()
+            .setName(ListFilterNames.BY_NAME)
             .setIsSelected(listFilter.byName)
             .setFilterOption(listFilter.byNameOption.sFilterOption)
             .build()
-        val byCategoryFilter = SettingsFilter.newBuilder()
-            .setName("byCategory")
+        val byCategoryFilter = SettingsFilter
+            .newBuilder()
+            .setName(ListFilterNames.BY_CATEGORY)
             .setIsSelected(listFilter.byCategory)
             .setFilterOption(listFilter.byCategoryOption.sFilterOption)
             .build()
         val filterList = listOf(byIsCheckedFilter, byNameFilter, byCategoryFilter)
         settings.updateData { settings ->
-            val builder = settings.toBuilder()
-            builder.clearListFilters()
-            builder.addAllListFilters(filterList)
-            builder.build()
+            settings
+                .toBuilder()
+                .clearListFilters()
+                .addAllListFilters(filterList)
+                .build()
         }
     }
+}
+
+fun getCustomSettingsDefaultInstance(): Settings = Settings
+    .newBuilder()
+    .addAllListFilters(defaultListFilters())
+    .build()
+
+private fun defaultListFilters(): List<SettingsFilter> {
+    val filters = mutableListOf<SettingsFilter>()
+    ListFilterNames.names.forEach {
+        val filter = SettingsFilter.newBuilder().setName(it).build()
+        filters.add(filter)
+    }
+    return filters
 }
