@@ -2,6 +2,7 @@ package com.heyzeusv.yourlists.util
 
 import androidx.annotation.StringRes
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.SettingsFilter
 import com.heyzeusv.yourlists.SettingsFilterOption
 
 object FilterValue {
@@ -23,5 +24,14 @@ enum class FilterOption(
         nameId = R.string.fad_desc,
         value = FilterValue.DESC,
         sFilterOption = SettingsFilterOption.DESC,
-    )
+    );
+
+    companion object {
+        fun fromSettingsFilter(filter: SettingsFilter): FilterOption {
+            return when (filter.filterOption) {
+                SettingsFilterOption.DESC -> DESC
+                else -> ASC
+            }
+        }
+    }
 }

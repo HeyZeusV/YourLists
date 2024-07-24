@@ -20,9 +20,9 @@ data class OverviewFilter(
                 filterList.find { it.name == BY_NAME } ?: defaultSettingsFilter(BY_NAME)
             return OverviewFilter(
                 byCompletion = byCompletionFilter.isSelected,
-                byCompletionOption = FilterOption.entries[byCompletionFilter.filterOptionValue],
+                byCompletionOption = FilterOption.fromSettingsFilter(byCompletionFilter),
                 byName = byNameFilter.isSelected,
-                byNameOption = FilterOption.entries[byNameFilter.filterOptionValue],
+                byNameOption = FilterOption.fromSettingsFilter(byNameFilter),
             )
         }
     }

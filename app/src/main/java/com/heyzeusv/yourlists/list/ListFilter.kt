@@ -25,11 +25,11 @@ data class ListFilter(
                 filterList.find { it.name == BY_NAME } ?: defaultSettingsFilter(BY_NAME)
             return ListFilter(
                 byIsChecked = byIsCheckedFilter.isSelected,
-                byIsCheckedOption = FilterOption.entries[byIsCheckedFilter.filterOptionValue],
+                byIsCheckedOption = FilterOption.fromSettingsFilter(byIsCheckedFilter),
                 byCategory = byCategoryFilter.isSelected,
-                byCategoryOption = FilterOption.entries[byCategoryFilter.filterOptionValue],
+                byCategoryOption = FilterOption.fromSettingsFilter(byCategoryFilter),
                 byName = byNameFilter.isSelected,
-                byNameOption = FilterOption.entries[byNameFilter.filterOptionValue],
+                byNameOption = FilterOption.fromSettingsFilter(byNameFilter),
             )
         }
     }
