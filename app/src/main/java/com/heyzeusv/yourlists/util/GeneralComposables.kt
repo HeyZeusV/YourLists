@@ -180,13 +180,14 @@ fun ItemInfo(
 
 @Composable
 fun ListInfo(
+    modifier: Modifier = Modifier,
     itemList: ItemListWithItems,
     itemListOnClick: (ItemListWithItems) -> Unit,
     displayOptions: Boolean,
     optionOnClick: (ItemListWithItems) -> Unit = { },
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { itemListOnClick(itemList) },
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),

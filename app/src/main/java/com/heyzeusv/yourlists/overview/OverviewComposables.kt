@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.overview
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -132,6 +133,7 @@ fun OverviewScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OverviewScreen(
     itemLists: List<ItemListWithItems>,
@@ -156,8 +158,12 @@ fun OverviewScreen(
             contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
         ) {
-            items(itemLists.reversed()) {
+            items(
+                items = itemLists.reversed(),
+                key = { it.itemList.itemListId }
+            ) {
                 ListInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     itemList = it,
                     itemListOnClick = itemListOnClick,
                     displayOptions = true,
