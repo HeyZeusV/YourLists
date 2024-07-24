@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.list
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -109,6 +110,7 @@ fun ListScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListScreen(
     itemList: ItemListWithItems,
@@ -132,8 +134,12 @@ fun ListScreen(
             contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
         ) {
-            items(itemList.items) {
+            items(
+                items = itemList.items,
+                key = { it.itemId },
+            ) {
                 ItemInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     item = it,
                     surfaceOnClick = {
                         selectedItem = it
