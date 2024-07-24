@@ -26,8 +26,8 @@ interface ItemListDao : BaseDao<ItemList> {
     @Query("SELECT * " +
             "FROM ItemList " +
             "ORDER BY " +
-            "CASE WHEN :byName = 1 AND :byNameOption = '$ASC' THEN name END ASC, " +
-            "CASE WHEN :byName = 1 AND :byNameOption = '$DESC' THEN name End DESC")
+            "CASE WHEN :byName = 1 AND :byNameOption = '$ASC' THEN name COLLATE NOCASE END ASC, " +
+            "CASE WHEN :byName = 1 AND :byNameOption = '$DESC' THEN name COLLATE NOCASE END DESC")
     fun getSortedItemListsWithItems(
         byName: Boolean,
         byNameOption: String
