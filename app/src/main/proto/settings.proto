@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "com.heyzeusv.yourlists";
+option java_multiple_files = true;
+
+message Settings {
+  repeated SettingsFilter list_filters = 2;
+}
+
+message SettingsFilter {
+  string name = 1;
+  bool is_selected = 2;
+  SettingsFilterOption filter_option = 3;
+}
+
+enum SettingsFilterOption {
+  ASC = 0;
+  DESC = 1;
+}
