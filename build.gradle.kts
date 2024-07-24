@@ -5,4 +5,5 @@ plugins {
     alias(libs.plugins.dagger.hilt.android) apply false
     alias(libs.plugins.devtools.ksp) apply false
     alias(libs.plugins.androidx.room) apply false
+    alias(libs.plugins.protobuf) apply false
 }
