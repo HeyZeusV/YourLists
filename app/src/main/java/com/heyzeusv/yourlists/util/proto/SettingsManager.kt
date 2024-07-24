@@ -6,6 +6,8 @@ import com.heyzeusv.yourlists.Settings
 import com.heyzeusv.yourlists.SettingsFilter
 import com.heyzeusv.yourlists.list.ListFilter
 import com.heyzeusv.yourlists.list.ListFilterNames
+import com.heyzeusv.yourlists.overview.OverviewFilter
+import com.heyzeusv.yourlists.overview.OverviewFilterNames
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import java.io.IOException
@@ -26,6 +28,30 @@ class SettingsManager @Inject constructor(
                 throw exception
             }
         }
+
+    suspend fun updateOverviewFilter(overviewFilter: OverviewFilter) {
+        val byCompletionFilter = SettingsFilter
+            .newBuilder()
+            .setName(OverviewFilterNames.BY_COMPLETION)
+            .setIsSelected(overviewFilter.byCompletion)
+            .setFilterOption(overviewFilter.byCompletionOption.sFilterOption)
+            .build()
+        val byNameFilter = SettingsFilter
+            .newBuilder()
+            .setName(OverviewFilterNames.BY_NAME)
+            .setIsSelected(overviewFilter.byName)
+            .setFilterOption(overviewFilter.byNameOption.sFilterOption)
+            .build()
+        val filterList = listOf(byCompletionFilter, byNameFilter)
+        settings.updateData { settings ->
+            settings
+                .toBuilder()
+                .clearOverviewFilter()
+                .addAllOverviewFilter(filterList)
+                .build()
+        }
+    }
+
     suspend fun updateListFilter(listFilter: ListFilter) {
         val byIsCheckedFilter = SettingsFilter
             .newBuilder()
@@ -49,8 +75,8 @@ class SettingsManager @Inject constructor(
         settings.updateData { settings ->
             settings
                 .toBuilder()
-                .clearListFilters()
-                .addAllListFilters(filterList)
+                .clearListFilter()
+                .addAllListFilter(filterList)
                 .build()
         }
     }
@@ -58,14 +84,25 @@ class SettingsManager @Inject constructor(
 
 fun getCustomSettingsDefaultInstance(): Settings = Settings
     .newBuilder()
-    .addAllListFilters(defaultListFilters())
+    .addAllOverviewFilter(defaultOverviewFilter())
+    .addAllListFilter(defaultListFilter())
     .build()
 
-private fun defaultListFilters(): List<SettingsFilter> {
+fun defaultSettingsFilter(name: String): SettingsFilter =
+    SettingsFilter.newBuilder().setName(name).build()
+
+private fun defaultOverviewFilter(): List<SettingsFilter> {
+    val filters = mutableListOf<SettingsFilter>()
+    OverviewFilterNames.names.forEach {
+        filters.add(defaultSettingsFilter(it))
+    }
+    return filters
+}
+
+private fun defaultListFilter(): List<SettingsFilter> {
     val filters = mutableListOf<SettingsFilter>()
     ListFilterNames.names.forEach {
-        val filter = SettingsFilter.newBuilder().setName(it).build()
-        filters.add(filter)
+        filters.add(defaultSettingsFilter(it))
     }
     return filters
 }

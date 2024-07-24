@@ -82,7 +82,7 @@ fun ListScreen(
         )
     }
     LaunchedEffect(key1 = settings) {
-        filter = ListFilter.settingsFilterToListFilter(settings.listFiltersList)
+        filter = ListFilter.settingsFilterToListFilter(settings.listFilterList)
     }
     ListScreen(
         itemList = ItemListWithItems(itemList, items),

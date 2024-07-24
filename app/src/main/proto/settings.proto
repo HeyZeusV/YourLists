@@ -4,7 +4,8 @@ option java_package = "com.heyzeusv.yourlists";
 option java_multiple_files = true;
 
 message Settings {
-  repeated SettingsFilter list_filters = 2;
+  repeated SettingsFilter overview_filter = 1;
+  repeated SettingsFilter list_filter = 2;
 }
 
 message SettingsFilter {

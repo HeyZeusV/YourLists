@@ -52,7 +52,7 @@ class ListViewModel @Inject constructor(
         .flatMapLatest { setting ->
             repo.getSortedItemsWithParentId(
                 id = itemListId.value,
-                filter = ListFilter.settingsFilterToListFilter(setting.listFiltersList)
+                filter = ListFilter.settingsFilterToListFilter(setting.listFilterList)
             )
         }
         .stateIn(
