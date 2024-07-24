@@ -1,3 +1,4 @@
+import com.google.protobuf.gradle.id
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.devtools.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -31,8 +33,8 @@ android {
         applicationId = "com.heyzeusv.yourlists"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.1.0"
+        versionCode = 4
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -94,6 +96,9 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     // Navigation
     implementation(libs.androidx.navigation.compose)
+    // Proto Datastore
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -109,4 +114,23 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.8.0"
+    }
+
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

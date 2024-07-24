@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.overview
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
@@ -22,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,16 +37,20 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
+import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.SingleFilterSelection
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun OverviewScreen(
@@ -54,8 +61,14 @@ fun OverviewScreen(
 ) {
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     val nextItemListId by overviewVM.nextItemListId.collectAsStateWithLifecycle()
-    var displayNewListAlertDialog by remember { mutableStateOf(false) }
+    val settings by overviewVM.settings.collectAsStateWithLifecycle()
+
+    var filter by remember { mutableStateOf(OverviewFilter()) }
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var showNewListDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     val topAppBarTitle = sRes(OverviewDestination.title)
 
@@ -67,6 +80,7 @@ fun OverviewScreen(
             TopAppBarState(
                 destination = OverviewDestination,
                 title = topAppBarTitle,
+                onActionRightPressed = { showFilterDialog = true },
             )
         )
     }
@@ -78,16 +92,20 @@ fun OverviewScreen(
         fabSetup(
             FabState(
                 isFabDisplayed = isFabDisplayed,
-                fabAction = { displayNewListAlertDialog = true },
+                fabAction = { showNewListDialog = true },
             )
         )
     }
+    LaunchedEffect(key1 = settings) {
+        filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
+    }
     OverviewScreen(
+        listState = listState,
         itemLists = itemLists,
         itemListOnClick = { itemList ->
             itemList.itemList.let { navController.navigateToItemList(it.itemListId, it.name) }
         },
-        emptyButtonOnClick = { displayNewListAlertDialog = true },
+        emptyButtonOnClick = { showNewListDialog = true },
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
         optionRenameOnClick = overviewVM::renameItemList,
@@ -95,21 +113,44 @@ fun OverviewScreen(
         optionDeleteOnClick = overviewVM::deleteItemList,
     )
     InputAlertDialog(
-        display = displayNewListAlertDialog,
-        onDismissRequest = { displayNewListAlertDialog = false },
+        display = showNewListDialog,
+        onDismissRequest = { showNewListDialog = false },
         title = sRes(R.string.os_ad_new_title),
         maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
             overviewVM.insertItemList(input)
             navController.navigateToItemList(nextItemListId, input)
-            displayNewListAlertDialog = false
+            showNewListDialog = false
         },
-        onDismiss = { displayNewListAlertDialog = false }
+        onDismiss = { showNewListDialog = false }
     )
+    FilterAlertDialog(
+        display = showFilterDialog,
+        title = sRes(R.string.fad_title),
+        onConfirm = {
+            showFilterDialog = false
+            overviewVM.updateFilter(filter)
+            scope.launch {
+                delay(300)
+                listState.animateScrollToItem(0)
+            }
+        },
+        onDismiss = {
+            showFilterDialog = false
+            filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
+        },
+    ) {
+        OverviewFilter(
+            filter = filter,
+            updateFilter = { filter = it },
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OverviewScreen(
+    listState: LazyListState = rememberLazyListState(),
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (ItemListWithItems) -> Unit,
     emptyButtonOnClick: () -> Unit,
@@ -119,7 +160,6 @@ fun OverviewScreen(
     optionCopyOnClick: (ItemListWithItems) -> Unit,
     optionDeleteOnClick: (ItemList) -> Unit,
 ) {
-    val listState = rememberLazyListState()
     var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
     var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
 
@@ -132,8 +172,12 @@ fun OverviewScreen(
             contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.os_lists_spacedBy)),
         ) {
-            items(itemLists.reversed()) {
+            items(
+                items = itemLists.reversed(),
+                key = { it.itemList.itemListId }
+            ) {
                 ListInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     itemList = it,
                     itemListOnClick = itemListOnClick,
                     displayOptions = true,
@@ -183,6 +227,29 @@ fun OverviewScreen(
         },
         onDismiss = { showRenameAlertDialog = null }
     )
+}
+
+@Composable
+fun OverviewFilter(
+    filter: OverviewFilter,
+    updateFilter: (OverviewFilter) -> Unit,
+) {
+    Column {
+        SingleFilterSelection(
+            name = sRes(R.string.os_filter_byCompletion),
+            isSelected = filter.byCompletion,
+            updateIsSelected = { updateFilter(filter.copy(byCompletion = !filter.byCompletion)) },
+            filterOption = filter.byCompletionOption,
+            updateFilterOption = { updateFilter(filter.copy(byCompletionOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.os_filter_byName),
+            isSelected = filter.byName,
+            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName)) },
+            filterOption = filter.byNameOption,
+            updateFilterOption = { updateFilter(filter.copy(byNameOption = it)) },
+        )
+    }
 }
 
 @Composable
@@ -265,6 +332,21 @@ private fun OverviewScreenPreview() {
 
 @Preview
 @Composable
+private fun OverviewFilterPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                OverviewFilter(
+                    filter = OverviewFilter(),
+                    updateFilter = { },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
 private fun OverviewScreenEmptyPreview() {
     PreviewUtil.run {
         Preview {
@@ -313,4 +395,3 @@ private fun OverviewBottomSheetActionPreview() {
         }
     }
 }
-

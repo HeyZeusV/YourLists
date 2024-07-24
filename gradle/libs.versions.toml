@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.0"
+datastore = "1.1.1"
 devtoolsKsp = "1.9.0-1.0.12"
 hiltAndroid = "2.50"
 hiltNavigationCompose = "1.2.0"
@@ -14,10 +15,13 @@ composeBom = "2024.06.00"
 lifecycleViewmodelKtx = "2.8.3"
 lifecycleViewmodelCompose = "2.8.3"
 navigationCompose = "2.7.7"
+protobuf = "0.9.4"
+protobufJavalite = "3.25.2"
 roomRuntime = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
@@ -41,10 +45,12 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobufJavalite" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKsp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-androidx-room = { id = "androidx.room", version.ref = "roomRuntime"}
+androidx-room = { id = "androidx.room", version.ref = "roomRuntime" }
+protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }

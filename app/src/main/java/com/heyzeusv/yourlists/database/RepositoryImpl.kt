@@ -9,6 +9,8 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.list.ListFilter
+import com.heyzeusv.yourlists.overview.OverviewFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -32,14 +34,22 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteItemList(vararg itemLists: ItemList) =
         withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
 
+    override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
+
     override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithItems()
+
+    override fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>> =
+        itemListDao.getSortedItemListsWithItems(
+            byName = filter.byName,
+            byNameOption = filter.byNameOption.value,
+        )
 
     override fun getAllItemListsWithoutId(id: Long): Flow<List<ItemListWithItems>> =
         itemListDao.getAllItemListsWithoutId(id)
 
-    override fun getItemListWithId(id: Long): Flow<ItemListWithItems?> =
-        itemListDao.getItemListWithId(id)
+    override fun getItemListWithItemsWithId(id: Long): Flow<ItemListWithItems?> =
+        itemListDao.getItemListWithItemsWithId(id)
 
     override fun getMaxItemListId(): Flow<Long?> = itemListDao.getMaxItemListId()
 
@@ -54,6 +64,17 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun deleteItems(vararg items: Item) =
         withContext(Dispatchers.IO) { itemDao.delete(*items) }
+
+    override fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>> =
+        itemDao.getSortedItemsWithParentId(
+            id = id,
+            byIsChecked = filter.byIsChecked,
+            byIsCheckedOption = filter.byIsCheckedOption.value,
+            byCategory = filter.byCategory,
+            byCategoryOption = filter.byCategoryOption.value,
+            byName = filter.byName,
+            byNameOption = filter.byNameOption.value,
+        )
 
     /**
      *  DefaultItem Queries

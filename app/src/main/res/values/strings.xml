@@ -32,15 +32,24 @@
     <string name="asbs_add_all_as_is">Add all items as is</string>
     <string name="asbs_add_only_uncheck">Add only unchecked items</string>
 
-    <!-- InputAlertDialog (iad) -->
+    <!-- AlertDialog (ad) -->
+    <string name="ad_cancel">Cancel</string>
+    <!-- AlertDialog.Filter (fad) -->
+    <string name="fad_title">Edit filter</string>
+    <string name="fad_apply">Apply</string>
+    <string name="fad_asc">Ascending</string>
+    <string name="fad_desc">Descending</string>
+    <!-- AlertDialog.Input (iad) -->
     <string name="iad_label">Enter a name</string>
     <string name="iad_confirm">Save</string>
-    <string name="iad_cancel">Cancel</string>
     <string name="iad_cdesc_error">Input Error</string>
     <string name="iad_error">Can\'t be blank!</string>
 
     <!-- ListScreen (ls) -->
     <string name="ls_title">New List</string>
+    <string name="ls_filter_byIsChecked">By selected</string>
+    <string name="ls_filter_byName">By name</string>
+    <string name="ls_filter_byCategory">By category</string>
 <!--    <string name="ls_empty">Add a single item or an existing list!</string>-->
     <string name="ls_empty">Add an item using the button below!</string>
     <string name="ls_fab">Add</string>
@@ -51,6 +60,8 @@
     <!-- OverviewScreen (os) -->
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
+    <string name="os_filter_byCompletion">By completion</string>
+    <string name="os_filter_byName">By name</string>
     <string name="os_ad_new_title">New List</string>
     <string name="os_ad_rename_title">Rename List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->

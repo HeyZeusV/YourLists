@@ -1,18 +1,23 @@
 package com.heyzeusv.yourlists.list
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,13 +31,17 @@ import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
+import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.ItemInfo
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.SingleFilterSelection
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.navigateToAdd
 import com.heyzeusv.yourlists.util.sRes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListScreen(
@@ -43,9 +52,15 @@ fun ListScreen(
     topAppBarTitle: String,
 ) {
     val itemList by listVM.itemList.collectAsStateWithLifecycle()
+    val items by listVM.items.collectAsStateWithLifecycle()
     val categories by listVM.categories.collectAsStateWithLifecycle()
+    val settings by listVM.settings.collectAsStateWithLifecycle()
 
+    var filter by remember { mutableStateOf(ListFilter()) }
+    var showFilterDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     BackHandler(enabled = showBottomSheet) {
         showBottomSheet = false
@@ -56,35 +71,63 @@ fun ListScreen(
                 destination = ListDestination,
                 title = topAppBarTitle,
                 onNavPressed = { navController.navigateUp() },
+                onActionRightPressed = { showFilterDialog = true },
             )
         )
     }
-    LaunchedEffect(key1 = itemList.items, key2 = showBottomSheet) {
+    LaunchedEffect(key1 = items, key2 = showBottomSheet) {
         val isFabDisplayed = when {
-            itemList.items.isEmpty() || showBottomSheet -> false
+            items.isEmpty() || showBottomSheet -> false
             else -> true
         }
         fabSetup(
             FabState(
                 isFabDisplayed = isFabDisplayed,
-                fabAction = { navController.navigateToAdd(itemList.itemList.itemListId) },
+                fabAction = { navController.navigateToAdd(itemList.itemListId) },
             )
         )
     }
+    LaunchedEffect(key1 = settings) {
+        filter = ListFilter.settingsFilterToListFilter(settings.listFilterList)
+    }
     ListScreen(
-        itemList = itemList,
+        listState = listState,
+        itemList = ItemListWithItems(itemList, items),
         categories = categories,
-        emptyButtonOnClick = { navController.navigateToAdd(itemList.itemList.itemListId) },
+        emptyButtonOnClick = { navController.navigateToAdd(itemList.itemListId) },
         checkboxOnClick = listVM::updateItemIsChecked,
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
         updateOnClick = listVM::updateItem,
         deleteOnClick = listVM::deleteItem,
     )
+    FilterAlertDialog(
+        display = showFilterDialog,
+        title = sRes(R.string.fad_title),
+        onConfirm = {
+            showFilterDialog = false
+            listVM.updateFilter(filter)
+            scope.launch {
+                delay(300)
+                listState.animateScrollToItem(0)
+            }
+        },
+        onDismiss = {
+            showFilterDialog = false
+            filter = ListFilter.settingsFilterToListFilter(settings.listFilterList)
+        },
+    ) {
+        ListFilters(
+            filter = filter,
+            updateFilter = { filter = it },
+        )
+    }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListScreen(
+    listState: LazyListState = rememberLazyListState(),
     itemList: ItemListWithItems,
     categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
@@ -94,7 +137,6 @@ fun ListScreen(
     updateOnClick: (Item) -> Unit,
     deleteOnClick: (Item) -> Unit,
 ) {
-    val listState = rememberLazyListState()
     var selectedItem by remember { mutableStateOf(Item()) }
 
     if (itemList.items.isNotEmpty()) {
@@ -106,8 +148,12 @@ fun ListScreen(
             contentPadding = PaddingValues(bottom = dRes(R.dimen.fab_padding_bottom)),
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.ls_list_spacedBy))
         ) {
-            items(itemList.items) {
+            items(
+                items = itemList.items,
+                key = { it.itemId },
+            ) {
                 ItemInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     item = it,
                     surfaceOnClick = {
                         selectedItem = it
@@ -139,6 +185,36 @@ fun ListScreen(
             secondaryOnClick = null,
             deleteLabel = sRes(R.string.lsbs_delete),
             deleteOnClick = { deleteOnClick(it as Item) }
+        )
+    }
+}
+
+@Composable
+fun ListFilters(
+    filter: ListFilter,
+    updateFilter: (ListFilter) -> Unit,
+) {
+    Column {
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byIsChecked),
+            isSelected = filter.byIsChecked,
+            updateIsSelected = { updateFilter(filter.copy(byIsChecked = !filter.byIsChecked)) },
+            filterOption = filter.byIsCheckedOption,
+            updateFilterOption = { updateFilter(filter.copy(byIsCheckedOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byCategory),
+            isSelected = filter.byCategory,
+            updateIsSelected = { updateFilter(filter.copy(byCategory = !filter.byCategory)) },
+            filterOption = filter.byCategoryOption,
+            updateFilterOption = { updateFilter(filter.copy(byCategoryOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.ls_filter_byName),
+            isSelected = filter.byName,
+            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName)) },
+            filterOption = filter.byNameOption,
+            updateFilterOption = { updateFilter(filter.copy(byNameOption = it)) },
         )
     }
 }
@@ -177,6 +253,21 @@ fun ListScreenEmptyPreview() {
                 updateOnClick = { },
                 deleteOnClick = { },
             )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ListFiltersPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                ListFilters(
+                    filter = ListFilter(),
+                    updateFilter = { },
+                )
+            }
         }
     }
 }

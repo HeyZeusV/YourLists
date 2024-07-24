@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.heyzeusv.yourlists.R
+import com.heyzeusv.yourlists.ui.icons.Filter
 
 interface Destination {
     val route: String
@@ -37,8 +38,8 @@ object OverviewDestination: Destination {
     override val navDescription: Int = R.string.app_name
     override val actionLeftIcon: ImageVector = Blank
     override val actionLeftDescription: Int = 0
-    override val actionRightIcon: ImageVector = Blank
-    override val actionRightDescription: Int = 0
+    override val actionRightIcon: ImageVector = Filter
+    override val actionRightDescription: Int = R.string.fad_title
     override val fabIcon: ImageVector = Icons.Default.Add
     override val fabText: Int = R.string.os_fab
 }
@@ -50,8 +51,8 @@ object ListDestination: Destination {
     override val navDescription: Int = R.string.navigate_back
     override val actionLeftIcon: ImageVector = Blank
     override val actionLeftDescription: Int = 0
-    override val actionRightIcon: ImageVector = Blank
-    override val actionRightDescription: Int = 0
+    override val actionRightIcon: ImageVector = Filter
+    override val actionRightDescription: Int = R.string.fad_title
     override val fabIcon: ImageVector = Icons.Default.Add
     override val fabText: Int = R.string.ls_fab
 

@@ -115,6 +115,7 @@ fun EmptyList(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemInfo(
+    modifier: Modifier = Modifier,
     item: BaseItem,
     surfaceOnClick: () -> Unit,
     checkboxOnClick: (Item, (Boolean) -> Unit) -> Unit = { _, _ -> },
@@ -122,7 +123,7 @@ fun ItemInfo(
     var isCheckboxEnabled by remember { mutableStateOf(true) }
     val decimalFormat = DecimalFormat("#,##0.00")
 
-    Surface(modifier = Modifier.clickable { surfaceOnClick() }) {
+    Surface(modifier = modifier.clickable { surfaceOnClick() }) {
         Row(
             modifier = Modifier
                 .padding(
@@ -179,13 +180,14 @@ fun ItemInfo(
 
 @Composable
 fun ListInfo(
+    modifier: Modifier = Modifier,
     itemList: ItemListWithItems,
     itemListOnClick: (ItemListWithItems) -> Unit,
     displayOptions: Boolean,
     optionOnClick: (ItemListWithItems) -> Unit = { },
 ) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { itemListOnClick(itemList) },
         shape = RoundedCornerShape(dRes(R.dimen.card_radius)),

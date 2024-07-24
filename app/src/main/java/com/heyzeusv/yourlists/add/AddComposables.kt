@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.add
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -194,6 +195,7 @@ fun AddScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddItemPage(
     defaultItemQuery: String,
@@ -239,7 +241,7 @@ fun AddItemPage(
             },
             singleLine = true,
         )
-        if (defaultItemQuery.isNotBlank()) {
+        AnimatedVisibility(visible = defaultItemQuery.isNotBlank()) {
             Surface(
                 modifier = Modifier
                     .padding(bottom = dRes(R.dimen.if_spacedBy_horizontal))
@@ -269,8 +271,12 @@ fun AddItemPage(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
         ) {
-            items(defaultItems) {
+            items(
+                items = defaultItems,
+                key = { it.itemId },
+            ) {
                 ItemInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     item = it,
                     surfaceOnClick = {
                         focusManager.clearFocus()

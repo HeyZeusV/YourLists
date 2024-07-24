@@ -2,30 +2,62 @@ package com.heyzeusv.yourlists.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.heyzeusv.yourlists.SettingsFilterOption
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
+import com.heyzeusv.yourlists.util.proto.SettingsManager
+import com.heyzeusv.yourlists.util.proto.defaultSettingsFilter
+import com.heyzeusv.yourlists.util.proto.getCustomSettingsDefaultInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class OverviewViewModel @Inject constructor(
-    private val repo: Repository
+    private val settingsManager: SettingsManager,
+    private val repo: Repository,
 ) : ViewModel() {
 
-    private val _itemLists = MutableStateFlow(emptyList<ItemListWithItems>())
-    val itemLists = _itemLists.asStateFlow()
+    val settings = settingsManager.settingsFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = getCustomSettingsDefaultInstance(),
+    )
+
+    private val byCompletionFilter
+        get() = settings.value.overviewFilterList.find { it.name == BY_COMPLETION }
+            ?: defaultSettingsFilter(BY_COMPLETION)
+
+    val itemLists = settings
+        .flatMapLatest { setting ->
+            repo.getSortedItemListsWithItems(
+                filter = OverviewFilter.settingsFilterToOverviewFilter(setting.overviewFilterList)
+            )
+        }
+        .map { list ->
+            if (byCompletionFilter.isSelected) {
+                when (byCompletionFilter.filterOption) {
+                    SettingsFilterOption.DESC -> list.sortedByDescending { it.progress.first }
+                    else -> list.sortedBy { it.progress.first }
+                }
+            } else {
+                list
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
 
     val nextItemListId = repo.getMaxItemListId()
         .map { (it ?: 0L) + 1 }
@@ -35,8 +67,10 @@ class OverviewViewModel @Inject constructor(
             initialValue = 0L
         )
 
-    init {
-        getAllItemLists()
+    fun updateFilter(filter: OverviewFilter) {
+        viewModelScope.launch {
+            settingsManager.updateOverviewFilter(filter)
+        }
     }
 
     fun renameItemList(itemList: ItemList, newName: String) {
@@ -77,14 +111,6 @@ class OverviewViewModel @Inject constructor(
     fun deleteItemList(itemList: ItemList) {
         viewModelScope.launch {
             repo.deleteItemList(itemList)
-        }
-    }
-
-    private fun getAllItemLists() {
-        viewModelScope.launch {
-            repo.getAllItemLists().flowOn(Dispatchers.IO).collectLatest { lists ->
-                _itemLists.update { lists }
-            }
         }
     }
 }
