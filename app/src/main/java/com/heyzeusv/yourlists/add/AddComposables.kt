@@ -194,6 +194,7 @@ fun AddScreen(
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AddItemPage(
     defaultItemQuery: String,
@@ -269,8 +270,12 @@ fun AddItemPage(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.as_list_spacedBy)),
         ) {
-            items(defaultItems) {
+            items(
+                items = defaultItems,
+                key = { it.itemId },
+            ) {
                 ItemInfo(
+                    modifier = Modifier.animateItemPlacement(),
                     item = it,
                     surfaceOnClick = {
                         focusManager.clearFocus()

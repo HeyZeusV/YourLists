@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +40,8 @@ import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.navigateToAdd
 import com.heyzeusv.yourlists.util.sRes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ListScreen(
@@ -55,6 +59,8 @@ fun ListScreen(
     var filter by remember { mutableStateOf(ListFilter()) }
     var showFilterDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     BackHandler(enabled = showBottomSheet) {
         showBottomSheet = false
@@ -85,6 +91,7 @@ fun ListScreen(
         filter = ListFilter.settingsFilterToListFilter(settings.listFilterList)
     }
     ListScreen(
+        listState = listState,
         itemList = ItemListWithItems(itemList, items),
         categories = categories,
         emptyButtonOnClick = { navController.navigateToAdd(itemList.itemListId) },
@@ -100,8 +107,15 @@ fun ListScreen(
         onConfirm = {
             showFilterDialog = false
             listVM.updateFilter(filter)
+            scope.launch {
+                delay(300)
+                listState.animateScrollToItem(0)
+            }
         },
-        onDismiss = { showFilterDialog = false },
+        onDismiss = {
+            showFilterDialog = false
+            filter = ListFilter.settingsFilterToListFilter(settings.listFilterList)
+        },
     ) {
         ListFilters(
             filter = filter,
@@ -113,6 +127,7 @@ fun ListScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListScreen(
+    listState: LazyListState = rememberLazyListState(),
     itemList: ItemListWithItems,
     categories: List<Category>,
     emptyButtonOnClick: () -> Unit,
@@ -122,7 +137,6 @@ fun ListScreen(
     updateOnClick: (Item) -> Unit,
     deleteOnClick: (Item) -> Unit,
 ) {
-    val listState = rememberLazyListState()
     var selectedItem by remember { mutableStateOf(Item()) }
 
     if (itemList.items.isNotEmpty()) {

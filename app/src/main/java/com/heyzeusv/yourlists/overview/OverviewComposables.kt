@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
@@ -23,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,8 @@ import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun OverviewScreen(
@@ -63,6 +67,8 @@ fun OverviewScreen(
     var showFilterDialog by remember { mutableStateOf(false) }
     var showNewListDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     val topAppBarTitle = sRes(OverviewDestination.title)
 
@@ -94,6 +100,7 @@ fun OverviewScreen(
         filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
     }
     OverviewScreen(
+        listState = listState,
         itemLists = itemLists,
         itemListOnClick = { itemList ->
             itemList.itemList.let { navController.navigateToItemList(it.itemListId, it.name) }
@@ -123,8 +130,15 @@ fun OverviewScreen(
         onConfirm = {
             showFilterDialog = false
             overviewVM.updateFilter(filter)
+            scope.launch {
+                delay(300)
+                listState.animateScrollToItem(0)
+            }
         },
-        onDismiss = { showFilterDialog = false },
+        onDismiss = {
+            showFilterDialog = false
+            filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
+        },
     ) {
         OverviewFilter(
             filter = filter,
@@ -136,6 +150,7 @@ fun OverviewScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OverviewScreen(
+    listState: LazyListState = rememberLazyListState(),
     itemLists: List<ItemListWithItems>,
     itemListOnClick: (ItemListWithItems) -> Unit,
     emptyButtonOnClick: () -> Unit,
@@ -145,7 +160,6 @@ fun OverviewScreen(
     optionCopyOnClick: (ItemListWithItems) -> Unit,
     optionDeleteOnClick: (ItemList) -> Unit,
 ) {
-    val listState = rememberLazyListState()
     var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
     var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
 
