@@ -94,6 +94,8 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
+    // kotlin-csv
+    implementation(libs.kotlin.csv.jvm)
     // Navigation
     implementation(libs.androidx.navigation.compose)
     // Proto Datastore
