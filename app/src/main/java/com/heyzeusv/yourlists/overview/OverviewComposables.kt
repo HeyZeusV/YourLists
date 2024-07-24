@@ -34,10 +34,12 @@ import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
+import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
+import com.heyzeusv.yourlists.util.SingleFilterSelection
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
@@ -54,7 +56,11 @@ fun OverviewScreen(
 ) {
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
     val nextItemListId by overviewVM.nextItemListId.collectAsStateWithLifecycle()
-    var displayNewListAlertDialog by remember { mutableStateOf(false) }
+    val settings by overviewVM.settings.collectAsStateWithLifecycle()
+
+    var filter by remember { mutableStateOf(OverviewFilter()) }
+    var showFilterDialog by remember { mutableStateOf(false) }
+    var showNewListDialog by remember { mutableStateOf(false) }
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val topAppBarTitle = sRes(OverviewDestination.title)
@@ -67,6 +73,7 @@ fun OverviewScreen(
             TopAppBarState(
                 destination = OverviewDestination,
                 title = topAppBarTitle,
+                onActionRightPressed = { showFilterDialog = true },
             )
         )
     }
@@ -78,16 +85,19 @@ fun OverviewScreen(
         fabSetup(
             FabState(
                 isFabDisplayed = isFabDisplayed,
-                fabAction = { displayNewListAlertDialog = true },
+                fabAction = { showNewListDialog = true },
             )
         )
+    }
+    LaunchedEffect(key1 = settings) {
+        filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
     }
     OverviewScreen(
         itemLists = itemLists,
         itemListOnClick = { itemList ->
             itemList.itemList.let { navController.navigateToItemList(it.itemListId, it.name) }
         },
-        emptyButtonOnClick = { displayNewListAlertDialog = true },
+        emptyButtonOnClick = { showNewListDialog = true },
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
         optionRenameOnClick = overviewVM::renameItemList,
@@ -95,17 +105,31 @@ fun OverviewScreen(
         optionDeleteOnClick = overviewVM::deleteItemList,
     )
     InputAlertDialog(
-        display = displayNewListAlertDialog,
-        onDismissRequest = { displayNewListAlertDialog = false },
+        display = showNewListDialog,
+        onDismissRequest = { showNewListDialog = false },
         title = sRes(R.string.os_ad_new_title),
         maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
             overviewVM.insertItemList(input)
             navController.navigateToItemList(nextItemListId, input)
-            displayNewListAlertDialog = false
+            showNewListDialog = false
         },
-        onDismiss = { displayNewListAlertDialog = false }
+        onDismiss = { showNewListDialog = false }
     )
+    FilterAlertDialog(
+        display = showFilterDialog,
+        title = sRes(R.string.fad_title),
+        onConfirm = {
+            showFilterDialog = false
+            overviewVM.updateFilter(filter)
+        },
+        onDismiss = { showFilterDialog = false },
+    ) {
+        OverviewFilter(
+            filter = filter,
+            updateFilter = { filter = it },
+        )
+    }
 }
 
 @Composable
@@ -183,6 +207,29 @@ fun OverviewScreen(
         },
         onDismiss = { showRenameAlertDialog = null }
     )
+}
+
+@Composable
+fun OverviewFilter(
+    filter: OverviewFilter,
+    updateFilter: (OverviewFilter) -> Unit,
+) {
+    Column {
+        SingleFilterSelection(
+            name = sRes(R.string.os_filter_byCompletion),
+            isSelected = filter.byCompletion,
+            updateIsSelected = { updateFilter(filter.copy(byCompletion = !filter.byCompletion)) },
+            filterOption = filter.byCompletionOption,
+            updateFilterOption = { updateFilter(filter.copy(byCompletionOption = it)) },
+        )
+        SingleFilterSelection(
+            name = sRes(R.string.os_filter_byName),
+            isSelected = filter.byName,
+            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName)) },
+            filterOption = filter.byNameOption,
+            updateFilterOption = { updateFilter(filter.copy(byNameOption = it)) },
+        )
+    }
 }
 
 @Composable
@@ -265,6 +312,21 @@ private fun OverviewScreenPreview() {
 
 @Preview
 @Composable
+private fun OverviewFilterPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                OverviewFilter(
+                    filter = OverviewFilter(),
+                    updateFilter = { },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
 private fun OverviewScreenEmptyPreview() {
     PreviewUtil.run {
         Preview {
@@ -313,4 +375,3 @@ private fun OverviewBottomSheetActionPreview() {
         }
     }
 }
-

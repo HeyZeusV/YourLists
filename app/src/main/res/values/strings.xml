@@ -47,7 +47,6 @@
 
     <!-- ListScreen (ls) -->
     <string name="ls_title">New List</string>
-    <string name="ls_cdesc_filter">Edit filter</string>
     <string name="ls_filter_byIsChecked">By selected</string>
     <string name="ls_filter_byName">By name</string>
     <string name="ls_filter_byCategory">By category</string>
@@ -61,6 +60,8 @@
     <!-- OverviewScreen (os) -->
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
+    <string name="os_filter_byCompletion">By completion</string>
+    <string name="os_filter_byName">By name</string>
     <string name="os_ad_new_title">New List</string>
     <string name="os_ad_rename_title">Rename List</string>
     <!-- OverviewScreen.BottomSheet (osbs) -->

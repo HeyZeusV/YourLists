@@ -184,21 +184,21 @@ fun ListFilters(
         SingleFilterSelection(
             name = sRes(R.string.ls_filter_byIsChecked),
             isSelected = filter.byIsChecked,
-            updateIsSelected = { updateFilter(filter.copy(byIsChecked = !filter.byIsChecked))},
+            updateIsSelected = { updateFilter(filter.copy(byIsChecked = !filter.byIsChecked)) },
             filterOption = filter.byIsCheckedOption,
             updateFilterOption = { updateFilter(filter.copy(byIsCheckedOption = it)) },
         )
         SingleFilterSelection(
             name = sRes(R.string.ls_filter_byCategory),
             isSelected = filter.byCategory,
-            updateIsSelected = { updateFilter(filter.copy(byCategory = !filter.byCategory))},
+            updateIsSelected = { updateFilter(filter.copy(byCategory = !filter.byCategory)) },
             filterOption = filter.byCategoryOption,
             updateFilterOption = { updateFilter(filter.copy(byCategoryOption = it)) },
         )
         SingleFilterSelection(
             name = sRes(R.string.ls_filter_byName),
             isSelected = filter.byName,
-            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName))},
+            updateIsSelected = { updateFilter(filter.copy(byName = !filter.byName)) },
             filterOption = filter.byNameOption,
             updateFilterOption = { updateFilter(filter.copy(byNameOption = it)) },
         )
