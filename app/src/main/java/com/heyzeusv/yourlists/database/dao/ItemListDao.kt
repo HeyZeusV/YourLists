@@ -19,11 +19,6 @@ abstract class ItemListDao : BaseDao<ItemList>("ItemList") {
 
     @Transaction
     @Query("SELECT * " +
-            "FROM ItemList")
-    abstract fun getAllItemListsWithItems(): Flow<List<ItemListWithItems>>
-
-    @Transaction
-    @Query("SELECT * " +
             "FROM ItemList " +
             "ORDER BY " +
             "CASE WHEN :byName = 1 AND :byNameOption = '$ASC' THEN name COLLATE NOCASE END ASC, " +

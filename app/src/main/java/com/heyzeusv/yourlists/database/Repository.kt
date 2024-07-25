@@ -19,9 +19,9 @@ interface Repository {
 
     suspend fun deleteItemList(vararg itemLists: ItemList)
 
-    fun getItemListWithId(id: Long): Flow<ItemList>
+    suspend fun getAllItemLists(): List<ItemList>
 
-    fun getAllItemLists(): Flow<List<ItemListWithItems>>
+    fun getItemListWithId(id: Long): Flow<ItemList>
 
     fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>>
 
@@ -40,6 +40,8 @@ interface Repository {
 
     suspend fun deleteItems(vararg items: Item)
 
+    suspend fun getAllItems(): List<Item>
+
     fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>>
 
     /**
@@ -49,7 +51,9 @@ interface Repository {
 
     suspend fun deleteDefaultItems(vararg defaultItems: DefaultItem)
 
-    fun getAllDefaultItems(): Flow<List<DefaultItem>>
+    suspend fun getAllDefaultItems(): List<DefaultItem>
+
+    fun getAllDefaultItemsFlow(): Flow<List<DefaultItem>>
 
     fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
 
@@ -58,5 +62,7 @@ interface Repository {
      */
     suspend fun insertCategories(vararg categories: Category)
 
-    fun getAllCategories(): Flow<List<Category>>
+    suspend fun getAllCategories(): List<Category>
+
+    fun getAllCategoriesFlow(): Flow<List<Category>>
 }

@@ -117,6 +117,18 @@ class OverviewViewModel @Inject constructor(
     }
 
     fun exportDatabaseToCsv() {
-        csvConverter.exportDatabaseToCsv(emptyList(), emptyList(), emptyList(), emptyList())
+        viewModelScope.launch {
+            val categoryData = repo.getAllCategories()
+            val itemListData = repo.getAllItemLists()
+            val defaultItemData = repo.getAllDefaultItems()
+            val itemData = repo.getAllItems()
+            csvConverter.exportDatabaseToCsv(categoryData, itemListData, defaultItemData, itemData)
+        }
+    }
+
+    // TODO: Remove this
+    // TODO: locate at user/0/com.heyzeusv.yourlists.files/...
+    init {
+        exportDatabaseToCsv()
     }
 }

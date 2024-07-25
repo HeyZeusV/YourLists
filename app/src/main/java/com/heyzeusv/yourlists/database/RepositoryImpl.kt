@@ -36,10 +36,10 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteItemList(vararg itemLists: ItemList) =
         withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
 
-    override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
+    override suspend fun getAllItemLists(): List<ItemList> =
+        withContext(Dispatchers.IO) { itemListDao.getAll() }
 
-    override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
-        itemListDao.getAllItemListsWithItems()
+    override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
 
     override fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>> =
         itemListDao.getSortedItemListsWithItems(
@@ -67,6 +67,9 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteItems(vararg items: Item) =
         withContext(Dispatchers.IO) { itemDao.delete(*items) }
 
+    override suspend fun getAllItems(): List<Item> =
+        withContext(Dispatchers.IO) { itemDao.getAll() }
+
     override fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>> =
         itemDao.getSortedItemsWithParentId(
             id = id,
@@ -87,7 +90,10 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteDefaultItems(vararg defaultItems: DefaultItem) =
         withContext(Dispatchers.IO) { defaultItemDao.delete(*defaultItems) }
 
-    override fun getAllDefaultItems(): Flow<List<DefaultItem>> =
+    override suspend fun getAllDefaultItems(): List<DefaultItem> =
+        withContext(Dispatchers.IO) { defaultItemDao.getAll() }
+
+    override fun getAllDefaultItemsFlow(): Flow<List<DefaultItem>> =
         defaultItemDao.getAllDefaultItems()
 
     override fun searchDefaultItems(query: String): Flow<List<DefaultItem>> =
@@ -99,5 +105,8 @@ class RepositoryImpl @Inject constructor(
     override suspend fun insertCategories(vararg categories: Category) =
         withContext(Dispatchers.IO) { categoryDao.insert(*categories) }
 
-    override fun getAllCategories(): Flow<List<Category>> = categoryDao.getAllCategories()
+    override suspend fun getAllCategories(): List<Category> =
+        withContext(Dispatchers.IO) { categoryDao.getAll() }
+
+    override fun getAllCategoriesFlow(): Flow<List<Category>> = categoryDao.getAllCategories()
 }

@@ -40,14 +40,14 @@ class AddViewModel @Inject constructor(
         .debounce(300)
         .flatMapLatest { query ->
             if (query.isBlank()) {
-                repo.getAllDefaultItems()
+                repo.getAllDefaultItemsFlow()
             } else {
                 val cleanQuery = cleanQuery(query)
                 repo.searchDefaultItems(cleanQuery)
             }
         }
 
-    val categories = repo.getAllCategories()
+    val categories = repo.getAllCategoriesFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
