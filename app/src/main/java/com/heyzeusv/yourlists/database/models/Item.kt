@@ -48,6 +48,8 @@ data class Item(
     val originItemListId: Long? = null,
 ) : BaseItem, DatabaseEntity {
     @Ignore
+    override val csvName: String = this::class.java.simpleName
+    @Ignore
     override val csvHeader: List<String> = listOf(
         ::itemId.name, ::name.name, ::category.name,
         ::quantity.name, ::unit.name, ::memo.name,

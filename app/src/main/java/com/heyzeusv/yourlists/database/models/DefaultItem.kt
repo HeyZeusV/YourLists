@@ -30,7 +30,8 @@ data class DefaultItem(
     override val unit: String = "",
     override val memo: String = "",
 ) : BaseItem, DatabaseEntity {
-
+    @Ignore
+    override val csvName: String = this::class.java.simpleName
     @Ignore
     override val csvHeader: List<String> = listOf(
         ::itemId.name, ::name.name, ::category.name,

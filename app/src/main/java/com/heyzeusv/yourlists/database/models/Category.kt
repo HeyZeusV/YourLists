@@ -15,9 +15,11 @@ import com.heyzeusv.yourlists.database.DatabaseEntity
 )
 data class Category(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val name: String,
+    val id: Long = 0L,
+    val name: String = "",
 ) : DatabaseEntity {
+    @Ignore
+    override val csvName: String = this::class.java.simpleName
     @Ignore
     override val csvHeader: List<String> = listOf(::id.name, ::name.name)
     @Ignore

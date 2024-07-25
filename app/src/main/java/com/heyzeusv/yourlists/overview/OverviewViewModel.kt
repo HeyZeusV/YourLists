@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.overview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.SettingsFilterOption
+import com.heyzeusv.yourlists.database.CsvConverter
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class OverviewViewModel @Inject constructor(
     private val settingsManager: SettingsManager,
     private val repo: Repository,
+    private val csvConverter: CsvConverter,
 ) : ViewModel() {
 
     val settings = settingsManager.settingsFlow.stateIn(
@@ -112,5 +114,9 @@ class OverviewViewModel @Inject constructor(
         viewModelScope.launch {
             repo.deleteItemList(itemList)
         }
+    }
+
+    fun exportDatabaseToCsv() {
+        csvConverter.exportDatabaseToCsv(emptyList(), emptyList(), emptyList(), emptyList())
     }
 }

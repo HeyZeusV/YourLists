@@ -10,9 +10,11 @@ import com.heyzeusv.yourlists.database.DatabaseEntity
 @Entity
 data class ItemList(
     @PrimaryKey(autoGenerate = true)
-    val itemListId: Long,
-    val name: String
+    val itemListId: Long = 0L,
+    val name: String = "",
 ) : DatabaseEntity {
+    @Ignore
+    override val csvName: String = this::class.java.simpleName
     @Ignore
     override val csvHeader: List<String> = listOf(::itemListId.name, ::name.name)
     @Ignore
