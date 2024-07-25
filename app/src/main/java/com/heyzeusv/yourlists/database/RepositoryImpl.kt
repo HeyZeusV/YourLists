@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.database
 
+import com.heyzeusv.yourlists.database.dao.AllDao
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemDao
@@ -17,6 +18,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
+    private val allDao: AllDao,
     private val itemListDao: ItemListDao,
     private val itemDao: ItemDao,
     private val defaultItemDao: DefaultItemDao,

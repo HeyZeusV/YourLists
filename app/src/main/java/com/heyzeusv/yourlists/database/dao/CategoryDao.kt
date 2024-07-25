@@ -6,10 +6,10 @@ import com.heyzeusv.yourlists.database.models.Category
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface CategoryDao : BaseDao<Category> {
+abstract class CategoryDao : BaseDao<Category>("Category") {
 
     @Query("SELECT * " +
             "FROM Category " +
             "ORDER BY name ASC")
-    fun getAllCategories(): Flow<List<Category>>
+    abstract fun getAllCategories(): Flow<List<Category>>
 }

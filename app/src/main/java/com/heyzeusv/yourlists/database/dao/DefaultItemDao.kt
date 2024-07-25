@@ -6,15 +6,15 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface DefaultItemDao : BaseDao<DefaultItem> {
+abstract class DefaultItemDao : BaseDao<DefaultItem>("DefaultItem") {
 
     @Query("SELECT * " +
             "FROM DefaultItem")
-    fun getAllDefaultItems(): Flow<List<DefaultItem>>
+    abstract fun getAllDefaultItems(): Flow<List<DefaultItem>>
 
     @Query("SELECT * " +
             "FROM DefaultItem " +
             "JOIN DefaultItemFts ON DefaultItem.name = DefaultItemFts.name " +
             "WHERE DefaultItemFts MATCH :query")
-    fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
+    abstract fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
 }

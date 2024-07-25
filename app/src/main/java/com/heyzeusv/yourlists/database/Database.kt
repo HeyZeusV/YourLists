@@ -2,6 +2,7 @@ package com.heyzeusv.yourlists.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.heyzeusv.yourlists.database.dao.AllDao
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemDao
@@ -27,7 +28,7 @@ import com.heyzeusv.yourlists.database.models.ItemList
     ]
 )
 abstract class Database : RoomDatabase() {
-
+    abstract fun allDao(): AllDao
     abstract fun itemListDao(): ItemListDao
     abstract fun itemDao(): ItemDao
     abstract fun defaultItemDao(): DefaultItemDao

@@ -8,7 +8,7 @@ import com.heyzeusv.yourlists.util.FilterValue.DESC
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ItemDao : BaseDao<Item> {
+abstract class ItemDao : BaseDao<Item>("Item") {
 
     @Query("SELECT * " +
             "FROM Item " +
@@ -20,7 +20,7 @@ interface ItemDao : BaseDao<Item> {
             "CASE WHEN :byCategory = 1 AND :byCategoryOption = '$DESC' THEN category COLLATE NOCASE END DESC," +
             "CASE WHEN :byName = 1 AND :byNameOption = '$ASC' THEN name COLLATE NOCASE END ASC, " +
             "CASE WHEN :byName = 1 AND :byNameOption = '$DESC' THEN name COLLATE NOCASE END DESC")
-    fun getSortedItemsWithParentId(
+    abstract fun getSortedItemsWithParentId(
         id: Long,
         byIsChecked: Boolean,
         byIsCheckedOption: String,

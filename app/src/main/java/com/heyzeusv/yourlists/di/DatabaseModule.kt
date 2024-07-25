@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.heyzeusv.yourlists.database.Database
+import com.heyzeusv.yourlists.database.dao.AllDao
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemDao
@@ -19,6 +20,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object DatabaseModule {
+
+    @Provides
+    fun provideAllDao(database: Database): AllDao = database.allDao()
 
     @Provides
     fun provideItemListDao(database: Database): ItemListDao = database.itemListDao()
