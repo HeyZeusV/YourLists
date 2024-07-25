@@ -51,11 +51,14 @@ data class Item(
     override val csvName: String = this::class.java.simpleName
     @Ignore
     override val csvHeader: List<String> = listOf(
-        ::itemId.name, ::name.name, ::category.name,
-        ::quantity.name, ::unit.name, ::memo.name,
+        ::itemId.name, ::name.name, ::isChecked.name, ::category.name, ::quantity.name,
+        ::unit.name, ::memo.name, ::parentItemListId.name, ::originItemListId.name
     )
     @Ignore
-    override val csvRow: List<Any> = listOf(itemId, name, category, quantity, unit, memo)
+    override val csvRow: List<Any?> = listOf(
+        itemId, name, isChecked, category, quantity,
+        unit, memo, parentItemListId, originItemListId
+    )
 
     override fun editCopy(
         itemId: Long,
