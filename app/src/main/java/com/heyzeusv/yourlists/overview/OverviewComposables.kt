@@ -1,6 +1,11 @@
 package com.heyzeusv.yourlists.overview
 
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
@@ -35,6 +41,7 @@ import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.BottomSheet
+import com.heyzeusv.yourlists.util.DrawerOnClicks
 import com.heyzeusv.yourlists.util.EmptyList
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.FilterAlertDialog
@@ -57,6 +64,7 @@ fun OverviewScreen(
     overviewVM: OverviewViewModel,
     navController: NavHostController,
     topAppBarSetup: (TopAppBarState) -> Unit,
+    drawerSetup: (DrawerOnClicks) -> Unit,
     fabSetup: (FabState) -> Unit,
 ) {
     val itemLists by overviewVM.itemLists.collectAsStateWithLifecycle()
@@ -99,6 +107,10 @@ fun OverviewScreen(
     LaunchedEffect(key1 = settings) {
         filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
     }
+    DrawerSetup(
+        overviewVM = overviewVM,
+        drawerSetup = drawerSetup,
+    )
     OverviewScreen(
         listState = listState,
         itemLists = itemLists,
@@ -307,6 +319,58 @@ fun OverviewBottomSheetAction(
             text = sRes(action.nameId),
             color = action.color,
             style = MaterialTheme.typography.titleLarge
+        )
+    }
+}
+
+@Composable
+fun DrawerSetup(
+    overviewVM: OverviewViewModel,
+    drawerSetup: (DrawerOnClicks) -> Unit,
+) {
+    val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+//    var result by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+        it?.let { uri ->
+            uri.path?.let { path ->
+                Log.d("tag", "encoded path ${uri.encodedPath}")
+                Log.d("tag", "path ${uri.path}")
+                val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, flags)
+                Log.d("tag", "result $uri")
+                Log.d("tag", "user info ${uri.userInfo}")
+//                result = uri
+                overviewVM.exportDatabaseToCsv()
+                scope.launch {
+                    overviewVM.updatePortationPath(path)
+                    overviewVM.exportDatabaseToCsv()
+                }
+            }
+        }
+    }
+    LaunchedEffect(key1 = launcher) {
+        drawerSetup(
+            DrawerOnClicks(
+                importOnClick = {
+                    if (overviewVM.settings.value.portationPath.isBlank()) {
+                        launcher.launch(null)
+                    } else {
+
+                        overviewVM.exportDatabaseToCsv()
+                    }
+                },
+                exportOnClick = {
+                    if (overviewVM.settings.value.portationPath.isBlank()) {
+                        launcher.launch(null)
+                    } else {
+                        scope.launch {
+                            overviewVM.updatePortationPath("")
+                        }
+                    }
+                }
+            )
         )
     }
 }

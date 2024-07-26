@@ -1,14 +1,8 @@
 package com.heyzeusv.yourlists
 
-import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -47,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -67,6 +60,8 @@ import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.Destination
+import com.heyzeusv.yourlists.util.DrawerOnClicks
+import com.heyzeusv.yourlists.util.DrawerOption
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.OverviewDestination
@@ -76,27 +71,20 @@ import com.heyzeusv.yourlists.util.currentDestination
 import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.pRes
-import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var settingsManger: SettingsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             YourListsTheme {
-                YourLists(
-                    updatePortationPath = { settingsManger.updatePortationPath(it) }
-                )
+                YourLists()
             }
         }
     }
@@ -106,10 +94,10 @@ class MainActivity : ComponentActivity() {
 fun YourLists(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     navController: NavHostController = rememberNavController(),
-    updatePortationPath: suspend (String) -> Unit,
 ) {
     val currentBackStack by navController.currentBackStackEntryAsState()
     var topAppBarState by remember { mutableStateOf(TopAppBarState()) }
+    var drawerOnClicks by remember { mutableStateOf(DrawerOnClicks()) }
     var fabState by remember { mutableStateOf(FabState()) }
 
     val scope = rememberCoroutineScope()
@@ -118,7 +106,7 @@ fun YourLists(
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.85f)) {
                 DrawerHeader()
-                DrawerContent(updatePortationPath = updatePortationPath)
+                DrawerContent(drawerOnClicks = drawerOnClicks)
             }
         },
         drawerState = drawerState,
@@ -169,6 +157,7 @@ fun YourLists(
                             topAppBarState =
                                 it.copy(onNavPressed = { scope.launch { drawerState.open() } })
                         },
+                        drawerSetup = { drawerOnClicks = it },
                         fabSetup = { fabState = it },
                     )
                 }
@@ -290,69 +279,31 @@ fun DrawerHeader() {
 }
 
 @Composable
-fun DrawerContent(
-    updatePortationPath: suspend (String) -> Unit,
-) {
-    val context = LocalContext.current
-
-    val scope = rememberCoroutineScope()
-    var result by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
-        it?.let { uri ->
-            uri.path?.let { path ->
-                Log.d("tag", "encoded path ${uri.encodedPath}")
-                Log.d("tag", "path ${uri.path}")
-                val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
-                context.contentResolver.takePersistableUriPermission(uri, flags)
-                scope.launch {
-                    updatePortationPath(path)
-                }
-                Log.d("tag", "result $uri")
-                result = uri
-            }
-        }
-    }
-
+fun DrawerContent(drawerOnClicks: DrawerOnClicks) {
     Column(
         modifier = Modifier.padding(top = dRes(R.dimen.d_content_padding_top)),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.d_content_spacedBy_vertical)),
     ) {
-        NavigationDrawerItem(
-            label = {
-                Text(
-                    text = sRes(R.string.d_import),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            },
-            selected = false,
-            onClick = { /*TODO*/ },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            icon = {
-                Icon(
-                    painter = pRes(R.drawable.icon_import),
-                    contentDescription = sRes(R.string.d_import),
-                )
-            }
-        )
-        NavigationDrawerItem(
-            label = {
-                Text(
-                    text = sRes(R.string.d_export),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            },
-            selected = false,
-            onClick = { /*TODO*/ },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-            icon = {
-                Icon(
-                    painter = pRes(R.drawable.icon_export),
-                    contentDescription = sRes(R.string.d_export),
-                )
-            }
-        )
+        DrawerOption.entries.forEachIndexed { index, drawerOption ->
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = sRes(drawerOption.nameId),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                selected = false,
+                onClick = drawerOnClicks.onClickList[index],
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                icon = {
+                    Icon(
+                        painter = pRes(drawerOption.iconId),
+                        contentDescription = sRes(drawerOption.nameId),
+                    )
+                }
+            )
+        }
     }
-//    launcher.launch(null)
 }
 
 @Preview
@@ -388,7 +339,7 @@ private fun DrawerContentPreview() {
         Preview {
             Surface {
                 DrawerContent(
-                    updatePortationPath = { }
+                    drawerOnClicks = DrawerOnClicks(),
                 )
             }
         }

@@ -15,22 +15,24 @@ class CsvConverter @Inject constructor(
     private val context: Context,
 ) {
     fun exportDatabaseToCsv(
+        filePath: String,
         categoryData: List<Category>,
         itemListData: List<ItemList>,
         defaultItemData: List<DefaultItem>,
         itemData: List<Item>,
     ) {
-        exportDatabaseEntityToCsv(Category(), categoryData)
-        exportDatabaseEntityToCsv(ItemList(), itemListData)
-        exportDatabaseEntityToCsv(DefaultItem(), defaultItemData)
-        exportDatabaseEntityToCsv(Item(), itemData)
+        exportDatabaseEntityToCsv(filePath, Category(), categoryData)
+        exportDatabaseEntityToCsv(filePath, ItemList(), itemListData)
+        exportDatabaseEntityToCsv(filePath, DefaultItem(), defaultItemData)
+        exportDatabaseEntityToCsv(filePath, Item(), itemData)
     }
 
     private fun exportDatabaseEntityToCsv(
+        filePath: String,
         entity: DatabaseEntity,
         entityData: List<DatabaseEntity>,
     ) {
-        val csvFile = createFile(entity.csvName)
+        val csvFile = createFile(filePath, entity.csvName)
         csvWriter().open(targetFile = csvFile, append = false) {
             writeRow(entity.csvHeader)
             entityData.forEach {
@@ -39,7 +41,7 @@ class CsvConverter @Inject constructor(
         }
     }
 
-    private fun createFile(fileName: String): File {
+    private fun createFile(filePath: String, fileName: String): File {
         return File(context.filesDir, "$fileName$CSV_SUFFIX").apply {
             delete()
             createNewFile()

@@ -8,6 +8,13 @@ data class TopAppBarState(
     val onActionRightPressed: () -> Unit = { },
 )
 
+data class DrawerOnClicks(
+    val importOnClick: () -> Unit = { },
+    val exportOnClick: () -> Unit = { },
+) {
+    val onClickList = listOf(importOnClick, exportOnClick)
+}
+
 data class FabState(
     val isFabDisplayed: Boolean = true,
     val fabAction: () -> Unit = { },

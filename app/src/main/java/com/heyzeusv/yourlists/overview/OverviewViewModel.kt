@@ -75,6 +75,10 @@ class OverviewViewModel @Inject constructor(
         }
     }
 
+    suspend fun updatePortationPath(path: String) {
+        settingsManager.updatePortationPath(path)
+    }
+
     fun renameItemList(itemList: ItemList, newName: String) {
         viewModelScope.launch {
             val renamed = itemList.copy(name = newName)
@@ -118,17 +122,15 @@ class OverviewViewModel @Inject constructor(
 
     fun exportDatabaseToCsv() {
         viewModelScope.launch {
+            val filePath = settings.value.portationPath
             val categoryData = repo.getAllCategories()
             val itemListData = repo.getAllItemLists()
             val defaultItemData = repo.getAllDefaultItems()
             val itemData = repo.getAllItems()
-            csvConverter.exportDatabaseToCsv(categoryData, itemListData, defaultItemData, itemData)
+            csvConverter.exportDatabaseToCsv(filePath, categoryData, itemListData, defaultItemData, itemData)
         }
     }
 
     // TODO: Remove this
     // TODO: locate at data/user/0/com.heyzeusv.yourlists.files/...
-    init {
-        exportDatabaseToCsv()
-    }
 }
