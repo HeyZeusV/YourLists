@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Your Lists</string>
     <string name="navigate_back">Navigate Back</string>
+    <string name="open_drawer">Open Drawer</string>
     <string name="button_cdesc_options">Displays additional options</string>
     <string-array name="unit_values">
         <item>Unit</item>
