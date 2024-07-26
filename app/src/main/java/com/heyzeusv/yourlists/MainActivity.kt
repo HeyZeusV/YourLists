@@ -2,11 +2,13 @@ package com.heyzeusv.yourlists
 
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,41 +64,37 @@ import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.currentDestination
 import com.heyzeusv.yourlists.util.iRes
+import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var settingsManger: SettingsManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val exportRequest = registerForActivityResult(ActivityResultContracts.OpenDocumentTree()) {
-            it?.let { uri ->
-                Log.d("tag", "encoded path ${uri.encodedPath}")
-                Log.d("tag", "path ${uri.path}")
-                val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
-                baseContext.contentResolver.takePersistableUriPermission(uri, flags)
-                Log.d("tag", "result $uri")
-            }
-        }
-        exportRequest.launch(null)
+
         setContent {
             YourListsTheme {
                 YourLists(
-                    exportOnClick = { exportRequest.launch(null) }
+                    updatePortationPath = { settingsManger.updatePortationPath(it) }
                 )
             }
         }
     }
 }
 
-// TODO: Back press should close BottomSheet, if open
 @Composable
 fun YourLists(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     navController: NavHostController = rememberNavController(),
-    exportOnClick: () -> Unit,
+    updatePortationPath: suspend (String) -> Unit,
 ) {
     val currentBackStack by navController.currentBackStackEntryAsState()
     var topAppBarState by remember { mutableStateOf(TopAppBarState()) }
@@ -106,7 +105,7 @@ fun YourLists(
     ModalNavigationDrawer(
         drawerContent = {
             ModalDrawerSheet {
-
+                DrawerContent(updatePortationPath = updatePortationPath)
             }
         },
         drawerState = drawerState,
@@ -254,6 +253,33 @@ fun YourListsTopAppBar(
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
     )
+}
+
+@Composable
+fun DrawerContent(
+    updatePortationPath: suspend (String) -> Unit,
+) {
+    val context = LocalContext.current
+
+    val scope = rememberCoroutineScope()
+    var result by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+        it?.let { uri ->
+            uri.path?.let { path ->
+                Log.d("tag", "encoded path ${uri.encodedPath}")
+                Log.d("tag", "path ${uri.path}")
+                val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(uri, flags)
+                scope.launch {
+                    updatePortationPath(path)
+                }
+                Log.d("tag", "result $uri")
+                result = uri
+            }
+        }
+    }
+
+//    launcher.launch(null)
 }
 
 @Preview
