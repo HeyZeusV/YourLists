@@ -30,6 +30,15 @@
     <dimen name="bs_horizontal_spacedBy">12.dp</dimen>
     <dimen name="bs_bottom_spacer">8.dp</dimen>
 
+    <!-- Drawer (d) -->
+    <dimen name="d_padding_vertical">16.dp</dimen>
+    <dimen name="d_content_padding_top">16.dp</dimen>
+    <dimen name="d_content_spacedBy_vertical">8.dp</dimen>
+    <!-- DrawerItem (di) -->
+    <dimen name="di_height">48.dp</dimen>
+    <dimen name="di_padding_horizontal">16.dp</dimen>
+    <dimen name="di_spacedBy_horizontal">8.dp</dimen>
+
     <!-- EmptyList (el) -->
     <dimen name="el_icon_size">36.dp</dimen>
     <dimen name="el_padding_horizontal">16.dp</dimen>

@@ -46,6 +46,10 @@
     <string name="iad_cdesc_error">Input Error</string>
     <string name="iad_error">Can\'t be blank!</string>
 
+    <!-- Drawer (d) -->
+    <string name="d_import">Import</string>
+    <string name="d_export">Export</string>
+
     <!-- ListScreen (ls) -->
     <string name="ls_title">New List</string>
     <string name="ls_filter_byIsChecked">By selected</string>
@@ -59,6 +63,7 @@
     <string name="lsbs_delete">Delete Item</string>
 
     <!-- OverviewScreen (os) -->
+    <string name="os_title">Overview</string>
     <string name="os_empty">Seems pretty empty here…\nChange that using the button below!</string>
     <string name="os_fab">New List</string>
     <string name="os_filter_byCompletion">By completion</string>

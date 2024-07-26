@@ -12,7 +12,11 @@ import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTre
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerState
@@ -25,7 +29,10 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,8 +44,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,7 +73,9 @@ import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.currentDestination
+import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
+import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
@@ -104,7 +116,8 @@ fun YourLists(
 
     ModalNavigationDrawer(
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.85f)) {
+                DrawerHeader()
                 DrawerContent(updatePortationPath = updatePortationPath)
             }
         },
@@ -256,6 +269,27 @@ fun YourListsTopAppBar(
 }
 
 @Composable
+fun DrawerHeader() {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(vertical = dRes(R.dimen.d_padding_vertical))
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = pRes(R.drawable.ic_launcher_foreground),
+            contentDescription = sRes(R.string.app_name),
+            modifier = Modifier.scale(2f),
+        )
+        Text(
+            text = sRes(R.string.app_name),
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
+        )
+    }
+}
+
+@Composable
 fun DrawerContent(
     updatePortationPath: suspend (String) -> Unit,
 ) {
@@ -279,6 +313,45 @@ fun DrawerContent(
         }
     }
 
+    Column(
+        modifier = Modifier.padding(top = dRes(R.dimen.d_content_padding_top)),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.d_content_spacedBy_vertical)),
+    ) {
+        NavigationDrawerItem(
+            label = {
+                Text(
+                    text = sRes(R.string.d_import),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            },
+            selected = false,
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+            icon = {
+                Icon(
+                    painter = pRes(R.drawable.icon_import),
+                    contentDescription = sRes(R.string.d_import),
+                )
+            }
+        )
+        NavigationDrawerItem(
+            label = {
+                Text(
+                    text = sRes(R.string.d_export),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            },
+            selected = false,
+            onClick = { /*TODO*/ },
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+            icon = {
+                Icon(
+                    painter = pRes(R.drawable.icon_export),
+                    contentDescription = sRes(R.string.d_export),
+                )
+            }
+        )
+    }
 //    launcher.launch(null)
 }
 
@@ -293,5 +366,31 @@ fun YourListsTopAppBarPreview() {
             onActionLeftPressed = { },
             onActionRightPressed = { },
         )
+    }
+}
+
+@Preview
+@Composable
+private fun DrawerHeaderPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                DrawerHeader()
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DrawerContentPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                DrawerContent(
+                    updatePortationPath = { }
+                )
+            }
+        }
     }
 }
