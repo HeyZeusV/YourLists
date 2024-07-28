@@ -350,17 +350,16 @@ fun DrawerSetup(
                     if (overviewVM.settings.value.portationPath.isBlank()) {
                         launcher.launch(null)
                     } else {
-
-                        overviewVM.exportDatabaseToCsv()
+                        scope.launch {
+                            overviewVM.updatePortationPath("")
+                        }
                     }
                 },
                 exportOnClick = {
                     if (overviewVM.settings.value.portationPath.isBlank()) {
                         launcher.launch(null)
                     } else {
-                        scope.launch {
-                            overviewVM.updatePortationPath("")
-                        }
+                        overviewVM.exportDatabaseToCsv()
                     }
                 }
             )
