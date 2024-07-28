@@ -123,7 +123,7 @@ class OverviewViewModel @Inject constructor(
 
     fun createParentDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
         viewModelScope.launch {
-            val parentDirectoryUri = csvConverter.createParentDirectory(selectedDirectoryUri)
+            val parentDirectoryUri = csvConverter.findOrCreateParentDirectory(selectedDirectoryUri)
             updatePortationPath(parentDirectoryUri.toString())
             suspendExportDatabaseToCsv()
         }

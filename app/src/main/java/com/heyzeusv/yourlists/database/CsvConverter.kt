@@ -33,15 +33,15 @@ class CsvConverter @Inject constructor(
         defaultItemData: List<DefaultItem>,
         itemData: List<Item>,
     ) {
-        val thisExportDirectory = createThisExportDirectory(parentDirectoryUri)
-        exportDatabaseEntityToCsv(thisExportDirectory, Category(), categoryData)
-        exportDatabaseEntityToCsv(thisExportDirectory, ItemList(), itemListData)
-        exportDatabaseEntityToCsv(thisExportDirectory, DefaultItem(), defaultItemData)
-        exportDatabaseEntityToCsv(thisExportDirectory, Item(), itemData)
+        val newExportDirectory = createNewExportDirectory(parentDirectoryUri)
+        exportDatabaseEntityToCsv(newExportDirectory, Category(), categoryData)
+        exportDatabaseEntityToCsv(newExportDirectory, ItemList(), itemListData)
+        exportDatabaseEntityToCsv(newExportDirectory, DefaultItem(), defaultItemData)
+        exportDatabaseEntityToCsv(newExportDirectory, Item(), itemData)
     }
 
     private fun exportDatabaseEntityToCsv(
-        thisExportDirectory: DocumentFile,
+        newExportDirectory: DocumentFile,
         entity: DatabaseEntity,
         entityData: List<DatabaseEntity>,
     ) {
@@ -53,7 +53,7 @@ class CsvConverter @Inject constructor(
             }
         }
         val csvDocumentFile =
-            thisExportDirectory.createFile("text/*", "${entity.csvName}$CSV_SUFFIX")!!
+            newExportDirectory.createFile("text/*", "${entity.csvName}$CSV_SUFFIX")!!
         writeToDocumentFileFromFile(csvFile, csvDocumentFile)
     }
 
@@ -96,17 +96,20 @@ class CsvConverter @Inject constructor(
         csvFile.delete()
     }
 
-    fun createParentDirectory(selectedDirectoryUri: Uri): Uri {
+    fun findOrCreateParentDirectory(selectedDirectoryUri: Uri): Uri {
         val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
-        val parentDirectory = selectedDirectory.createDirectory(PARENT_DIRECTORY_NAME)!!
+        var parentDirectory = selectedDirectory.findFile(PARENT_DIRECTORY_NAME)
+        if (parentDirectory == null) {
+            parentDirectory = selectedDirectory.createDirectory(PARENT_DIRECTORY_NAME)!!
+        }
         return parentDirectory.uri
     }
 
-    private fun createThisExportDirectory(parentDirectoryUri: Uri): DocumentFile {
+    private fun createNewExportDirectory(parentDirectoryUri: Uri): DocumentFile {
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
         val sdf = SimpleDateFormat("MMMM_dd_yyyy__hh_mm_aa", Locale.getDefault())
         val formattedDate = sdf.format(Date())
-        val thisExportDirectory = parentDirectory.createDirectory(formattedDate)!!
-        return thisExportDirectory
+        val newExportDirectory = parentDirectory.createDirectory(formattedDate)!!
+        return newExportDirectory
     }
 }
