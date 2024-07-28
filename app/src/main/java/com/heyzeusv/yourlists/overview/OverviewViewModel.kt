@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.overview
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.SettingsFilterOption
@@ -120,17 +121,32 @@ class OverviewViewModel @Inject constructor(
         }
     }
 
-    fun exportDatabaseToCsv() {
+    fun createParentDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
         viewModelScope.launch {
-            val filePath = settings.value.portationPath
-            val categoryData = repo.getAllCategories()
-            val itemListData = repo.getAllItemLists()
-            val defaultItemData = repo.getAllDefaultItems()
-            val itemData = repo.getAllItems()
-            csvConverter.exportDatabaseToCsv(filePath, categoryData, itemListData, defaultItemData, itemData)
+            val parentDirectoryUri = csvConverter.createParentDirectory(selectedDirectoryUri)
+            updatePortationPath(parentDirectoryUri.toString())
+            suspendExportDatabaseToCsv()
         }
     }
 
-    // TODO: Remove this
-    // TODO: locate at data/user/0/com.heyzeusv.yourlists.files/...
+    fun exportDatabaseToCsv() {
+        viewModelScope.launch {
+            suspendExportDatabaseToCsv()
+        }
+    }
+
+    private suspend fun suspendExportDatabaseToCsv() {
+        val parentDirectoryUri = Uri.parse(settings.value.portationPath)
+        val categoryData = repo.getAllCategories()
+        val itemListData = repo.getAllItemLists()
+        val defaultItemData = repo.getAllDefaultItems()
+        val itemData = repo.getAllItems()
+        csvConverter.exportDatabaseToCsv(
+            parentDirectoryUri = parentDirectoryUri,
+            categoryData = categoryData,
+            itemListData = itemListData,
+            defaultItemData = defaultItemData,
+            itemData = itemData,
+        )
+    }
 }

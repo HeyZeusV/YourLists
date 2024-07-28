@@ -334,20 +334,13 @@ fun DrawerSetup(
 //    var result by remember { mutableStateOf<Uri?>(null) }
     val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
-            uri.path?.let { path ->
-                Log.d("tag", "encoded path ${uri.encodedPath}")
-                Log.d("tag", "path ${uri.path}")
-                val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
-                context.contentResolver.takePersistableUriPermission(uri, flags)
-                Log.d("tag", "result $uri")
-                Log.d("tag", "user info ${uri.userInfo}")
-//                result = uri
-                overviewVM.exportDatabaseToCsv()
-                scope.launch {
-                    overviewVM.updatePortationPath(path)
-                    overviewVM.exportDatabaseToCsv()
-                }
-            }
+            Log.d("tag", "encoded path ${uri.encodedPath}")
+            Log.d("tag", "path ${uri.path}")
+            val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
+            Log.d("tag", "result $uri")
+            Log.d("tag", "user info ${uri.userInfo}")
+            overviewVM.createParentDirectoryAndExportToCsv(uri)
         }
     }
     LaunchedEffect(key1 = launcher) {
