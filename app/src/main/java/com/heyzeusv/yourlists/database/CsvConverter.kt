@@ -35,7 +35,7 @@ class CsvConverter @Inject constructor(
         updateShowSnackbar: (Boolean) -> Unit,
     ) {
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
-        if (parentDirectory.parentFile == null) {
+        if (!parentDirectory.exists()) {
             updateShowSnackbar(true)
         } else {
             val newExportDirectory = createNewExportDirectory(parentDirectory)

@@ -375,9 +375,9 @@ fun DrawerSetup(
     LaunchedEffect(key1 = showPortationSnackbar) {
         if (showPortationSnackbar) {
             val action = snackbarHostState.showSnackbar(
-                message = "Error",
-                actionLabel = "Fix it",
-                duration = SnackbarDuration.Long
+                message = context.getString(R.string.p_error_directory_missing_message),
+                actionLabel = context.getString(R.string.p_error_directory_missing_action),
+                duration = SnackbarDuration.Short
             )
             when (action) {
                 SnackbarResult.ActionPerformed -> {
@@ -385,6 +385,7 @@ fun DrawerSetup(
                     overviewVM.updateShowPortationSnackbar(false)
                 }
                 SnackbarResult.Dismissed -> {
+                    overviewVM.updatePortationPath("")
                     overviewVM.updateShowPortationSnackbar(false)
                 }
             }

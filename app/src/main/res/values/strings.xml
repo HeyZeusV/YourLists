@@ -78,4 +78,8 @@
     <string name="osbs_cdesc_copy">Create a copy of this list.</string>
     <string name="osbs_delete">Delete</string>
     <string name="osbs_cdesc_delete">Delete this list.</string>
+
+    <!-- Portation (p) -->
+    <string name="p_error_directory_missing_message">YourLists directory missing!</string>
+    <string name="p_error_directory_missing_action">Select new</string>
 </resources>
