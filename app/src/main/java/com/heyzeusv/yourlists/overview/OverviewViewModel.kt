@@ -15,10 +15,13 @@ import com.heyzeusv.yourlists.util.proto.defaultSettingsFilter
 import com.heyzeusv.yourlists.util.proto.getCustomSettingsDefaultInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -69,6 +72,11 @@ class OverviewViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = 0L
         )
+
+    private val _showPortationSnackbar = MutableStateFlow(false)
+    val showPortationSnackbar = _showPortationSnackbar.asStateFlow()
+    fun updateShowPortationSnackbar(value: Boolean) = _showPortationSnackbar.update { value }
+
 
     fun updateFilter(filter: OverviewFilter) {
         viewModelScope.launch {
@@ -141,12 +149,14 @@ class OverviewViewModel @Inject constructor(
         val itemListData = repo.getAllItemLists()
         val defaultItemData = repo.getAllDefaultItems()
         val itemData = repo.getAllItems()
+
         csvConverter.exportDatabaseToCsv(
             parentDirectoryUri = parentDirectoryUri,
             categoryData = categoryData,
             itemListData = itemListData,
             defaultItemData = defaultItemData,
             itemData = itemData,
+            updateShowSnackbar = { show -> _showPortationSnackbar.update { show } },
         )
     }
 }

@@ -26,6 +26,8 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -95,6 +97,7 @@ fun YourLists(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     navController: NavHostController = rememberNavController(),
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val currentBackStack by navController.currentBackStackEntryAsState()
     var topAppBarState by remember { mutableStateOf(TopAppBarState()) }
     var drawerOnClicks by remember { mutableStateOf(DrawerOnClicks()) }
@@ -106,7 +109,10 @@ fun YourLists(
         drawerContent = {
             ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.85f)) {
                 DrawerHeader()
-                DrawerContent(drawerOnClicks = drawerOnClicks)
+                DrawerContent(
+                    closeDrawer = { scope.launch { drawerState.close() } },
+                    drawerOnClicks = drawerOnClicks,
+                )
             }
         },
         drawerState = drawerState,
@@ -122,6 +128,7 @@ fun YourLists(
                     onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
                 )
             },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             floatingActionButton = {
                 if (fabState.isFabDisplayed) {
                     ExtendedFloatingActionButton(
@@ -153,6 +160,7 @@ fun YourLists(
                     OverviewScreen(
                         overviewVM = overviewVM,
                         navController = navController,
+                        snackbarHostState = snackbarHostState,
                         topAppBarSetup = {
                             topAppBarState =
                                 it.copy(onNavPressed = { scope.launch { drawerState.open() } })
@@ -279,7 +287,10 @@ fun DrawerHeader() {
 }
 
 @Composable
-fun DrawerContent(drawerOnClicks: DrawerOnClicks) {
+fun DrawerContent(
+    closeDrawer: () -> Unit,
+    drawerOnClicks: DrawerOnClicks,
+) {
     Column(
         modifier = Modifier.padding(top = dRes(R.dimen.d_content_padding_top)),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.d_content_spacedBy_vertical)),
@@ -293,7 +304,10 @@ fun DrawerContent(drawerOnClicks: DrawerOnClicks) {
                     )
                 },
                 selected = false,
-                onClick = drawerOnClicks.onClickList[index],
+                onClick = {
+                    drawerOnClicks.onClickList[index]()
+                    closeDrawer()
+                },
                 modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                 icon = {
                     Icon(
@@ -339,6 +353,7 @@ private fun DrawerContentPreview() {
         Preview {
             Surface {
                 DrawerContent(
+                    closeDrawer = { },
                     drawerOnClicks = DrawerOnClicks(),
                 )
             }

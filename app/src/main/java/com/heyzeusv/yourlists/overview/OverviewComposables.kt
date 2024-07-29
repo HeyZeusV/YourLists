@@ -2,7 +2,7 @@ package com.heyzeusv.yourlists.overview
 
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-import android.util.Log
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
@@ -22,6 +22,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,6 +66,7 @@ import kotlinx.coroutines.launch
 fun OverviewScreen(
     overviewVM: OverviewViewModel,
     navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
     topAppBarSetup: (TopAppBarState) -> Unit,
     drawerSetup: (DrawerOnClicks) -> Unit,
     fabSetup: (FabState) -> Unit,
@@ -109,6 +113,7 @@ fun OverviewScreen(
     }
     DrawerSetup(
         overviewVM = overviewVM,
+        snackbarHostState = snackbarHostState,
         drawerSetup = drawerSetup,
     )
     OverviewScreen(
@@ -326,44 +331,64 @@ fun OverviewBottomSheetAction(
 @Composable
 fun DrawerSetup(
     overviewVM: OverviewViewModel,
+    snackbarHostState: SnackbarHostState,
     drawerSetup: (DrawerOnClicks) -> Unit,
 ) {
+    val showPortationSnackbar by overviewVM.showPortationSnackbar.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
 
-    val scope = rememberCoroutineScope()
-//    var result by remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+    val importLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
         it?.let { uri ->
-            Log.d("tag", "encoded path ${uri.encodedPath}")
-            Log.d("tag", "path ${uri.path}")
-            val flags = FLAG_GRANT_READ_URI_PERMISSION or FLAG_GRANT_WRITE_URI_PERMISSION
+            val flags = FLAG_GRANT_READ_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
-            Log.d("tag", "result $uri")
-            Log.d("tag", "user info ${uri.userInfo}")
+        }
+    }
+    val exportLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {
+        it?.let { uri ->
+            val flags = FLAG_GRANT_WRITE_URI_PERMISSION
+            context.contentResolver.takePersistableUriPermission(uri, flags)
             overviewVM.createParentDirectoryAndExportToCsv(uri)
         }
     }
-    LaunchedEffect(key1 = launcher) {
+
+    LaunchedEffect(exportLauncher) {
         drawerSetup(
             DrawerOnClicks(
                 importOnClick = {
                     if (overviewVM.settings.value.portationPath.isBlank()) {
-                        launcher.launch(null)
+                        importLauncher.launch(null)
                     } else {
-                        scope.launch {
-                            overviewVM.updatePortationPath("")
-                        }
+                        importLauncher.launch(Uri.parse(overviewVM.settings.value.portationPath))
                     }
                 },
                 exportOnClick = {
                     if (overviewVM.settings.value.portationPath.isBlank()) {
-                        launcher.launch(null)
+                        exportLauncher.launch(null)
                     } else {
                         overviewVM.exportDatabaseToCsv()
                     }
                 }
             )
         )
+    }
+    LaunchedEffect(key1 = showPortationSnackbar) {
+        if (showPortationSnackbar) {
+            val action = snackbarHostState.showSnackbar(
+                message = "Error",
+                actionLabel = "Fix it",
+                duration = SnackbarDuration.Long
+            )
+            when (action) {
+                SnackbarResult.ActionPerformed -> {
+                    exportLauncher.launch(null)
+                    overviewVM.updateShowPortationSnackbar(false)
+                }
+                SnackbarResult.Dismissed -> {
+                    overviewVM.updateShowPortationSnackbar(false)
+                }
+            }
+        }
     }
 }
 

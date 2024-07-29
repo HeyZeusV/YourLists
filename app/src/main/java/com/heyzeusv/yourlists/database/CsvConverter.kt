@@ -32,12 +32,18 @@ class CsvConverter @Inject constructor(
         itemListData: List<ItemList>,
         defaultItemData: List<DefaultItem>,
         itemData: List<Item>,
+        updateShowSnackbar: (Boolean) -> Unit,
     ) {
-        val newExportDirectory = createNewExportDirectory(parentDirectoryUri)
-        exportDatabaseEntityToCsv(newExportDirectory, Category(), categoryData)
-        exportDatabaseEntityToCsv(newExportDirectory, ItemList(), itemListData)
-        exportDatabaseEntityToCsv(newExportDirectory, DefaultItem(), defaultItemData)
-        exportDatabaseEntityToCsv(newExportDirectory, Item(), itemData)
+        val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
+        if (parentDirectory.parentFile == null) {
+            updateShowSnackbar(true)
+        } else {
+            val newExportDirectory = createNewExportDirectory(parentDirectory)
+            exportDatabaseEntityToCsv(newExportDirectory, Category(), categoryData)
+            exportDatabaseEntityToCsv(newExportDirectory, ItemList(), itemListData)
+            exportDatabaseEntityToCsv(newExportDirectory, DefaultItem(), defaultItemData)
+            exportDatabaseEntityToCsv(newExportDirectory, Item(), itemData)
+        }
     }
 
     private fun exportDatabaseEntityToCsv(
@@ -105,8 +111,7 @@ class CsvConverter @Inject constructor(
         return parentDirectory.uri
     }
 
-    private fun createNewExportDirectory(parentDirectoryUri: Uri): DocumentFile {
-        val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
+    private fun createNewExportDirectory(parentDirectory: DocumentFile): DocumentFile {
         val sdf = SimpleDateFormat("MMMM_dd_yyyy__hh_mm_aa", Locale.getDefault())
         val formattedDate = sdf.format(Date())
         val newExportDirectory = parentDirectory.createDirectory(formattedDate)!!
