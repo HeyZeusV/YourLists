@@ -1,11 +1,12 @@
 package com.heyzeusv.yourlists.overview
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.withTransaction
 import com.heyzeusv.yourlists.SettingsFilterOption
 import com.heyzeusv.yourlists.database.CsvConverter
+import com.heyzeusv.yourlists.database.Database
 import com.heyzeusv.yourlists.database.DatabaseData
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
@@ -31,6 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OverviewViewModel @Inject constructor(
     private val settingsManager: SettingsManager,
+    private val database: Database,
     private val repo: Repository,
     private val csvConverter: CsvConverter,
 ) : ViewModel() {
@@ -134,8 +136,13 @@ class OverviewViewModel @Inject constructor(
     fun importCsvToDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch {
             val result = csvConverter.importCsvToDatabase(selectedDirectoryUri)
-
-            Log.d("tag", "result $result")
+            result?.let {
+                database.withTransaction {
+                    repo.deleteAll()
+                    repo.insertDatabaseData(result)
+                    repo.rebuildDefaultItemFts()
+                }
+            }
         }
     }
 

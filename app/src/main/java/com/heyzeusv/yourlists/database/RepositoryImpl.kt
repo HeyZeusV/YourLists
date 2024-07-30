@@ -25,6 +25,27 @@ class RepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao,
 ) : Repository {
     /**
+     *  All Queries
+     */
+    override suspend fun deleteAll() = withContext(Dispatchers.IO) {
+        itemDao.deleteAll()
+        itemListDao.deleteAll()
+        defaultItemDao.deleteAll()
+        categoryDao.deleteAll()
+        allDao.deleteAllPrimaryKeys()
+    }
+
+    override suspend fun insertDatabaseData(data: DatabaseData) = withContext(Dispatchers.IO) {
+        categoryDao.insert(*data.categoryData.toTypedArray())
+        defaultItemDao.insert(*data.defaultItemData.toTypedArray())
+        itemListDao.insert(*data.itemListData.toTypedArray())
+        itemDao.insert(*data.itemData.toTypedArray())
+    }
+
+    override suspend fun rebuildDefaultItemFts() =
+        withContext(Dispatchers.IO) { allDao.rebuildDefaultItemFts() }
+
+    /**
      *  ItemList Queries
      */
     override suspend fun insertItemList(vararg itemLists: ItemList) =

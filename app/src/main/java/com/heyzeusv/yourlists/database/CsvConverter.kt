@@ -104,6 +104,7 @@ class CsvConverter @Inject constructor(
                 }
             }
         }
+        csvFile.delete()
         return entityData
     }
 

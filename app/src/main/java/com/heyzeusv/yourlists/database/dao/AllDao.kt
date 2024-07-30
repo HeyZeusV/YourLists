@@ -7,8 +7,8 @@ import androidx.room.Query
 abstract class AllDao {
 
     @Query("INSERT INTO DefaultItemFts(DefaultItemFts) VALUES ('rebuild')")
-    abstract fun rebuildDefaultItemFts()
+    abstract suspend fun rebuildDefaultItemFts()
 
     @Query("DELETE FROM sqlite_sequence")
-    abstract fun deleteAllPrimaryKeys()
+    abstract suspend fun deleteAllPrimaryKeys()
 }

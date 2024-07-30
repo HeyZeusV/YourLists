@@ -11,6 +11,15 @@ import kotlinx.coroutines.flow.Flow
 
 interface Repository {
     /**
+     *  All Queries
+     */
+    suspend fun deleteAll()
+
+    suspend fun insertDatabaseData(data: DatabaseData)
+
+    suspend fun rebuildDefaultItemFts()
+
+    /**
      *  ItemList Queries
      */
     suspend fun insertItemList(vararg itemLists: ItemList)
