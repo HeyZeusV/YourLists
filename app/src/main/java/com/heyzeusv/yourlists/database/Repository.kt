@@ -7,6 +7,7 @@ import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
 import com.heyzeusv.yourlists.overview.OverviewFilter
+import com.heyzeusv.yourlists.util.portation.CsvData
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
@@ -15,7 +16,7 @@ interface Repository {
      */
     suspend fun deleteAll()
 
-    suspend fun insertDatabaseData(data: DatabaseData)
+    suspend fun insertCsvData(data: CsvData)
 
     suspend fun rebuildDefaultItemFts()
 

@@ -12,6 +12,7 @@ import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
 import com.heyzeusv.yourlists.overview.OverviewFilter
+import com.heyzeusv.yourlists.util.portation.CsvData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
@@ -35,7 +36,7 @@ class RepositoryImpl @Inject constructor(
         allDao.deleteAllPrimaryKeys()
     }
 
-    override suspend fun insertDatabaseData(data: DatabaseData) = withContext(Dispatchers.IO) {
+    override suspend fun insertCsvData(data: CsvData) = withContext(Dispatchers.IO) {
         categoryDao.insert(*data.categoryData.toTypedArray())
         defaultItemDao.insert(*data.defaultItemData.toTypedArray())
         itemListDao.insert(*data.itemListData.toTypedArray())

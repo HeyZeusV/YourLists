@@ -1,17 +1,17 @@
-package com.heyzeusv.yourlists.database
+package com.heyzeusv.yourlists.util.portation
 
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 
-data class DatabaseData(
+data class CsvData(
     val categoryData: List<Category>,
     val itemListData: List<ItemList>,
     val defaultItemData : List<DefaultItem>,
     val itemData: List<Item>,
 ) {
-    val entityDataPair: List<Pair<DatabaseEntity, List<DatabaseEntity>>> = listOf(
+    val entityDataPair: List<Pair<CsvInfo, List<CsvInfo>>> = listOf(
         Pair(Category(), categoryData),
         Pair(ItemList(), itemListData),
         Pair(DefaultItem(), defaultItemData),

@@ -5,7 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.heyzeusv.yourlists.Settings
-import com.heyzeusv.yourlists.database.CsvConverter
+import com.heyzeusv.yourlists.util.portation.CsvConverter
 import com.heyzeusv.yourlists.util.proto.SettingsSerializer
 import dagger.Module
 import dagger.Provides

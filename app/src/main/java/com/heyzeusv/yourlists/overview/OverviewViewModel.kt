@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.heyzeusv.yourlists.SettingsFilterOption
-import com.heyzeusv.yourlists.database.CsvConverter
+import com.heyzeusv.yourlists.util.portation.CsvConverter
 import com.heyzeusv.yourlists.database.Database
-import com.heyzeusv.yourlists.database.DatabaseData
+import com.heyzeusv.yourlists.util.portation.CsvData
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
@@ -139,7 +139,7 @@ class OverviewViewModel @Inject constructor(
             result?.let {
                 database.withTransaction {
                     repo.deleteAll()
-                    repo.insertDatabaseData(result)
+                    repo.insertCsvData(result)
                     repo.rebuildDefaultItemFts()
                 }
             }
@@ -166,11 +166,11 @@ class OverviewViewModel @Inject constructor(
         val itemListData = repo.getAllItemLists()
         val defaultItemData = repo.getAllDefaultItems()
         val itemData = repo.getAllItems()
-        val databaseData = DatabaseData(categoryData, itemListData, defaultItemData, itemData)
+        val csvData = CsvData(categoryData, itemListData, defaultItemData, itemData)
 
         csvConverter.exportDatabaseToCsv(
             parentDirectoryUri = parentDirectoryUri,
-            databaseData = databaseData,
+            csvData = csvData,
             updateShowSnackbar = { show -> _showPortationSnackbar.update { show } },
         )
     }

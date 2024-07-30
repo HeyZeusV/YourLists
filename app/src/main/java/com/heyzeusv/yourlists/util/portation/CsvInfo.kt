@@ -1,6 +1,6 @@
-package com.heyzeusv.yourlists.database
+package com.heyzeusv.yourlists.util.portation
 
-interface DatabaseEntity {
+interface CsvInfo {
     val csvName: String
     val csvHeader: List<String>
     val csvRow: List<Any?>

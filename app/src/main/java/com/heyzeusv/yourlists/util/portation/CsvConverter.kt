@@ -1,4 +1,4 @@
-package com.heyzeusv.yourlists.database
+package com.heyzeusv.yourlists.util.portation
 
 import android.content.Context
 import android.net.Uri
@@ -34,7 +34,7 @@ class CsvConverter @Inject constructor(
     private val csvFileNames =
         listOf(CATEGORY_CSV, ITEM_LIST_CSV, DEFAULT_ITEM_CSV, ITEM_CSV)
 
-    fun importCsvToDatabase(selectedDirectoryUri: Uri): DatabaseData? {
+    fun importCsvToDatabase(selectedDirectoryUri: Uri): CsvData? {
         val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
         csvFileNames.forEach {
             val csvFile = selectedDirectory.findFile(it)
@@ -45,7 +45,7 @@ class CsvConverter @Inject constructor(
             }
         }
         @Suppress("UNCHECKED_CAST")
-        return DatabaseData(
+        return CsvData(
             categoryData = importCsvToDatabaseEntity(CATEGORY_CSV) as List<Category>,
             itemListData = importCsvToDatabaseEntity(ITEM_LIST_CSV) as List<ItemList>,
             defaultItemData = importCsvToDatabaseEntity(DEFAULT_ITEM_CSV) as List<DefaultItem>,
@@ -53,14 +53,14 @@ class CsvConverter @Inject constructor(
         )
     }
 
-    private fun importCsvToDatabaseEntity(csvFileName: String): List<DatabaseEntity> {
+    private fun importCsvToDatabaseEntity(csvFileName: String): List<CsvInfo> {
         val csvFile = File(context.filesDir, csvFileName)
         val content = csvReader().readAll(csvFile)
         if (content.size == 1) return emptyList()
 
         val header = content[0]
         val rows = content.drop(1)
-        val entityData = mutableListOf<DatabaseEntity>()
+        val entityData = mutableListOf<CsvInfo>()
         when (header) {
             Category().csvHeader -> {
                 rows.forEach {
@@ -132,7 +132,7 @@ class CsvConverter @Inject constructor(
 
     fun exportDatabaseToCsv(
         parentDirectoryUri: Uri,
-        databaseData: DatabaseData,
+        csvData: CsvData,
         updateShowSnackbar: (Boolean) -> Unit,
     ) {
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
@@ -140,7 +140,7 @@ class CsvConverter @Inject constructor(
             updateShowSnackbar(true)
         } else {
             val newExportDirectory = createNewExportDirectory(parentDirectory)
-            databaseData.entityDataPair.forEach {
+            csvData.entityDataPair.forEach {
                 exportDatabaseEntityToCsv(newExportDirectory, it.first, it.second)
             }
         }
@@ -148,8 +148,8 @@ class CsvConverter @Inject constructor(
 
     private fun exportDatabaseEntityToCsv(
         newExportDirectory: DocumentFile,
-        entity: DatabaseEntity,
-        entityData: List<DatabaseEntity>,
+        entity: CsvInfo,
+        entityData: List<CsvInfo>,
     ) {
         val csvFile = createAndWriteEntityDataToFile(entity, entityData)
         val csvDocumentFile =
@@ -158,8 +158,8 @@ class CsvConverter @Inject constructor(
     }
 
     private fun createAndWriteEntityDataToFile(
-        entity: DatabaseEntity,
-        entityData: List<DatabaseEntity>,
+        entity: CsvInfo,
+        entityData: List<CsvInfo>,
     ): File {
         val csvFile = File(context.filesDir, "${entity.csvName}$CSV_SUFFIX").apply {
             delete()

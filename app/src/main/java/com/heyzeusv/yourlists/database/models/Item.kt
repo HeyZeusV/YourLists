@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.heyzeusv.yourlists.database.DatabaseEntity
+import com.heyzeusv.yourlists.util.portation.CsvInfo
 
 @Entity(
     foreignKeys = [
@@ -46,7 +46,7 @@ data class Item(
     override val memo: String = "",
     val parentItemListId: Long = 0L,
     val originItemListId: Long? = null,
-) : BaseItem, DatabaseEntity {
+) : BaseItem, CsvInfo {
     @Ignore
     override val csvName: String = this::class.java.simpleName
     @Ignore

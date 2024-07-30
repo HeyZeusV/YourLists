@@ -5,14 +5,14 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.heyzeusv.yourlists.database.DatabaseEntity
+import com.heyzeusv.yourlists.util.portation.CsvInfo
 
 @Entity
 data class ItemList(
     @PrimaryKey(autoGenerate = true)
     val itemListId: Long = 0L,
     val name: String = "",
-) : DatabaseEntity {
+) : CsvInfo {
     @Ignore
     override val csvName: String = this::class.java.simpleName
     @Ignore
