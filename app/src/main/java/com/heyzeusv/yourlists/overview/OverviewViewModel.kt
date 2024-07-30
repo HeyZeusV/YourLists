@@ -1,6 +1,7 @@
 package com.heyzeusv.yourlists.overview
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.SettingsFilterOption
@@ -126,6 +127,14 @@ class OverviewViewModel @Inject constructor(
     fun deleteItemList(itemList: ItemList) {
         viewModelScope.launch {
             repo.deleteItemList(itemList)
+        }
+    }
+
+    fun importCsvToDatabase(selectedDirectoryUri: Uri) {
+        viewModelScope.launch {
+            val result = csvConverter.importCsvToDatabase(selectedDirectoryUri)
+
+            Log.d("tag", "result $result")
         }
     }
 

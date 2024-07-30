@@ -342,6 +342,7 @@ fun DrawerSetup(
         it?.let { uri ->
             val flags = FLAG_GRANT_READ_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flags)
+            overviewVM.importCsvToDatabase(uri)
         }
     }
     val exportLauncher = rememberLauncherForActivityResult(contract = OpenDocumentTree()) {

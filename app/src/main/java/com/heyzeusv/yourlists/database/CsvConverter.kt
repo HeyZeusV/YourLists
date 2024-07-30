@@ -3,6 +3,7 @@ package com.heyzeusv.yourlists.database
 import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
+import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
@@ -21,11 +22,113 @@ import java.util.Objects
 import javax.inject.Inject
 
 private const val PARENT_DIRECTORY_NAME = "YourLists"
+private const val CATEGORY_CSV = "Category.csv"
+private const val ITEM_LIST_CSV = "ItemList.csv"
+private const val DEFAULT_ITEM_CSV = "DefaultItem.csv"
+private const val ITEM_CSV = "Item.csv"
 private const val CSV_SUFFIX = ".csv"
 
 class CsvConverter @Inject constructor(
     private val context: Context,
 ) {
+    private val csvFileNames =
+        listOf(CATEGORY_CSV, ITEM_LIST_CSV, DEFAULT_ITEM_CSV, ITEM_CSV)
+
+    fun importCsvToDatabase(selectedDirectoryUri: Uri): DatabaseData? {
+        val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
+        csvFileNames.forEach {
+            val csvFile = selectedDirectory.findFile(it)
+            if (csvFile == null) {
+                return null
+            } else {
+                writeToFileFromDocumentFile(csvFile)
+            }
+        }
+        @Suppress("UNCHECKED_CAST")
+        return DatabaseData(
+            categoryData = importCsvToDatabaseEntity(CATEGORY_CSV) as List<Category>,
+            itemListData = importCsvToDatabaseEntity(ITEM_LIST_CSV) as List<ItemList>,
+            defaultItemData = importCsvToDatabaseEntity(DEFAULT_ITEM_CSV) as List<DefaultItem>,
+            itemData = importCsvToDatabaseEntity(ITEM_CSV) as List<Item>,
+        )
+    }
+
+    private fun importCsvToDatabaseEntity(csvFileName: String): List<DatabaseEntity> {
+        val csvFile = File(context.filesDir, csvFileName)
+        val content = csvReader().readAll(csvFile)
+        if (content.size == 1) return emptyList()
+
+        val header = content[0]
+        val rows = content.drop(1)
+        val entityData = mutableListOf<DatabaseEntity>()
+        when (header) {
+            Category().csvHeader -> {
+                rows.forEach {
+                    val entry = Category(id = it[0].toLong(), name = it[1])
+                    entityData.add(entry)
+                }
+            }
+            ItemList().csvHeader -> {
+                rows.forEach {
+                    val entry = ItemList(itemListId = it[0].toLong(), name = it[1])
+                    entityData.add(entry)
+                }
+            }
+            DefaultItem().csvHeader -> {
+                rows.forEach {
+                    val entry = DefaultItem(
+                        itemId = it[0].toLong(),
+                        name = it[1],
+                        category = it[2],
+                        quantity = it[3].toDouble(),
+                        unit = it[4],
+                        memo = it[5],
+                    )
+                    entityData.add(entry)
+                }
+            }
+            Item().csvHeader -> {
+                rows.forEach {
+                    val entry = Item(
+                        itemId = it[0].toLong(),
+                        name = it[1],
+                        isChecked = it[2].toBoolean(),
+                        category = it[3],
+                        quantity = it[4].toDouble(),
+                        unit = it[5],
+                        memo = it[6],
+                        parentItemListId = it[7].toLong(),
+                        originItemListId = it[8].toLongOrNull()
+                    )
+                    entityData.add(entry)
+                }
+            }
+        }
+        return entityData
+    }
+
+    private fun writeToFileFromDocumentFile(csvDocumentFile: DocumentFile) {
+        val csvFile = File(context.filesDir, csvDocumentFile.name!!).apply {
+            delete()
+            createNewFile()
+        }
+        val dfInputStream = context.contentResolver.openInputStream(csvDocumentFile.uri)
+        val dfReader = BufferedReader(InputStreamReader(dfInputStream))
+
+        val fWriter = PrintWriter(FileWriter(csvFile))
+
+        var line = dfReader.readLine()
+        while (line != null) {
+            fWriter.write(line)
+            fWriter.println()
+            line = dfReader.readLine()
+        }
+
+        dfReader.close()
+        fWriter.flush()
+        fWriter.close()
+    }
+
     fun exportDatabaseToCsv(
         parentDirectoryUri: Uri,
         categoryData: List<Category>,
@@ -52,12 +155,6 @@ class CsvConverter @Inject constructor(
         entityData: List<DatabaseEntity>,
     ) {
         val csvFile = createAndWriteEntityDataToFile(entity, entityData)
-        csvWriter().open(targetFile = csvFile, append = false) {
-            writeRow(entity.csvHeader)
-            entityData.forEach {
-                writeRow(it.csvRow)
-            }
-        }
         val csvDocumentFile =
             newExportDirectory.createFile("text/*", "${entity.csvName}$CSV_SUFFIX")!!
         writeToDocumentFileFromFile(csvFile, csvDocumentFile)
@@ -73,9 +170,7 @@ class CsvConverter @Inject constructor(
         }
         csvWriter().open(csvFile) {
             writeRow(entity.csvHeader)
-            entityData.forEach {
-                writeRow(it.csvRow)
-            }
+            entityData.forEach { writeRow(it.csvRow) }
         }
         return csvFile
     }
