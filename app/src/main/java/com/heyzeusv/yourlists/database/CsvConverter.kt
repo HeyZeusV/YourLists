@@ -131,10 +131,7 @@ class CsvConverter @Inject constructor(
 
     fun exportDatabaseToCsv(
         parentDirectoryUri: Uri,
-        categoryData: List<Category>,
-        itemListData: List<ItemList>,
-        defaultItemData: List<DefaultItem>,
-        itemData: List<Item>,
+        databaseData: DatabaseData,
         updateShowSnackbar: (Boolean) -> Unit,
     ) {
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
@@ -142,10 +139,9 @@ class CsvConverter @Inject constructor(
             updateShowSnackbar(true)
         } else {
             val newExportDirectory = createNewExportDirectory(parentDirectory)
-            exportDatabaseEntityToCsv(newExportDirectory, Category(), categoryData)
-            exportDatabaseEntityToCsv(newExportDirectory, ItemList(), itemListData)
-            exportDatabaseEntityToCsv(newExportDirectory, DefaultItem(), defaultItemData)
-            exportDatabaseEntityToCsv(newExportDirectory, Item(), itemData)
+            databaseData.entityDataPair.forEach {
+                exportDatabaseEntityToCsv(newExportDirectory, it.first, it.second)
+            }
         }
     }
 

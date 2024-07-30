@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.heyzeusv.yourlists.SettingsFilterOption
 import com.heyzeusv.yourlists.database.CsvConverter
+import com.heyzeusv.yourlists.database.DatabaseData
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
@@ -158,13 +159,11 @@ class OverviewViewModel @Inject constructor(
         val itemListData = repo.getAllItemLists()
         val defaultItemData = repo.getAllDefaultItems()
         val itemData = repo.getAllItems()
+        val databaseData = DatabaseData(categoryData, itemListData, defaultItemData, itemData)
 
         csvConverter.exportDatabaseToCsv(
             parentDirectoryUri = parentDirectoryUri,
-            categoryData = categoryData,
-            itemListData = itemListData,
-            defaultItemData = defaultItemData,
-            itemData = itemData,
+            databaseData = databaseData,
             updateShowSnackbar = { show -> _showPortationSnackbar.update { show } },
         )
     }
