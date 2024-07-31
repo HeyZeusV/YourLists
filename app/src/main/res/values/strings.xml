@@ -86,6 +86,7 @@
     <string name="p_error_export_table_failed">Something went wrong while exporting %1$s, please try again</string>
     <string name="p_error_missing_directory">YourLists directory missing!</string>
     <string name="p_error_missing_directory_action">Select new</string>
-    <string name="p_progress_export_entity_success">Successfully exported %1$s</string>
+    <string name="p_progress_export_entity_success">Successfully exported %1$s…</string>
+    <string name="p_progress_export_started">Started exporting all data…</string>
     <string name="p_progress_export_success">Successfully exported all data!</string>
 </resources>

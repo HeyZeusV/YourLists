@@ -137,6 +137,7 @@ class CsvConverter @Inject constructor(
         csvData: CsvData,
         updatePortationStatus: (PortationStatus) -> Unit,
     ) {
+        updatePortationStatus(Progress.ExportStarted)
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
         if (!parentDirectory.exists()) {
             updatePortationStatus(Error.MissingDirectory)

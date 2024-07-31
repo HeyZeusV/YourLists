@@ -12,6 +12,7 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.di.IODispatcher
 import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
 import com.heyzeusv.yourlists.util.portation.PortationStatus
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
@@ -20,6 +21,7 @@ import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.proto.defaultSettingsFilter
 import com.heyzeusv.yourlists.util.proto.getCustomSettingsDefaultInstance
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,11 +31,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class OverviewViewModel @Inject constructor(
+    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val settingsManager: SettingsManager,
     private val database: Database,
     private val repo: Repository,
@@ -168,16 +172,19 @@ class OverviewViewModel @Inject constructor(
 
     private suspend fun suspendExportDatabaseToCsv() {
         val parentDirectoryUri = Uri.parse(settings.value.portationPath)
-        val categoryData = repo.getAllCategories()
-        val itemListData = repo.getAllItemLists()
-        val defaultItemData = repo.getAllDefaultItems()
-        val itemData = repo.getAllItems()
-        val csvData = CsvData(categoryData, itemListData, defaultItemData, itemData)
-
-        csvConverter.exportDatabaseToCsv(
-            parentDirectoryUri = parentDirectoryUri,
-            csvData = csvData,
-            updatePortationStatus = { status -> _portationStatus.update { status } },
+        val csvData = CsvData(
+            categoryData = repo.getAllCategories(),
+            itemListData = repo.getAllItemLists(),
+            defaultItemData = repo.getAllDefaultItems(),
+            itemData = repo.getAllItems()
         )
+
+        withContext(ioDispatcher) {
+            csvConverter.exportDatabaseToCsv(
+                parentDirectoryUri = parentDirectoryUri,
+                csvData = csvData,
+                updatePortationStatus = { status -> _portationStatus.update { status } },
+            )
+        }
     }
 }

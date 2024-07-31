@@ -7,8 +7,10 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,10 +18,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -37,12 +41,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
+import com.heyzeusv.yourlists.ui.theme.BlackAlpha90
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.DrawerOnClicks
 import com.heyzeusv.yourlists.util.EmptyList
@@ -58,6 +64,7 @@ import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
+import com.heyzeusv.yourlists.util.portation.PortationStatus
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error.MissingDirectory
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
@@ -72,6 +79,7 @@ fun OverviewScreen(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
     topAppBarSetup: (TopAppBarState) -> Unit,
+    openDrawer: () -> Unit,
     drawerSetup: (DrawerOnClicks) -> Unit,
     fabSetup: (FabState) -> Unit,
 ) {
@@ -96,6 +104,7 @@ fun OverviewScreen(
             TopAppBarState(
                 destination = OverviewDestination,
                 title = topAppBarTitle,
+                onNavPressed = openDrawer,
                 onActionRightPressed = { showFilterDialog = true },
             )
         )
@@ -115,11 +124,6 @@ fun OverviewScreen(
     LaunchedEffect(key1 = settings) {
         filter = OverviewFilter.settingsFilterToOverviewFilter(settings.overviewFilterList)
     }
-    DrawerSetup(
-        overviewVM = overviewVM,
-        snackbarHostState = snackbarHostState,
-        drawerSetup = drawerSetup,
-    )
     OverviewScreen(
         listState = listState,
         itemLists = itemLists,
@@ -132,6 +136,27 @@ fun OverviewScreen(
         optionRenameOnClick = overviewVM::renameItemList,
         optionCopyOnClick = overviewVM::copyItemList,
         optionDeleteOnClick = overviewVM::deleteItemList,
+    )
+    DrawerSetup(
+        overviewVM = overviewVM,
+        snackbarHostState = snackbarHostState,
+        drawerSetup = drawerSetup,
+        enableTopAppBarAndFab = {
+            topAppBarSetup(
+                TopAppBarState(
+                    destination = OverviewDestination,
+                    title = topAppBarTitle,
+                    onNavPressed = { if (it) openDrawer() },
+                    onActionRightPressed = { if (it) showFilterDialog = true },
+                )
+            )
+            fabSetup(
+                FabState(
+                    isFabDisplayed = it,
+                    fabAction = { showNewListDialog = true },
+                )
+            )
+        },
     )
     InputAlertDialog(
         display = showNewListDialog,
@@ -337,6 +362,7 @@ fun DrawerSetup(
     overviewVM: OverviewViewModel,
     snackbarHostState: SnackbarHostState,
     drawerSetup: (DrawerOnClicks) -> Unit,
+    enableTopAppBarAndFab: (Boolean) -> Unit,
 ) {
     val portationStatus by overviewVM.portationStatus.collectAsStateWithLifecycle()
 
@@ -380,6 +406,7 @@ fun DrawerSetup(
     LaunchedEffect(key1 = portationStatus) {
         when (portationStatus) {
             is Error, Progress.ExportSuccess -> {
+                enableTopAppBarAndFab(true)
                 val actionLabel = if (portationStatus is MissingDirectory) {
                     context.getString(R.string.p_error_missing_directory_action)
                 } else {
@@ -397,7 +424,56 @@ fun DrawerSetup(
                 }
                 overviewVM.updatePortationStatus(Standby)
             }
-            else -> { }
+            is Standby -> enableTopAppBarAndFab(true)
+            else -> enableTopAppBarAndFab(false)
+        }
+    }
+    PortationProgress(portationStatus = portationStatus)
+}
+
+@Composable
+fun PortationProgress(portationStatus: PortationStatus) {
+    var displayProgress by remember { mutableStateOf(false) }
+    var progressText by remember { mutableStateOf("") }
+
+    when (portationStatus) {
+        is Progress.ExportEntitySuccess -> {
+            displayProgress = true
+            progressText = sRes(portationStatus.message, portationStatus.file)
+        }
+        is Progress.ExportStarted -> {
+            displayProgress = true
+            progressText = sRes(portationStatus.message)
+        }
+        else -> {
+            displayProgress = false
+            progressText = ""
+        }
+    }
+
+    if (displayProgress) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(BlackAlpha90),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                verticalArrangement =
+                Arrangement.spacedBy(dRes(R.dimen.p_progress_spacedBy_vertical)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(dRes(R.dimen.p_progress_size)),
+                    strokeWidth = dRes(R.dimen.p_progress_stroke_width),
+                )
+                Text(
+                    text = progressText,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.headlineLarge,
+                )
+            }
         }
     }
 }
@@ -483,6 +559,16 @@ private fun OverviewBottomSheetActionPreview() {
                     actionOnClick = { },
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PortationProgressPreview() {
+    PreviewUtil.run {
+        Preview {
+            PortationProgress(portationStatus = Progress.ExportEntitySuccess("Preview"))
         }
     }
 }

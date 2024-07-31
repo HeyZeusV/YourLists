@@ -161,10 +161,8 @@ fun YourLists(
                         overviewVM = overviewVM,
                         navController = navController,
                         snackbarHostState = snackbarHostState,
-                        topAppBarSetup = {
-                            topAppBarState =
-                                it.copy(onNavPressed = { scope.launch { drawerState.open() } })
-                        },
+                        topAppBarSetup = { topAppBarState = it },
+                        openDrawer = { scope.launch { drawerState.open() } },
                         drawerSetup = { drawerOnClicks = it },
                         fabSetup = { fabState = it },
                     )

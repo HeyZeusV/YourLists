@@ -65,4 +65,8 @@
     <dimen name="osli_padding_all">12.dp</dimen>
     <dimen name="osli_progress_height">8.dp</dimen>
     <dimen name="osli_progress_spacedBy">12.dp</dimen>
+    <!-- Portation (p) -->
+    <dimen name="p_progress_size">250.dp</dimen>
+    <dimen name="p_progress_stroke_width">16.dp</dimen>
+    <dimen name="p_progress_spacedBy_vertical">8.dp</dimen>
 </resources>

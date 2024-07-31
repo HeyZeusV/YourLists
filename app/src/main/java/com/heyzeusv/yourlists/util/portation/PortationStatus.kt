@@ -12,6 +12,7 @@ sealed class PortationStatus(@StringRes open val message: Int) {
     }
     sealed class Progress(@StringRes override val message: Int) : PortationStatus(message) {
         data class ExportEntitySuccess(val file: String) : Progress(R.string.p_progress_export_entity_success)
+        data object ExportStarted : Progress(R.string.p_progress_export_started)
         data object ExportSuccess : Progress(R.string.p_progress_export_success)
     }
     data object Standby : PortationStatus(R.string.blank_string)
