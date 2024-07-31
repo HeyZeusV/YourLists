@@ -18,6 +18,8 @@ interface Repository {
 
     suspend fun insertCsvData(data: CsvData)
 
+    suspend fun getAllCsvData(): CsvData
+
     suspend fun rebuildDefaultItemFts()
 
     /**
@@ -28,8 +30,6 @@ interface Repository {
     suspend fun updateItemList(vararg itemLists: ItemList)
 
     suspend fun deleteItemList(vararg itemLists: ItemList)
-
-    suspend fun getAllItemLists(): List<ItemList>
 
     fun getItemListWithId(id: Long): Flow<ItemList>
 
@@ -50,8 +50,6 @@ interface Repository {
 
     suspend fun deleteItems(vararg items: Item)
 
-    suspend fun getAllItems(): List<Item>
-
     fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>>
 
     /**
@@ -61,9 +59,7 @@ interface Repository {
 
     suspend fun deleteDefaultItems(vararg defaultItems: DefaultItem)
 
-    suspend fun getAllDefaultItems(): List<DefaultItem>
-
-    fun getAllDefaultItemsFlow(): Flow<List<DefaultItem>>
+    fun getAllDefaultItems(): Flow<List<DefaultItem>>
 
     fun searchDefaultItems(query: String): Flow<List<DefaultItem>>
 
@@ -71,8 +67,6 @@ interface Repository {
      *  Category Queries
      */
     suspend fun insertCategories(vararg categories: Category)
-
-    suspend fun getAllCategories(): List<Category>
 
     fun getAllCategoriesFlow(): Flow<List<Category>>
 }

@@ -28,7 +28,7 @@ class RepositoryImpl @Inject constructor(
     /**
      *  All Queries
      */
-    override suspend fun deleteAll() = withContext(Dispatchers.IO) {
+    override suspend fun deleteAll() {
         itemDao.deleteAll()
         itemListDao.deleteAll()
         defaultItemDao.deleteAll()
@@ -36,15 +36,21 @@ class RepositoryImpl @Inject constructor(
         allDao.deleteAllPrimaryKeys()
     }
 
-    override suspend fun insertCsvData(data: CsvData) = withContext(Dispatchers.IO) {
+    override suspend fun insertCsvData(data: CsvData) {
         categoryDao.insert(*data.categoryData.toTypedArray())
         defaultItemDao.insert(*data.defaultItemData.toTypedArray())
         itemListDao.insert(*data.itemListData.toTypedArray())
         itemDao.insert(*data.itemData.toTypedArray())
     }
 
-    override suspend fun rebuildDefaultItemFts() =
-        withContext(Dispatchers.IO) { allDao.rebuildDefaultItemFts() }
+    override suspend fun getAllCsvData(): CsvData = CsvData(
+        categoryData = categoryDao.getAll(),
+        itemListData = itemListDao.getAll(),
+        defaultItemData = defaultItemDao.getAll(),
+        itemData = itemDao.getAll(),
+    )
+
+    override suspend fun rebuildDefaultItemFts() = allDao.rebuildDefaultItemFts()
 
     /**
      *  ItemList Queries
@@ -57,9 +63,6 @@ class RepositoryImpl @Inject constructor(
 
     override suspend fun deleteItemList(vararg itemLists: ItemList) =
         withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
-
-    override suspend fun getAllItemLists(): List<ItemList> =
-        withContext(Dispatchers.IO) { itemListDao.getAll() }
 
     override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
 
@@ -89,9 +92,6 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteItems(vararg items: Item) =
         withContext(Dispatchers.IO) { itemDao.delete(*items) }
 
-    override suspend fun getAllItems(): List<Item> =
-        withContext(Dispatchers.IO) { itemDao.getAll() }
-
     override fun getSortedItemsWithParentId(id: Long, filter: ListFilter): Flow<List<Item>> =
         itemDao.getSortedItemsWithParentId(
             id = id,
@@ -112,10 +112,7 @@ class RepositoryImpl @Inject constructor(
     override suspend fun deleteDefaultItems(vararg defaultItems: DefaultItem) =
         withContext(Dispatchers.IO) { defaultItemDao.delete(*defaultItems) }
 
-    override suspend fun getAllDefaultItems(): List<DefaultItem> =
-        withContext(Dispatchers.IO) { defaultItemDao.getAll() }
-
-    override fun getAllDefaultItemsFlow(): Flow<List<DefaultItem>> =
+    override fun getAllDefaultItems(): Flow<List<DefaultItem>> =
         defaultItemDao.getAllDefaultItems()
 
     override fun searchDefaultItems(query: String): Flow<List<DefaultItem>> =
@@ -126,9 +123,6 @@ class RepositoryImpl @Inject constructor(
      */
     override suspend fun insertCategories(vararg categories: Category) =
         withContext(Dispatchers.IO) { categoryDao.insert(*categories) }
-
-    override suspend fun getAllCategories(): List<Category> =
-        withContext(Dispatchers.IO) { categoryDao.getAll() }
 
     override fun getAllCategoriesFlow(): Flow<List<Category>> = categoryDao.getAllCategories()
 }

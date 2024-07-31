@@ -40,7 +40,7 @@ class AddViewModel @Inject constructor(
         .debounce(300)
         .flatMapLatest { query ->
             if (query.isBlank()) {
-                repo.getAllDefaultItemsFlow()
+                repo.getAllDefaultItems()
             } else {
                 val cleanQuery = cleanQuery(query)
                 repo.searchDefaultItems(cleanQuery)
