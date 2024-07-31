@@ -58,6 +58,10 @@ import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
 import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Error.MissingDirectory
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Standby
 import com.heyzeusv.yourlists.util.sRes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -334,7 +338,7 @@ fun DrawerSetup(
     snackbarHostState: SnackbarHostState,
     drawerSetup: (DrawerOnClicks) -> Unit,
 ) {
-    val showPortationSnackbar by overviewVM.showPortationSnackbar.collectAsStateWithLifecycle()
+    val portationStatus by overviewVM.portationStatus.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
 
@@ -373,23 +377,27 @@ fun DrawerSetup(
             )
         )
     }
-    LaunchedEffect(key1 = showPortationSnackbar) {
-        if (showPortationSnackbar) {
-            val action = snackbarHostState.showSnackbar(
-                message = context.getString(R.string.p_error_directory_missing_message),
-                actionLabel = context.getString(R.string.p_error_directory_missing_action),
-                duration = SnackbarDuration.Short
-            )
-            when (action) {
-                SnackbarResult.ActionPerformed -> {
-                    exportLauncher.launch(null)
-                    overviewVM.updateShowPortationSnackbar(false)
+    LaunchedEffect(key1 = portationStatus) {
+        when (portationStatus) {
+            is Error, Progress.ExportSuccess -> {
+                val actionLabel = if (portationStatus is MissingDirectory) {
+                    context.getString(R.string.p_error_missing_directory_action)
+                } else {
+                    null
                 }
-                SnackbarResult.Dismissed -> {
-                    overviewVM.updatePortationPath("")
-                    overviewVM.updateShowPortationSnackbar(false)
+                val action = snackbarHostState.showSnackbar(
+                    message = context.getString(portationStatus.message),
+                    actionLabel = actionLabel,
+                    duration = SnackbarDuration.Short
+                )
+                when (action) {
+                    SnackbarResult.ActionPerformed -> exportLauncher.launch(null)
+                    SnackbarResult.Dismissed ->
+                        if (portationStatus is MissingDirectory) overviewVM.updatePortationPath("")
                 }
+                overviewVM.updatePortationStatus(Standby)
             }
+            else -> { }
         }
     }
 }

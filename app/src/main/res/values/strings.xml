@@ -3,6 +3,7 @@
     <string name="navigate_back">Navigate Back</string>
     <string name="open_drawer">Open Drawer</string>
     <string name="button_cdesc_options">Displays additional options</string>
+    <string name="blank_string" />
     <string-array name="unit_values">
         <item>Unit</item>
         <item>lb</item>
@@ -55,8 +56,7 @@
     <string name="ls_filter_byIsChecked">By selected</string>
     <string name="ls_filter_byName">By name</string>
     <string name="ls_filter_byCategory">By category</string>
-<!--    <string name="ls_empty">Add a single item or an existing list!</string>-->
-    <string name="ls_empty">Add an item using the button below!</string>
+    <string name="ls_empty">Add a single item or an existing list!</string>
     <string name="ls_fab">Add</string>
     <!-- ListScreen.BottomSheet (lsbs) -->
     <string name="lsbs_update">Update Item</string>
@@ -80,6 +80,12 @@
     <string name="osbs_cdesc_delete">Delete this list.</string>
 
     <!-- Portation (p) -->
-    <string name="p_error_directory_missing_message">YourLists directory missing!</string>
-    <string name="p_error_directory_missing_action">Select new</string>
+    <string name="p_error_try_again_action">Try again</string>
+    <string name="p_error_create_directory_failed">Something went wrong creating a new directory, please try again</string>
+    <string name="p_error_create_file_failed">Something went wrong creating %1$s, please try again</string>
+    <string name="p_error_export_table_failed">Something went wrong while exporting %1$s, please try again</string>
+    <string name="p_error_missing_directory">YourLists directory missing!</string>
+    <string name="p_error_missing_directory_action">Select new</string>
+    <string name="p_progress_export_entity_success">Successfully exported %1$s</string>
+    <string name="p_progress_export_success">Successfully exported all data!</string>
 </resources>

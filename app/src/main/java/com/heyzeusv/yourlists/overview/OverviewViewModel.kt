@@ -13,6 +13,9 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
+import com.heyzeusv.yourlists.util.portation.PortationStatus
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Standby
 import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.proto.defaultSettingsFilter
 import com.heyzeusv.yourlists.util.proto.getCustomSettingsDefaultInstance
@@ -77,10 +80,9 @@ class OverviewViewModel @Inject constructor(
             initialValue = 0L
         )
 
-    private val _showPortationSnackbar = MutableStateFlow(false)
-    val showPortationSnackbar = _showPortationSnackbar.asStateFlow()
-    fun updateShowPortationSnackbar(value: Boolean) = _showPortationSnackbar.update { value }
-
+    private val _portationStatus = MutableStateFlow<PortationStatus>(Standby)
+    val portationStatus = _portationStatus.asStateFlow()
+    fun updatePortationStatus(value: PortationStatus) = _portationStatus.update { value }
 
     fun updateFilter(filter: OverviewFilter) {
         viewModelScope.launch {
@@ -149,8 +151,12 @@ class OverviewViewModel @Inject constructor(
     fun createParentDirectoryAndExportToCsv(selectedDirectoryUri: Uri) {
         viewModelScope.launch {
             val parentDirectoryUri = csvConverter.findOrCreateParentDirectory(selectedDirectoryUri)
-            updatePortationPath(parentDirectoryUri.toString())
-            suspendExportDatabaseToCsv()
+            if (parentDirectoryUri == null) {
+                updatePortationStatus(Error.CreateDirectoryFailed)
+            } else {
+                updatePortationPath(parentDirectoryUri.toString())
+                suspendExportDatabaseToCsv()
+            }
         }
     }
 
@@ -171,7 +177,7 @@ class OverviewViewModel @Inject constructor(
         csvConverter.exportDatabaseToCsv(
             parentDirectoryUri = parentDirectoryUri,
             csvData = csvData,
-            updateShowSnackbar = { show -> _showPortationSnackbar.update { show } },
+            updatePortationStatus = { status -> _portationStatus.update { status } },
         )
     }
 }
