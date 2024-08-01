@@ -468,7 +468,8 @@ fun PortationProgress(portationStatus: PortationStatus) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BlackAlpha90),
+                .background(BlackAlpha90)
+                .clickable(enabled = false) {  },
             contentAlignment = Alignment.Center,
         ) {
             Column(
