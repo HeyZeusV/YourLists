@@ -417,7 +417,7 @@ fun DrawerSetup(
                     null
                 }
                 val action = snackbarHostState.showSnackbar(
-                    message = context.getString(portationStatus.message),
+                    message = context.getString(portationStatus.message, portationStatus.file),
                     actionLabel = actionLabel,
                     duration = SnackbarDuration.Short
                 )
@@ -450,11 +450,7 @@ fun PortationProgress(portationStatus: PortationStatus) {
     var progressText by remember { mutableStateOf("") }
 
     when (portationStatus) {
-        is Progress.ImportEntitySuccess -> {
-            displayProgress = true
-            progressText = sRes(portationStatus.message, portationStatus.file)
-        }
-        is Progress.ExportEntitySuccess -> {
+        is Progress.ImportEntitySuccess, is Progress.ExportEntitySuccess-> {
             displayProgress = true
             progressText = sRes(portationStatus.message, portationStatus.file)
         }
