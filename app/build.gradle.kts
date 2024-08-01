@@ -33,8 +33,8 @@ android {
         applicationId = "com.heyzeusv.yourlists"
         minSdk = 24
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
