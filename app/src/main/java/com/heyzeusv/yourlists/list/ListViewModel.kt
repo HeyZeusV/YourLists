@@ -76,7 +76,7 @@ class ListViewModel @Inject constructor(
 
     private fun getAllCategories() {
         viewModelScope.launch {
-            repo.getAllCategories().flowOn(Dispatchers.IO).collectLatest { list ->
+            repo.getAllCategoriesFlow().flowOn(Dispatchers.IO).collectLatest { list ->
                 _categories.update { list }
             }
         }

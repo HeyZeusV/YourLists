@@ -7,9 +7,21 @@ import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
 import com.heyzeusv.yourlists.overview.OverviewFilter
+import com.heyzeusv.yourlists.util.portation.CsvData
 import kotlinx.coroutines.flow.Flow
 
 interface Repository {
+    /**
+     *  All Queries
+     */
+    suspend fun deleteAll()
+
+    suspend fun insertCsvData(data: CsvData)
+
+    suspend fun getAllCsvData(): CsvData
+
+    suspend fun rebuildDefaultItemFts()
+
     /**
      *  ItemList Queries
      */
@@ -20,8 +32,6 @@ interface Repository {
     suspend fun deleteItemList(vararg itemLists: ItemList)
 
     fun getItemListWithId(id: Long): Flow<ItemList>
-
-    fun getAllItemLists(): Flow<List<ItemListWithItems>>
 
     fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>>
 
@@ -58,5 +68,5 @@ interface Repository {
      */
     suspend fun insertCategories(vararg categories: Category)
 
-    fun getAllCategories(): Flow<List<Category>>
+    fun getAllCategoriesFlow(): Flow<List<Category>>
 }

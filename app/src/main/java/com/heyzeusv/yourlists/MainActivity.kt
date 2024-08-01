@@ -6,26 +6,44 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,21 +62,28 @@ import com.heyzeusv.yourlists.overview.OverviewViewModel
 import com.heyzeusv.yourlists.ui.theme.YourListsTheme
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.Destination
+import com.heyzeusv.yourlists.util.DrawerOnClicks
+import com.heyzeusv.yourlists.util.DrawerOption
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ListDestination
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.TopAppBarState
 import com.heyzeusv.yourlists.util.currentDestination
+import com.heyzeusv.yourlists.util.dRes
 import com.heyzeusv.yourlists.util.iRes
+import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.sRes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             YourListsTheme {
                 YourLists()
@@ -67,86 +92,107 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// TODO: Back press should close BottomSheet, if open
 @Composable
 fun YourLists(
-    navController: NavHostController = rememberNavController()
+    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    navController: NavHostController = rememberNavController(),
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val currentBackStack by navController.currentBackStackEntryAsState()
     var topAppBarState by remember { mutableStateOf(TopAppBarState()) }
+    var drawerOnClicks by remember { mutableStateOf(DrawerOnClicks()) }
     var fabState by remember { mutableStateOf(FabState()) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            YourListsTopAppBar(
-                destination = currentBackStack.currentDestination(),
-                title = topAppBarState.title,
-                onNavPressed = { topAppBarState.onNavPressed.invoke() },
-                onActionLeftPressed = { topAppBarState.onActionLeftPressed.invoke() },
-                onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
-            )
+    val scope = rememberCoroutineScope()
+
+    ModalNavigationDrawer(
+        drawerContent = {
+            ModalDrawerSheet(modifier = Modifier.fillMaxWidth(0.85f)) {
+                DrawerHeader()
+                DrawerContent(
+                    closeDrawer = { scope.launch { drawerState.close() } },
+                    drawerOnClicks = drawerOnClicks,
+                )
+            }
         },
-        floatingActionButton = {
-            if (fabState.isFabDisplayed) {
-                ExtendedFloatingActionButton(
-                    text = { Text(text = sRes(topAppBarState.destination.fabText)) },
-                    icon = {
-                        Icon(
-                            imageVector = topAppBarState.destination.fabIcon,
-                            contentDescription = sRes(topAppBarState.destination.fabText)
-                        )
-                    },
-                    modifier = Modifier.height(48.dp),
-                    onClick = fabState.fabAction,
+        drawerState = drawerState,
+    ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                YourListsTopAppBar(
+                    destination = currentBackStack.currentDestination(),
+                    title = topAppBarState.title,
+                    onNavPressed = { topAppBarState.onNavPressed.invoke() },
+                    onActionLeftPressed = { topAppBarState.onActionLeftPressed.invoke() },
+                    onActionRightPressed = { topAppBarState.onActionRightPressed.invoke() },
                 )
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            floatingActionButton = {
+                if (fabState.isFabDisplayed) {
+                    ExtendedFloatingActionButton(
+                        text = { Text(text = sRes(topAppBarState.destination.fabText)) },
+                        icon = {
+                            Icon(
+                                imageVector = topAppBarState.destination.fabIcon,
+                                contentDescription = sRes(topAppBarState.destination.fabText)
+                            )
+                        },
+                        modifier = Modifier.height(48.dp),
+                        onClick = fabState.fabAction,
+                    )
+                }
             }
-        }
-    ) { paddingValues ->
-        val transitionDuration = iRes(R.integer.nav_transition_duration)
-        NavHost(
-            navController = navController,
-            startDestination = OverviewDestination.route,
-            modifier = Modifier.padding(paddingValues),
-            enterTransition = { slideInHorizontally(tween(transitionDuration)) { it } },
-            exitTransition = { slideOutHorizontally(tween(transitionDuration)) { -it } },
-            popEnterTransition = { slideInHorizontally(tween(transitionDuration)) { -it } },
-            popExitTransition = { slideOutHorizontally(tween(transitionDuration)) { it } }
-        ) {
-            composable(OverviewDestination.route) {
-                val overviewVM: OverviewViewModel = hiltViewModel()
-                OverviewScreen(
-                    overviewVM = overviewVM,
-                    navController = navController,
-                    topAppBarSetup = { topAppBarState = it },
-                    fabSetup = { fabState = it },
-                )
-            }
-            composable(
-                route = ListDestination.routeWithArg,
-                arguments = ListDestination.arguments,
-            ) { bse ->
-                val listVM: ListViewModel = hiltViewModel()
-                val topAppBarTitle = bse.arguments?.getString(ListDestination.NAME_ARG) ?: ""
-                ListScreen(
-                    listVM = listVM,
-                    navController = navController,
-                    topAppBarSetup = { topAppBarState = it },
-                    fabSetup = { fabState = it },
-                    topAppBarTitle = topAppBarTitle,
-                )
-            }
-            composable(
-                route = AddDestination.routeWithArg,
-                arguments = AddDestination.arguments,
+        ) { paddingValues ->
+            val transitionDuration = iRes(R.integer.nav_transition_duration)
+            NavHost(
+                navController = navController,
+                startDestination = OverviewDestination.route,
+                modifier = Modifier.padding(paddingValues),
+                enterTransition = { slideInHorizontally(tween(transitionDuration)) { it } },
+                exitTransition = { slideOutHorizontally(tween(transitionDuration)) { -it } },
+                popEnterTransition = { slideInHorizontally(tween(transitionDuration)) { -it } },
+                popExitTransition = { slideOutHorizontally(tween(transitionDuration)) { it } }
             ) {
-                val addVM: AddViewModel = hiltViewModel()
-                AddScreen(
-                    addVM = addVM,
-                    navController = navController,
-                    topAppBarSetup = { topAppBarState = it },
-                    fabSetup = { fabState = it }
-                )
+                composable(OverviewDestination.route) {
+                    val overviewVM: OverviewViewModel = hiltViewModel()
+                    OverviewScreen(
+                        overviewVM = overviewVM,
+                        navController = navController,
+                        snackbarHostState = snackbarHostState,
+                        topAppBarSetup = { topAppBarState = it },
+                        openDrawer = { scope.launch { drawerState.open() } },
+                        drawerSetup = { drawerOnClicks = it },
+                        fabSetup = { fabState = it },
+                    )
+                }
+                composable(
+                    route = ListDestination.routeWithArg,
+                    arguments = ListDestination.arguments,
+                ) { bse ->
+                    val listVM: ListViewModel = hiltViewModel()
+                    val topAppBarTitle = bse.arguments?.getString(ListDestination.NAME_ARG) ?: ""
+                    ListScreen(
+                        listVM = listVM,
+                        navController = navController,
+                        topAppBarSetup = { topAppBarState = it },
+                        fabSetup = { fabState = it },
+                        topAppBarTitle = topAppBarTitle,
+                    )
+                }
+                composable(
+                    route = AddDestination.routeWithArg,
+                    arguments = AddDestination.arguments,
+                ) {
+                    val addVM: AddViewModel = hiltViewModel()
+                    AddScreen(
+                        addVM = addVM,
+                        navController = navController,
+                        topAppBarSetup = { topAppBarState = it },
+                        fabSetup = { fabState = it }
+                    )
+                }
             }
         }
     }
@@ -181,7 +227,7 @@ fun YourListsTopAppBar(
         navigationIcon = {
             IconButton(
                 onClick = onNavPressed,
-                enabled = destination != OverviewDestination && isNavEnabled,
+                enabled = isNavEnabled,
                 colors = IconButtonDefaults.iconButtonColors(
                     disabledContentColor = MaterialTheme.colorScheme.onSurface
                 )
@@ -217,6 +263,61 @@ fun YourListsTopAppBar(
     )
 }
 
+@Composable
+fun DrawerHeader() {
+    Column(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(vertical = dRes(R.dimen.d_padding_vertical))
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon(
+            painter = pRes(R.drawable.ic_launcher_foreground),
+            contentDescription = sRes(R.string.app_name),
+            modifier = Modifier.scale(2f),
+        )
+        Text(
+            text = sRes(R.string.app_name),
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold)
+        )
+    }
+}
+
+@Composable
+fun DrawerContent(
+    closeDrawer: () -> Unit,
+    drawerOnClicks: DrawerOnClicks,
+) {
+    Column(
+        modifier = Modifier.padding(top = dRes(R.dimen.d_content_padding_top)),
+        verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.d_content_spacedBy_vertical)),
+    ) {
+        DrawerOption.entries.forEachIndexed { index, drawerOption ->
+            NavigationDrawerItem(
+                label = {
+                    Text(
+                        text = sRes(drawerOption.nameId),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                selected = false,
+                onClick = {
+                    drawerOnClicks.onClickList[index]()
+                    closeDrawer()
+                },
+                modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
+                icon = {
+                    Icon(
+                        painter = pRes(drawerOption.iconId),
+                        contentDescription = sRes(drawerOption.nameId),
+                    )
+                }
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun YourListsTopAppBarPreview() {
@@ -228,5 +329,32 @@ fun YourListsTopAppBarPreview() {
             onActionLeftPressed = { },
             onActionRightPressed = { },
         )
+    }
+}
+
+@Preview
+@Composable
+private fun DrawerHeaderPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                DrawerHeader()
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun DrawerContentPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface {
+                DrawerContent(
+                    closeDrawer = { },
+                    drawerOnClicks = DrawerOnClicks(),
+                )
+            }
+        }
     }
 }

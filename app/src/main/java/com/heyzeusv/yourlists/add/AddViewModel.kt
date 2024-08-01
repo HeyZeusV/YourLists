@@ -47,7 +47,7 @@ class AddViewModel @Inject constructor(
             }
         }
 
-    val categories = repo.getAllCategories()
+    val categories = repo.getAllCategoriesFlow()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

@@ -1,5 +1,6 @@
 package com.heyzeusv.yourlists.database
 
+import com.heyzeusv.yourlists.database.dao.AllDao
 import com.heyzeusv.yourlists.database.dao.CategoryDao
 import com.heyzeusv.yourlists.database.dao.DefaultItemDao
 import com.heyzeusv.yourlists.database.dao.ItemDao
@@ -11,17 +12,46 @@ import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.list.ListFilter
 import com.heyzeusv.yourlists.overview.OverviewFilter
+import com.heyzeusv.yourlists.util.portation.CsvData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RepositoryImpl @Inject constructor(
+    private val allDao: AllDao,
     private val itemListDao: ItemListDao,
     private val itemDao: ItemDao,
     private val defaultItemDao: DefaultItemDao,
     private val categoryDao: CategoryDao,
 ) : Repository {
+    /**
+     *  All Queries
+     */
+    override suspend fun deleteAll() {
+        itemDao.deleteAll()
+        itemListDao.deleteAll()
+        defaultItemDao.deleteAll()
+        categoryDao.deleteAll()
+        allDao.deleteAllPrimaryKeys()
+    }
+
+    override suspend fun insertCsvData(data: CsvData) {
+        categoryDao.insert(*data.categoryData.toTypedArray())
+        defaultItemDao.insert(*data.defaultItemData.toTypedArray())
+        itemListDao.insert(*data.itemListData.toTypedArray())
+        itemDao.insert(*data.itemData.toTypedArray())
+    }
+
+    override suspend fun getAllCsvData(): CsvData = CsvData(
+        categoryData = categoryDao.getAll(),
+        itemListData = itemListDao.getAll(),
+        defaultItemData = defaultItemDao.getAll(),
+        itemData = itemDao.getAll(),
+    )
+
+    override suspend fun rebuildDefaultItemFts() = allDao.rebuildDefaultItemFts()
+
     /**
      *  ItemList Queries
      */
@@ -35,9 +65,6 @@ class RepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) { itemListDao.delete(*itemLists) }
 
     override fun getItemListWithId(id: Long): Flow<ItemList> = itemListDao.getItemListWithId(id)
-
-    override fun getAllItemLists(): Flow<List<ItemListWithItems>> =
-        itemListDao.getAllItemListsWithItems()
 
     override fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>> =
         itemListDao.getSortedItemListsWithItems(
@@ -97,5 +124,5 @@ class RepositoryImpl @Inject constructor(
     override suspend fun insertCategories(vararg categories: Category) =
         withContext(Dispatchers.IO) { categoryDao.insert(*categories) }
 
-    override fun getAllCategories(): Flow<List<Category>> = categoryDao.getAllCategories()
+    override fun getAllCategoriesFlow(): Flow<List<Category>> = categoryDao.getAllCategories()
 }

@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
 import com.heyzeusv.yourlists.Settings
+import com.heyzeusv.yourlists.util.portation.CsvConverter
 import com.heyzeusv.yourlists.util.proto.SettingsSerializer
 import dagger.Module
 import dagger.Provides
@@ -21,7 +22,10 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
-
+    @Provides
+    @Singleton
+    fun provideCsvConverter(@ApplicationContext context: Context): CsvConverter =
+        CsvConverter(context)
     /**
      *  DataStore setup was done with help from this [blog.](https://blog.stackademic.com/using-proto-datastore-in-jetpack-compose-with-hilt-19be0df088fd)
      */

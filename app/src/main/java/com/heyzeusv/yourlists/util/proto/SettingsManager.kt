@@ -80,6 +80,15 @@ class SettingsManager @Inject constructor(
                 .build()
         }
     }
+
+    suspend fun updatePortationPath(path: String) {
+        settings.updateData { settings ->
+            settings
+                .toBuilder()
+                .setPortationPath(path)
+                .build()
+        }
+    }
 }
 
 fun getCustomSettingsDefaultInstance(): Settings = Settings

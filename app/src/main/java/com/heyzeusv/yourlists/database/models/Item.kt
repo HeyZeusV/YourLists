@@ -2,8 +2,10 @@ package com.heyzeusv.yourlists.database.models
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.heyzeusv.yourlists.util.portation.CsvInfo
 
 @Entity(
     foreignKeys = [
@@ -44,7 +46,19 @@ data class Item(
     override val memo: String = "",
     val parentItemListId: Long = 0L,
     val originItemListId: Long? = null,
-) : BaseItem {
+) : BaseItem, CsvInfo {
+    @Ignore
+    override val csvName: String = this::class.java.simpleName
+    @Ignore
+    override val csvHeader: List<String> = listOf(
+        ::itemId.name, ::name.name, ::isChecked.name, ::category.name, ::quantity.name,
+        ::unit.name, ::memo.name, ::parentItemListId.name, ::originItemListId.name
+    )
+    @Ignore
+    override val csvRow: List<Any?> = listOf(
+        itemId, name, isChecked, category, quantity,
+        unit, memo, parentItemListId, originItemListId
+    )
 
     override fun editCopy(
         itemId: Long,
