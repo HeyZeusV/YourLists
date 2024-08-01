@@ -84,9 +84,17 @@
     <string name="p_error_create_directory_failed">Something went wrong creating a new directory, please try again</string>
     <string name="p_error_create_file_failed">Something went wrong creating %1$s, please try again</string>
     <string name="p_error_export_table_failed">Something went wrong while exporting %1$s, please try again</string>
-    <string name="p_error_missing_directory">YourLists directory missing!</string>
+    <string name="p_error_export_missing_directory">YourLists directory is missing!</string>
+    <string name="p_error_import_corrupt_file">Something went wrong while reading %1$s, please try again</string>
+    <string name="p_error_import_invalid_data">%1$s contains invalid data!</string>
+    <string name="p_error_import_missing_directory">Selected directory is missing!</string>
+    <string name="p_error_import_missing_file">%1$s is missing from selected directory!</string>
     <string name="p_error_missing_directory_action">Select new</string>
     <string name="p_progress_export_entity_success">Successfully exported %1$s…</string>
     <string name="p_progress_export_started">Started exporting all data…</string>
     <string name="p_progress_export_success">Successfully exported all data!</string>
+    <string name="p_progress_import_entity_success">Successfully imported %1$s…</string>
+    <string name="p_progress_import_started">Started importing data…</string>
+    <string name="p_progress_import_success">Successfully imported data!</string>
+    <string name="p_progress_import_update_database">Updating database…</string>
 </resources>

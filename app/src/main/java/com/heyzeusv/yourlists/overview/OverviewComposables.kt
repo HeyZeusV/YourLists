@@ -66,7 +66,8 @@ import com.heyzeusv.yourlists.util.navigateToItemList
 import com.heyzeusv.yourlists.util.pRes
 import com.heyzeusv.yourlists.util.portation.PortationStatus
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
-import com.heyzeusv.yourlists.util.portation.PortationStatus.Error.MissingDirectory
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Error.ExportMissingDirectory
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Error.ImportMissingDirectory
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Standby
 import com.heyzeusv.yourlists.util.sRes
@@ -152,7 +153,7 @@ fun OverviewScreen(
             )
             fabSetup(
                 FabState(
-                    isFabDisplayed = it,
+                    isFabDisplayed = if (itemLists.isEmpty() || showBottomSheet) false else it,
                     fabAction = { showNewListDialog = true },
                 )
             )
@@ -405,9 +406,12 @@ fun DrawerSetup(
     }
     LaunchedEffect(key1 = portationStatus) {
         when (portationStatus) {
-            is Error, Progress.ExportSuccess -> {
+            is Error, Progress.ImportSuccess, Progress.ExportSuccess -> {
                 enableTopAppBarAndFab(true)
-                val actionLabel = if (portationStatus is MissingDirectory) {
+                val actionLabel = if (
+                    portationStatus is ImportMissingDirectory ||
+                    portationStatus is ExportMissingDirectory
+                ) {
                     context.getString(R.string.p_error_missing_directory_action)
                 } else {
                     null
@@ -418,9 +422,18 @@ fun DrawerSetup(
                     duration = SnackbarDuration.Short
                 )
                 when (action) {
-                    SnackbarResult.ActionPerformed -> exportLauncher.launch(null)
-                    SnackbarResult.Dismissed ->
-                        if (portationStatus is MissingDirectory) overviewVM.updatePortationPath("")
+                    SnackbarResult.ActionPerformed -> {
+                        if (portationStatus is ImportMissingDirectory) importLauncher.launch(null)
+                        if (portationStatus is ExportMissingDirectory) exportLauncher.launch(null)
+                    }
+                    SnackbarResult.Dismissed -> {
+                        if (
+                            portationStatus is ImportMissingDirectory ||
+                            portationStatus is ExportMissingDirectory
+                        ) {
+                            overviewVM.updatePortationPath("")
+                        }
+                    }
                 }
                 overviewVM.updatePortationStatus(Standby)
             }
@@ -437,11 +450,15 @@ fun PortationProgress(portationStatus: PortationStatus) {
     var progressText by remember { mutableStateOf("") }
 
     when (portationStatus) {
+        is Progress.ImportEntitySuccess -> {
+            displayProgress = true
+            progressText = sRes(portationStatus.message, portationStatus.file)
+        }
         is Progress.ExportEntitySuccess -> {
             displayProgress = true
             progressText = sRes(portationStatus.message, portationStatus.file)
         }
-        is Progress.ExportStarted -> {
+        Progress.ImportStarted, Progress.ImportUpdateDatabase, Progress.ExportStarted -> {
             displayProgress = true
             progressText = sRes(portationStatus.message)
         }

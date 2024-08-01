@@ -36,100 +36,157 @@ class CsvConverter @Inject constructor(
     private val csvFileNames =
         listOf(CATEGORY_CSV, ITEM_LIST_CSV, DEFAULT_ITEM_CSV, ITEM_CSV)
 
-    fun importCsvToDatabase(selectedDirectoryUri: Uri): CsvData? {
+    @Suppress("UNCHECKED_CAST")
+    fun importCsvToDatabase(
+        selectedDirectoryUri: Uri,
+        updatePortationStatus: (PortationStatus) -> Unit,
+    ): CsvData? {
+        updatePortationStatus(Progress.ImportStarted)
         val selectedDirectory = DocumentFile.fromTreeUri(context, selectedDirectoryUri)!!
+        if (!selectedDirectory.exists()) {
+            updatePortationStatus(Error.ImportMissingDirectory)
+            return null
+        }
+        val csvDocumentFiles = mutableListOf<DocumentFile>()
         csvFileNames.forEach {
-            val csvFile = selectedDirectory.findFile(it)
-            if (csvFile == null) {
+            val csvDocumentFile = selectedDirectory.findFile(it)
+            if (csvDocumentFile == null) {
+                updatePortationStatus(Error.ImportMissingFile(it))
                 return null
             } else {
-                writeToFileFromDocumentFile(csvFile)
+                csvDocumentFiles.add(csvDocumentFile)
             }
         }
-        @Suppress("UNCHECKED_CAST")
+        val csvFiles = mutableListOf<File>()
+        csvDocumentFiles.forEach {
+            val csvFile = writeToFileFromDocumentFile(it)
+            if (csvFile == null) {
+                csvFiles.forEach { file -> file.delete() }
+                updatePortationStatus(Error.ImportCorruptFile(it.name!!))
+                return null
+            }
+            updatePortationStatus(Progress.ImportEntitySuccess(it.name!!.removeSuffix(CSV_SUFFIX)))
+        }
+        val categoryData = importCsvToDatabaseEntity(CATEGORY_CSV) as List<Category>?
+        if (categoryData == null) {
+            updatePortationStatus(Error.ImportInvalidData(CATEGORY_CSV))
+            return null
+        }
+        val itemListData = importCsvToDatabaseEntity(ITEM_LIST_CSV) as List<ItemList>?
+        if (itemListData == null) {
+            updatePortationStatus(Error.ImportInvalidData(ITEM_LIST_CSV))
+            return null
+        }
+        val defaultItemData = importCsvToDatabaseEntity(DEFAULT_ITEM_CSV) as List<DefaultItem>?
+        if (defaultItemData == null) {
+            updatePortationStatus(Error.ImportInvalidData(DEFAULT_ITEM_CSV))
+            return null
+        }
+        val itemData = importCsvToDatabaseEntity(ITEM_CSV) as List<Item>?
+        if (itemData == null) {
+            updatePortationStatus(Error.ImportInvalidData(ITEM_CSV))
+            return null
+        }
+
         return CsvData(
-            categoryData = importCsvToDatabaseEntity(CATEGORY_CSV) as List<Category>,
-            itemListData = importCsvToDatabaseEntity(ITEM_LIST_CSV) as List<ItemList>,
-            defaultItemData = importCsvToDatabaseEntity(DEFAULT_ITEM_CSV) as List<DefaultItem>,
-            itemData = importCsvToDatabaseEntity(ITEM_CSV) as List<Item>,
+            categoryData = categoryData,
+            itemListData = itemListData,
+            defaultItemData = defaultItemData,
+            itemData = itemData,
         )
     }
 
-    private fun importCsvToDatabaseEntity(csvFileName: String): List<CsvInfo> {
-        val csvFile = File(context.filesDir, csvFileName)
-        val content = csvReader().readAll(csvFile)
-        if (content.size == 1) return emptyList()
+    private fun importCsvToDatabaseEntity(csvFileName: String): List<CsvInfo>? {
+        var csvFile: File? = null
+        try {
+            csvFile = File(context.filesDir, csvFileName)
+            val content = csvReader().readAll(csvFile)
+            if (content.size == 1) return emptyList()
 
-        val header = content[0]
-        val rows = content.drop(1)
-        val entityData = mutableListOf<CsvInfo>()
-        when (header) {
-            Category().csvHeader -> {
-                rows.forEach {
-                    val entry = Category(id = it[0].toLong(), name = it[1])
-                    entityData.add(entry)
+            val header = content[0]
+            val rows = content.drop(1)
+            val entityData = mutableListOf<CsvInfo>()
+            when (header) {
+                Category().csvHeader -> {
+                    rows.forEach {
+                        val entry = Category(id = it[0].toLong(), name = it[1])
+                        entityData.add(entry)
+                    }
+                }
+
+                ItemList().csvHeader -> {
+                    rows.forEach {
+                        val entry = ItemList(itemListId = it[0].toLong(), name = it[1])
+                        entityData.add(entry)
+                    }
+                }
+
+                DefaultItem().csvHeader -> {
+                    rows.forEach {
+                        val entry = DefaultItem(
+                            itemId = it[0].toLong(),
+                            name = it[1],
+                            category = it[2],
+                            quantity = it[3].toDouble(),
+                            unit = it[4],
+                            memo = it[5],
+                        )
+                        entityData.add(entry)
+                    }
+                }
+
+                Item().csvHeader -> {
+                    rows.forEach {
+                        val entry = Item(
+                            itemId = it[0].toLong(),
+                            name = it[1],
+                            isChecked = it[2].toBoolean(),
+                            category = it[3],
+                            quantity = it[4].toDouble(),
+                            unit = it[5],
+                            memo = it[6],
+                            parentItemListId = it[7].toLong(),
+                            originItemListId = it[8].toLongOrNull()
+                        )
+                        entityData.add(entry)
+                    }
                 }
             }
-            ItemList().csvHeader -> {
-                rows.forEach {
-                    val entry = ItemList(itemListId = it[0].toLong(), name = it[1])
-                    entityData.add(entry)
-                }
-            }
-            DefaultItem().csvHeader -> {
-                rows.forEach {
-                    val entry = DefaultItem(
-                        itemId = it[0].toLong(),
-                        name = it[1],
-                        category = it[2],
-                        quantity = it[3].toDouble(),
-                        unit = it[4],
-                        memo = it[5],
-                    )
-                    entityData.add(entry)
-                }
-            }
-            Item().csvHeader -> {
-                rows.forEach {
-                    val entry = Item(
-                        itemId = it[0].toLong(),
-                        name = it[1],
-                        isChecked = it[2].toBoolean(),
-                        category = it[3],
-                        quantity = it[4].toDouble(),
-                        unit = it[5],
-                        memo = it[6],
-                        parentItemListId = it[7].toLong(),
-                        originItemListId = it[8].toLongOrNull()
-                    )
-                    entityData.add(entry)
-                }
-            }
+            csvFile.delete()
+            return entityData
+        } catch (e: Exception) {
+            csvFile?.delete()
+            return null
         }
-        csvFile.delete()
-        return entityData
     }
 
-    private fun writeToFileFromDocumentFile(csvDocumentFile: DocumentFile) {
-        val csvFile = File(context.filesDir, csvDocumentFile.name!!).apply {
-            delete()
-            createNewFile()
+    private fun writeToFileFromDocumentFile(csvDocumentFile: DocumentFile): File? {
+        var csvFile: File? = null
+        try {
+            csvFile = File(context.filesDir, csvDocumentFile.name!!).apply {
+                delete()
+                createNewFile()
+            }
+            val dfInputStream = context.contentResolver.openInputStream(csvDocumentFile.uri)
+            val dfReader = BufferedReader(InputStreamReader(dfInputStream))
+
+            val fWriter = PrintWriter(FileWriter(csvFile))
+
+            var line = dfReader.readLine()
+            while (line != null) {
+                fWriter.write(line)
+                fWriter.println()
+                line = dfReader.readLine()
+            }
+
+            dfReader.close()
+            fWriter.flush()
+            fWriter.close()
+            return csvFile
+        } catch (e: Exception) {
+            csvFile?.delete()
+            return null
         }
-        val dfInputStream = context.contentResolver.openInputStream(csvDocumentFile.uri)
-        val dfReader = BufferedReader(InputStreamReader(dfInputStream))
-
-        val fWriter = PrintWriter(FileWriter(csvFile))
-
-        var line = dfReader.readLine()
-        while (line != null) {
-            fWriter.write(line)
-            fWriter.println()
-            line = dfReader.readLine()
-        }
-
-        dfReader.close()
-        fWriter.flush()
-        fWriter.close()
     }
 
     fun exportDatabaseToCsv(
@@ -140,7 +197,7 @@ class CsvConverter @Inject constructor(
         updatePortationStatus(Progress.ExportStarted)
         val parentDirectory = DocumentFile.fromTreeUri(context, parentDirectoryUri)!!
         if (!parentDirectory.exists()) {
-            updatePortationStatus(Error.MissingDirectory)
+            updatePortationStatus(Error.ExportMissingDirectory)
             return
         } else {
             val newExportDirectory = createNewExportDirectory(parentDirectory)

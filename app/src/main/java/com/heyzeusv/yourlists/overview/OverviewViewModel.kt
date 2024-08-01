@@ -15,6 +15,7 @@ import com.heyzeusv.yourlists.di.IODispatcher
 import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
 import com.heyzeusv.yourlists.util.portation.PortationStatus
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
+import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Standby
 import com.heyzeusv.yourlists.util.proto.SettingsManager
 import com.heyzeusv.yourlists.util.proto.defaultSettingsFilter
@@ -139,12 +140,17 @@ class OverviewViewModel @Inject constructor(
 
     fun importCsvToDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(ioDispatcher) {
-            val result = csvConverter.importCsvToDatabase(selectedDirectoryUri)
+            val result = csvConverter.importCsvToDatabase(
+                selectedDirectoryUri = selectedDirectoryUri,
+                updatePortationStatus = { status -> _portationStatus.update { status } },
+            )
             result?.let {
+                _portationStatus.update { Progress.ImportUpdateDatabase }
                 database.withTransaction {
                     repo.deleteAll()
                     repo.insertCsvData(result)
                     repo.rebuildDefaultItemFts()
+                    _portationStatus.update { Progress.ImportSuccess }
                 }
             }
         }
