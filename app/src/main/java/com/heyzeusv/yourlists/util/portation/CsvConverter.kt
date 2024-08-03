@@ -11,16 +11,9 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
-import java.io.BufferedReader
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileWriter
-import java.io.InputStreamReader
-import java.io.PrintWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Objects
 import javax.inject.Inject
 
 private const val PARENT_DIRECTORY_NAME = "YourLists"
@@ -165,6 +158,7 @@ class CsvConverter @Inject constructor(
                 return
             } else {
                 csvData.entityDataPair.forEach {
+                    // TODO Delete successfully created files and directory if there is a failure.
                     val portationStatus =
                         exportDatabaseEntityToCsv(newExportDirectory, it.first, it.second)
                     updatePortationStatus(portationStatus)
@@ -180,57 +174,16 @@ class CsvConverter @Inject constructor(
         entity: CsvInfo,
         entityData: List<CsvInfo>,
     ): PortationStatus {
-        val csvFile = createAndWriteEntityDataToFile(entity, entityData)
         val csvDocumentFile =
             newExportDirectory.createFile("text/*", "${entity.csvName}$CSV_SUFFIX")
                 ?: return Error.CreateFileFailed("${entity.csvName}$CSV_SUFFIX")
-        val portationStatus = writeToDocumentFileFromFile(csvFile, csvDocumentFile)
-        return portationStatus
-    }
-
-    private fun createAndWriteEntityDataToFile(
-        entity: CsvInfo,
-        entityData: List<CsvInfo>,
-    ): File {
-        val csvFile = File(context.filesDir, "${entity.csvName}$CSV_SUFFIX").apply {
-            delete()
-            createNewFile()
-        }
-        csvWriter().open(csvFile) {
+        val outputStream = context.contentResolver.openOutputStream(csvDocumentFile.uri)
+            ?: return Error.ExportEntityFailed(entity.csvName)
+        csvWriter().open(outputStream) {
             writeRow(entity.csvHeader)
             entityData.forEach { writeRow(it.csvRow) }
         }
-        return csvFile
-    }
-
-    private fun writeToDocumentFileFromFile(
-        csvFile: File,
-        csvDocumentFile: DocumentFile
-    ): PortationStatus {
-        try {
-            val fInputStream = FileInputStream(csvFile)
-            val fReader = BufferedReader(InputStreamReader(fInputStream))
-
-            val dfFileDescriptor = context.contentResolver.openFileDescriptor(
-                Objects.requireNonNull(csvDocumentFile).uri,
-                "w"
-            )
-            val dfWriter = PrintWriter(FileWriter(dfFileDescriptor?.fileDescriptor))
-
-            var line = fReader.readLine()
-            while (line != null) {
-                dfWriter.write(line)
-                dfWriter.println()
-                line = fReader.readLine()
-            }
-            dfWriter.flush()
-            dfWriter.close()
-            dfFileDescriptor?.close()
-            csvFile.delete()
-        } catch (e: Exception) {
-            return Error.ExportEntityFailed(csvFile.name.removeSuffix(CSV_SUFFIX))
-        }
-        return Progress.ExportEntitySuccess(csvFile.name.removeSuffix(CSV_SUFFIX))
+        return Progress.ExportEntitySuccess(entity.csvName)
     }
 
     private fun createNewExportDirectory(parentDirectory: DocumentFile): DocumentFile? {
