@@ -157,12 +157,17 @@ class CsvConverter @Inject constructor(
                 updatePortationStatus(Error.CreateDirectoryFailed)
                 return
             } else {
+                val newDocumentFiles = mutableListOf<DocumentFile>()
                 csvData.entityDataPair.forEach {
-                    // TODO Delete successfully created files and directory if there is a failure.
-                    val portationStatus =
+                    val portationResult =
                         exportDatabaseEntityToCsv(newExportDirectory, it.first, it.second)
-                    updatePortationStatus(portationStatus)
-                    if (portationStatus is Error) return
+                    updatePortationStatus(portationResult.first)
+                    if (portationResult.first is Error) {
+                        newDocumentFiles.forEach { file -> file.delete() }
+                        newExportDirectory.delete()
+                        return
+                    }
+                    newDocumentFiles.add(portationResult.second)
                 }
                 updatePortationStatus(Progress.ExportSuccess)
             }
@@ -173,17 +178,17 @@ class CsvConverter @Inject constructor(
         newExportDirectory: DocumentFile,
         entity: CsvInfo,
         entityData: List<CsvInfo>,
-    ): PortationStatus {
-        val csvDocumentFile =
-            newExportDirectory.createFile("text/*", "${entity.csvName}$CSV_SUFFIX")
-                ?: return Error.CreateFileFailed("${entity.csvName}$CSV_SUFFIX")
+    ): Pair<PortationStatus, DocumentFile> {
+        val fileName = "${entity.csvName}$CSV_SUFFIX"
+        val csvDocumentFile = newExportDirectory.createFile("text/*", fileName)
+            ?: return Pair(Error.CreateFileFailed(fileName), newExportDirectory)
         val outputStream = context.contentResolver.openOutputStream(csvDocumentFile.uri)
-            ?: return Error.ExportEntityFailed(entity.csvName)
+            ?: return Pair(Error.ExportEntityFailed(entity.csvName), newExportDirectory)
         csvWriter().open(outputStream) {
             writeRow(entity.csvHeader)
             entityData.forEach { writeRow(it.csvRow) }
         }
-        return Progress.ExportEntitySuccess(entity.csvName)
+        return Pair(Progress.ExportEntitySuccess(entity.csvName), csvDocumentFile)
     }
 
     private fun createNewExportDirectory(parentDirectory: DocumentFile): DocumentFile? {
