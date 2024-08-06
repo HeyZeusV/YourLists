@@ -7,12 +7,9 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
 import com.heyzeusv.yourlists.util.ListOptions
-import com.heyzeusv.yourlists.util.ListOptions.COPY_ALL_AS_IS
-import com.heyzeusv.yourlists.util.ListOptions.COPY_ALL_AS_UNCHECKED
-import com.heyzeusv.yourlists.util.ListOptions.COPY_ONLY_UNCHECKED
+import com.heyzeusv.yourlists.util.ListOptions.Copy.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -101,19 +98,18 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch { repo.deleteDefaultItems(defaultItem) }
     }
 
-    fun addListWithOption(itemList: ItemListWithItems, option: ListOptions) {
+    fun addListWithOption(option: ListOptions.Copy) {
         viewModelScope.launch {
             val itemsToAdd: List<Item> = when (option) {
-                COPY_ALL_AS_UNCHECKED -> itemList.items.map { it.copy(isChecked = false) }
-                COPY_ALL_AS_IS -> itemList.items
-                COPY_ONLY_UNCHECKED -> itemList.items.filter { !it.isChecked }
-                else -> return@launch
+                is AllAsUnchecked -> option.itemList.items.map { it.copy(isChecked = false) }
+                is AllAsIs -> option.itemList.items
+                is OnlyUnchecked -> option.itemList.items.filter { !it.isChecked }
             }
             val itemsToAddEdited = itemsToAdd.map {
                 it.copy(
                     itemId = 0L,
                     parentItemListId = itemListId.value,
-                    originItemListId = itemList.itemList.itemListId
+                    originItemListId = option.itemList.itemList.itemListId
                 )
             }
             repo.insertItems(*itemsToAddEdited.toTypedArray())
