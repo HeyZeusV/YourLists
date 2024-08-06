@@ -47,6 +47,7 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.AddDestination
+import com.heyzeusv.yourlists.util.ListOptions
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
@@ -108,7 +109,7 @@ fun AddScreen(
     addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
     itemLists: List<ItemListWithItems>,
-    addListButtonOnClick: (ItemListWithItems, AddListOptions) -> Unit,
+    addListButtonOnClick: (ItemListWithItems, ListOptions) -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
@@ -327,7 +328,7 @@ fun AddListPage(
 @Composable
 fun AddListBottomSheetContent(
     itemList: ItemListWithItems,
-    buttonOnClick: (ItemListWithItems, AddListOptions) -> Unit,
+    buttonOnClick: (ItemListWithItems, ListOptions) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -340,14 +341,14 @@ fun AddListBottomSheetContent(
             style = MaterialTheme.typography.headlineMedium
         )
         Button(
-            onClick = { buttonOnClick(itemList, AddListOptions.ALL_AS_UNCHECKED) },
+            onClick = { buttonOnClick(itemList, ListOptions.COPY_ALL_AS_UNCHECKED) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {
             Text(text = sRes(R.string.asbs_add_all_unchecked).uppercase())
         }
         Button(
-            onClick = { buttonOnClick(itemList, AddListOptions.ALL_AS_IS) },
+            onClick = { buttonOnClick(itemList, ListOptions.COPY_ALL_AS_IS) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
             colors = ButtonDefaults.filledTonalButtonColors(
@@ -358,7 +359,7 @@ fun AddListBottomSheetContent(
             Text(text = sRes(R.string.asbs_add_all_as_is).uppercase())
         }
         OutlinedButton(
-            onClick = { buttonOnClick(itemList, AddListOptions.ONLY_UNCHECKED) },
+            onClick = { buttonOnClick(itemList, ListOptions.COPY_ONLY_UNCHECKED) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {

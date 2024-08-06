@@ -9,6 +9,10 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
+import com.heyzeusv.yourlists.util.ListOptions
+import com.heyzeusv.yourlists.util.ListOptions.COPY_ALL_AS_IS
+import com.heyzeusv.yourlists.util.ListOptions.COPY_ALL_AS_UNCHECKED
+import com.heyzeusv.yourlists.util.ListOptions.COPY_ONLY_UNCHECKED
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -97,12 +101,13 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch { repo.deleteDefaultItems(defaultItem) }
     }
 
-    fun addListWithOption(itemList: ItemListWithItems, option: AddListOptions) {
+    fun addListWithOption(itemList: ItemListWithItems, option: ListOptions) {
         viewModelScope.launch {
             val itemsToAdd: List<Item> = when (option) {
-                AddListOptions.ALL_AS_UNCHECKED -> itemList.items.map { it.copy(isChecked = false) }
-                AddListOptions.ALL_AS_IS -> itemList.items
-                AddListOptions.ONLY_UNCHECKED -> itemList.items.filter { !it.isChecked }
+                COPY_ALL_AS_UNCHECKED -> itemList.items.map { it.copy(isChecked = false) }
+                COPY_ALL_AS_IS -> itemList.items
+                COPY_ONLY_UNCHECKED -> itemList.items.filter { !it.isChecked }
+                else -> return@launch
             }
             val itemsToAddEdited = itemsToAdd.map {
                 it.copy(
