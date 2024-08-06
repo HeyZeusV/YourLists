@@ -46,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
-import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha90
 import com.heyzeusv.yourlists.util.BottomSheet
@@ -56,6 +55,10 @@ import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
+import com.heyzeusv.yourlists.util.ListOptions
+import com.heyzeusv.yourlists.util.ListOptions.Copy
+import com.heyzeusv.yourlists.util.ListOptions.Delete
+import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.SingleFilterSelection
@@ -134,9 +137,7 @@ fun OverviewScreen(
         emptyButtonOnClick = { showNewListDialog = true },
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
-        optionRenameOnClick = overviewVM::renameItemList,
-        optionCopyOnClick = overviewVM::copyItemList,
-        optionDeleteOnClick = overviewVM::deleteItemList,
+        listOptionOnClick = overviewVM::handleListOption,
     )
     DrawerSetup(
         overviewVM = overviewVM,
@@ -203,12 +204,10 @@ fun OverviewScreen(
     emptyButtonOnClick: () -> Unit,
     showBottomSheet: Boolean,
     updateShowBottomSheet: (Boolean) -> Unit,
-    optionRenameOnClick: (ItemList, String) -> Unit,
-    optionCopyOnClick: (ItemListWithItems) -> Unit,
-    optionDeleteOnClick: (ItemList) -> Unit,
+    listOptionOnClick: (ListOptions) -> Unit,
 ) {
     var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
-    var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
+    var showRenameAlertDialog by remember { mutableStateOf(false) }
 
     if (itemLists.isNotEmpty()) {
         LazyColumn(
@@ -250,29 +249,30 @@ fun OverviewScreen(
         OverviewBottomSheetContent(
             itemList = selectedItemList,
             renameOnClick = {
-                showRenameAlertDialog = selectedItemList.itemList
+                showRenameAlertDialog = true
                 updateShowBottomSheet(false)
             },
             copyOnClick = {
-                optionCopyOnClick(selectedItemList)
+                // TODO: Implement dropdown showing options
+                listOptionOnClick(Copy.OnlyUnchecked(selectedItemList))
                 updateShowBottomSheet(false)
             },
             deleteOnClick = {
-                optionDeleteOnClick(selectedItemList.itemList)
+                listOptionOnClick(Delete(selectedItemList))
                 updateShowBottomSheet(false)
             },
         )
     }
     InputAlertDialog(
-        display = showRenameAlertDialog != null,
-        onDismissRequest = { showRenameAlertDialog = null },
+        display = showRenameAlertDialog,
+        onDismissRequest = { showRenameAlertDialog = false },
         title = sRes(R.string.os_ad_rename_title),
         maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
-            optionRenameOnClick(showRenameAlertDialog!!, input)
-            showRenameAlertDialog = null
+            listOptionOnClick(Rename(selectedItemList, input))
+            showRenameAlertDialog = false
         },
-        onDismiss = { showRenameAlertDialog = null }
+        onDismiss = { showRenameAlertDialog = false }
     )
 }
 
@@ -503,9 +503,7 @@ private fun OverviewScreenPreview() {
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },
-                optionRenameOnClick = { _, _ -> },
-                optionCopyOnClick = { },
-                optionDeleteOnClick = { },
+                listOptionOnClick = { },
             )
         }
     }
@@ -537,9 +535,7 @@ private fun OverviewScreenEmptyPreview() {
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },
-                optionRenameOnClick = { _, _ -> },
-                optionCopyOnClick = { },
-                optionDeleteOnClick = { },
+                listOptionOnClick = { },
             )
         }
     }

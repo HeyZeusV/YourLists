@@ -10,9 +10,13 @@ import com.heyzeusv.yourlists.database.Database
 import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemList
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.di.IODispatcher
 import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
+import com.heyzeusv.yourlists.util.ListOptions
+import com.heyzeusv.yourlists.util.ListOptions.Copy
+import com.heyzeusv.yourlists.util.ListOptions.Copy.*
+import com.heyzeusv.yourlists.util.ListOptions.Delete
+import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.portation.PortationStatus
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Error
 import com.heyzeusv.yourlists.util.portation.PortationStatus.Progress
@@ -97,46 +101,50 @@ class OverviewViewModel @Inject constructor(
         settingsManager.updatePortationPath(path)
     }
 
-    fun renameItemList(itemList: ItemList, newName: String) {
-        viewModelScope.launch {
-            val renamed = itemList.copy(name = newName)
-            repo.updateItemList(renamed)
-        }
-    }
-
     fun insertItemList(name: String) {
         viewModelScope.launch {
             repo.insertItemList(ItemList(nextItemListId.value, name))
         }
     }
 
-    fun copyItemList(itemList: ItemListWithItems) {
+    fun handleListOption(option: ListOptions) {
         viewModelScope.launch {
-            val copyName = "${itemList.itemList.name} - Copy"
-            val copyItemList = itemList.itemList.copy(
-                itemListId = nextItemListId.value,
-                name = copyName.take(32)
-            )
-            val copyItems = mutableListOf<Item>()
-            itemList.items.forEach {
-                copyItems.add(
-                    it.copy(
-                        itemId = 0L,
-                        parentItemListId = nextItemListId.value
-                    )
-                )
+            when (option) {
+                is Rename -> renameItemList(option.itemList.itemList, option.newName)
+                is Copy -> copyItemList(option)
+                is Delete -> deleteItemList(option.itemList.itemList)
             }
-
-            repo.insertItemList(copyItemList)
-            repo.insertItems(*copyItems.toTypedArray())
         }
     }
 
-    fun deleteItemList(itemList: ItemList) {
-        viewModelScope.launch {
-            repo.deleteItemList(itemList)
-        }
+    private suspend fun renameItemList(itemList: ItemList, newName: String) {
+        val renamed = itemList.copy(name = newName)
+        repo.updateItemList(renamed)
     }
+
+    private suspend fun copyItemList(copyOption: Copy) {
+        val copyName = "${copyOption.itemList.itemList.name} - Copy"
+        val copyItemList = copyOption.itemList.itemList.copy(
+            itemListId = nextItemListId.value,
+            name = copyName.take(32)
+        )
+        // TODO: Maybe make this in extension function since it is used in AddViewModel as well
+        val copyItems: List<Item> = when (copyOption) {
+            is AllAsUnchecked -> copyOption.itemList.items.map { it.copy(isChecked = false) }
+            is AllAsIs -> copyOption.itemList.items
+            is OnlyUnchecked -> copyOption.itemList.items.filter { !it.isChecked }
+        }
+        val copyItemsEdited = copyItems.map {
+            it.copy(
+                itemId = 0L,
+                parentItemListId = nextItemListId.value
+            )
+        }
+
+        repo.copyItemListWithItems(copyItemList, copyItemsEdited)
+    }
+
+    private suspend fun deleteItemList(itemList: ItemList) = repo.deleteItemList(itemList)
 
     fun importCsvToDatabase(selectedDirectoryUri: Uri) {
         viewModelScope.launch(ioDispatcher) {
