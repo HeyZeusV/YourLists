@@ -4,6 +4,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -30,6 +33,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -49,12 +53,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
@@ -573,6 +579,29 @@ fun FilteredDropDownMenu(
             }
         }
     }
+}
+
+@Composable
+fun ArrowVerticalFlip(
+    trigger: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var rotation by remember { mutableStateOf(0f) }
+    LaunchedEffect(key1 = trigger) {
+        animate(
+            initialValue = if (trigger) 0f else 180f,
+            targetValue = if (trigger) 180f else 0f,
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        ) { value, _ ->
+            rotation = value
+        }
+    }
+
+    Icon(
+        imageVector = Icons.Filled.ArrowDropDown,
+        contentDescription = sRes(R.string.arrow_flip_cdesc),
+        modifier = modifier.rotate(rotation),
+    )
 }
 
 @Preview

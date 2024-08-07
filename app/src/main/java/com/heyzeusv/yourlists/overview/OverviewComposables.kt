@@ -26,8 +26,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,7 +43,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
@@ -56,6 +53,7 @@ import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha90
+import com.heyzeusv.yourlists.util.ArrowVerticalFlip
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.DrawerOnClicks
 import com.heyzeusv.yourlists.util.EmptyList
@@ -358,12 +356,9 @@ fun OverviewCopyListAction(
                 actionOnClick = { showCopyOptions = !showCopyOptions },
                 modifier = Modifier.align(Alignment.CenterStart),
             )
-            Icon(
-                imageVector = Icons.Filled.ArrowDropDown,
-                contentDescription = sRes(R.string.osbs_cdesc_copy_show),
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .rotate(if (showCopyOptions) 180f else 0f),
+            ArrowVerticalFlip(
+                trigger = showCopyOptions,
+                modifier = Modifier.align(Alignment.CenterEnd)
             )
         }
         AnimatedVisibility(
