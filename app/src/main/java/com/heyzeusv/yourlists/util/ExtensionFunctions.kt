@@ -54,7 +54,7 @@ fun NavHostController.navigateToAdd(listId: Long) {
  */
 fun NavBackStackEntry?.currentDestination(): Destination {
     return Destinations.find {
-        this?.destination?.route?.contains(it.route) ?: false
+        this?.destination?.route?.split("/")?.first() == it.route
     } ?: OverviewDestination
 }
 
