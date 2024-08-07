@@ -14,7 +14,6 @@ import com.heyzeusv.yourlists.di.IODispatcher
 import com.heyzeusv.yourlists.overview.OverviewFilterNames.BY_COMPLETION
 import com.heyzeusv.yourlists.util.ListOptions
 import com.heyzeusv.yourlists.util.ListOptions.Copy
-import com.heyzeusv.yourlists.util.ListOptions.Copy.*
 import com.heyzeusv.yourlists.util.ListOptions.Delete
 import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.portation.PortationStatus
@@ -128,12 +127,7 @@ class OverviewViewModel @Inject constructor(
             itemListId = nextItemListId.value,
             name = copyName.take(32)
         )
-        // TODO: Maybe make this in extension function since it is used in AddViewModel as well
-        val copyItems: List<Item> = when (copyOption) {
-            is AllAsUnchecked -> copyOption.itemList.items.map { it.copy(isChecked = false) }
-            is AllAsIs -> copyOption.itemList.items
-            is OnlyUnchecked -> copyOption.itemList.items.filter { !it.isChecked }
-        }
+        val copyItems: List<Item> = copyOption.copyItems()
         val copyItemsEdited = copyItems.map {
             it.copy(
                 itemId = 0L,
