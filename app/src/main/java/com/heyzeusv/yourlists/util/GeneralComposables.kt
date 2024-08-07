@@ -1,5 +1,10 @@
 package com.heyzeusv.yourlists.util
 
+import androidx.annotation.ArrayRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.IntegerRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -53,6 +58,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,14 +70,21 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Category
@@ -79,6 +92,56 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
 import java.text.DecimalFormat
+
+/**
+ *  Load a string resource with formatting.
+ *
+ *  @param id The resource identifier.
+ *  @param args The format arguments.
+ *  @return The string data associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun sRes(@StringRes id: Int, vararg args: Any): String = stringResource(id, *args)
+
+/**
+ *  Load a string array resource .
+ *
+ *  @param id The resource identifier.
+ *  @return The string array data associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun saRes(@ArrayRes id: Int): Array<String> = stringArrayResource(id)
+
+/**
+ *  Create a [Painter] from an Android resource id.
+ *
+ *  @param id Resources object to query the image file from.
+ *  @return [Painter] used for drawing the loaded resource.
+ */
+@Composable
+fun pRes(@DrawableRes id: Int): Painter = painterResource(id)
+
+/**
+ *  Load a dimension resource.
+ *
+ *  @param id The resource identifier.
+ *  @return The dimension value associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun dRes(@DimenRes id: Int): Dp = dimensionResource(id)
+
+/**
+ *  Load a integer resource.
+ *
+ *  @param id The resource identifier.
+ *  @return The integer value associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun iRes(@IntegerRes id: Int): Int = integerResource(id)
 
 @Composable
 fun EmptyList(
