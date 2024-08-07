@@ -42,7 +42,6 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -55,6 +54,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -541,7 +541,7 @@ fun FilteredDropDownMenu(
                 .onFocusChanged { expanded = it.isFocused }
                 .menuAnchor(),
             label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = { ArrowVerticalFlip(trigger = expanded) },
             supportingText = {
                 Row {
                     Text(
@@ -586,7 +586,7 @@ fun ArrowVerticalFlip(
     trigger: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    var rotation by remember { mutableStateOf(0f) }
+    var rotation by remember { mutableFloatStateOf(0f) }
     LaunchedEffect(key1 = trigger) {
         animate(
             initialValue = if (trigger) 0f else 180f,
