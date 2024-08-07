@@ -6,6 +6,9 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,7 +59,7 @@ import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.ListOptions
-import com.heyzeusv.yourlists.util.ListOptions.Copy
+import com.heyzeusv.yourlists.util.ListOptions.Copy.*
 import com.heyzeusv.yourlists.util.ListOptions.Delete
 import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.OverviewDestination
@@ -253,8 +256,7 @@ fun OverviewScreen(
                 updateShowBottomSheet(false)
             },
             copyOnClick = {
-                // TODO: Implement dropdown showing options
-                listOptionOnClick(Copy.OnlyUnchecked(selectedItemList))
+                listOptionOnClick(it)
                 updateShowBottomSheet(false)
             },
             deleteOnClick = {
@@ -303,7 +305,7 @@ fun OverviewFilter(
 fun OverviewBottomSheetContent(
     itemList: ItemListWithItems,
     renameOnClick: () -> Unit,
-    copyOnClick: () -> Unit,
+    copyOnClick: (ListOptions) -> Unit,
     deleteOnClick: () -> Unit,
 ) {
     Column(
@@ -321,14 +323,52 @@ fun OverviewBottomSheetContent(
             action = OverviewBottomSheetActions.RENAME,
             actionOnClick = renameOnClick,
         )
-        OverviewBottomSheetAction(
-            action = OverviewBottomSheetActions.COPY,
-            actionOnClick = copyOnClick,
+        OverviewCopyListAction(
+            itemList = itemList,
+            copyOptionOnClick = copyOnClick,
         )
         OverviewBottomSheetAction(
             action = OverviewBottomSheetActions.DELETE,
             actionOnClick = deleteOnClick,
         )
+    }
+}
+
+@Composable
+fun OverviewCopyListAction(
+    itemList: ItemListWithItems,
+    copyOptionOnClick: (ListOptions) -> Unit,
+) {
+    var showCopyOptions by remember { mutableStateOf(false) }
+    // TODO: Add arrow up/down icon to show user there are options
+    Column(modifier = Modifier.fillMaxWidth()) {
+        OverviewBottomSheetAction(
+            action = OverviewBottomSheetActions.COPY,
+            actionOnClick = { showCopyOptions = !showCopyOptions },
+        )
+        AnimatedVisibility(
+            visible = showCopyOptions,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            Column(
+                modifier = Modifier.padding(top = dRes(R.dimen.bs_vertical_spacedBy)),
+                verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
+            ) {
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_AS_UNCHECKED,
+                    actionOnClick = { copyOptionOnClick(AllAsUnchecked(itemList)) },
+                )
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_AS_IS,
+                    actionOnClick = { copyOptionOnClick(AllAsIs(itemList)) },
+                )
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_ONLY_UNCHECKED,
+                    actionOnClick = { copyOptionOnClick(OnlyUnchecked(itemList)) },
+                )
+            }
+        }
     }
 }
 
@@ -469,7 +509,7 @@ fun PortationProgress(portationStatus: PortationStatus) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(BlackAlpha90)
-                .clickable(enabled = false) {  },
+                .clickable(enabled = false) { },
             contentAlignment = Alignment.Center,
         ) {
             Column(
