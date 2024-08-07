@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,7 +45,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -59,7 +64,9 @@ import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
 import com.heyzeusv.yourlists.util.ListOptions
-import com.heyzeusv.yourlists.util.ListOptions.Copy.*
+import com.heyzeusv.yourlists.util.ListOptions.Copy.AllAsIs
+import com.heyzeusv.yourlists.util.ListOptions.Copy.AllAsUnchecked
+import com.heyzeusv.yourlists.util.ListOptions.Copy.OnlyUnchecked
 import com.heyzeusv.yourlists.util.ListOptions.Delete
 import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.OverviewDestination
@@ -246,6 +253,7 @@ fun OverviewScreen(
         )
     }
     BottomSheet(
+        modifier = Modifier.height(dRes(R.dimen.osbs_height)),
         isVisible = showBottomSheet,
         updateIsVisible = { updateShowBottomSheet(it) },
     ) {
@@ -310,14 +318,17 @@ fun OverviewBottomSheetContent(
 ) {
     Column(
         modifier = Modifier
-            .padding(bottom = dRes(R.dimen.osbs_padding_bottom))
             .padding(all = dRes(R.dimen.bs_padding_all))
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
     ) {
         Text(
             text = sRes(R.string.osbs_manage, itemList.itemList.name),
-            style = MaterialTheme.typography.headlineMedium
+            maxLines = 2,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                lineBreak = LineBreak.Paragraph,
+                hyphens = Hyphens.Auto,
+            ),
         )
         OverviewBottomSheetAction(
             action = OverviewBottomSheetActions.RENAME,
@@ -340,12 +351,21 @@ fun OverviewCopyListAction(
     copyOptionOnClick: (ListOptions) -> Unit,
 ) {
     var showCopyOptions by remember { mutableStateOf(false) }
-    // TODO: Add arrow up/down icon to show user there are options
-    Column(modifier = Modifier.fillMaxWidth()) {
-        OverviewBottomSheetAction(
-            action = OverviewBottomSheetActions.COPY,
-            actionOnClick = { showCopyOptions = !showCopyOptions },
-        )
+    Column {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OverviewBottomSheetAction(
+                action = OverviewBottomSheetActions.COPY,
+                actionOnClick = { showCopyOptions = !showCopyOptions },
+                modifier = Modifier.align(Alignment.CenterStart),
+            )
+            Icon(
+                imageVector = Icons.Filled.ArrowDropDown,
+                contentDescription = sRes(R.string.osbs_cdesc_copy_show),
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .rotate(if (showCopyOptions) 180f else 0f),
+            )
+        }
         AnimatedVisibility(
             visible = showCopyOptions,
             enter = expandVertically(),
@@ -376,24 +396,25 @@ fun OverviewCopyListAction(
 fun OverviewBottomSheetAction(
     action: OverviewBottomSheetActions,
     actionOnClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { actionOnClick() },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))
+        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy)),
     ) {
         Icon(
             painter = pRes(action.iconId),
             contentDescription = sRes(action.iconCdescId),
             modifier = Modifier.height(action.iconSize),
-            tint = action.color
+            tint = action.color,
         )
         Text(
             text = sRes(action.nameId),
             color = action.color,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
     }
 }
@@ -592,6 +613,21 @@ private fun OverviewBottomSheetPreview() {
                     renameOnClick = { },
                     copyOnClick = { },
                     deleteOnClick = { },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OverviewCopyListActionPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                OverviewCopyListAction(
+                    itemList = ItemListWithItems(),
+                    copyOptionOnClick = { }
                 )
             }
         }

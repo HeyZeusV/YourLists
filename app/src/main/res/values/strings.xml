@@ -76,6 +76,7 @@
     <string name="osbs_cdesc_rename">Rename this list.</string>
     <string name="osbs_copy">Copy</string>
     <string name="osbs_cdesc_copy">Create a copy of this list.</string>
+    <string name="osbs_cdesc_copy_show">Show copy options.</string>
     <string name="osbs_copy_as_unchecked">As unchecked</string>
     <string name="osbs_cdesc_copy_as_unchecked">Create a copy of this list with all items unchecked.</string>
     <string name="osbs_copy_as_is">As is</string>

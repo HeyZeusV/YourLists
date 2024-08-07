@@ -39,13 +39,26 @@ object PreviewUtil {
     )
     val halfCheckedItemList = ItemListWithItems(
         itemList = ItemList(0L, "Half Checked / Half UnChecked Item List"),
-        items = List(10) { if (it % 2 == 0) itemChecked else itemUnchecked }
+        items = List(10) {
+            if (it % 2 == 0) {
+                itemChecked.copy(itemId = it.toLong())
+            } else {
+                itemUnchecked.copy(itemId = it.toLong())
+            }
+        }
     )
     val emptyItemList = ItemListWithItems(
         itemList = ItemList(0L, "Empty List"),
         items = emptyList()
     )
-    val itemLists = List(10) { if (it % 2 == 0) halfCheckedItemList else emptyItemList }
+    val itemLists = List(10) {
+        if (it % 2 == 0) {
+            halfCheckedItemList.copy(
+                itemList = halfCheckedItemList.itemList.copy(itemListId = it.toLong())
+            )
+        } else
+            emptyItemList.copy(itemList = emptyItemList.itemList.copy(itemListId = it.toLong()))
+    }
     val defaultItem = DefaultItem(
         itemId = 0L,
         name = "DefaultItem DefaultItem DefaultItem DefaultItem DefaultItem",
@@ -54,7 +67,7 @@ object PreviewUtil {
         unit = "Unit",
         memo = "This is a default item",
         )
-    val defaultItemList = List(10) { defaultItem }
+    val defaultItemList = List(10) { defaultItem.copy(itemId = it.toLong()) }
 
     @Composable
     fun Preview(content: @Composable () -> Unit) {

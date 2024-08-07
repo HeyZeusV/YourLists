@@ -283,6 +283,7 @@ fun TextFieldWithLimit(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BottomSheet(
+    modifier: Modifier = Modifier,
     isVisible: Boolean,
     updateIsVisible: (Boolean) -> Unit,
     content: @Composable () -> Unit,
@@ -313,7 +314,7 @@ fun BottomSheet(
             contentAlignment = Alignment.BottomCenter,
         ) {
             Card(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .offset(y = dRes(R.dimen.bs_bottom_spacer))
                     .animateEnterExit(
