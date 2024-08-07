@@ -47,6 +47,8 @@ import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.EditItemBottomSheetContent
 import com.heyzeusv.yourlists.util.AddDestination
+import com.heyzeusv.yourlists.util.ListOptions.Copy
+import com.heyzeusv.yourlists.util.ListOptions.Copy.*
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.ItemInfo
@@ -108,7 +110,7 @@ fun AddScreen(
     addToListOnClick: (DefaultItem) -> Unit,
     deleteDefaultItemOnClick: (DefaultItem) -> Unit,
     itemLists: List<ItemListWithItems>,
-    addListButtonOnClick: (ItemListWithItems, AddListOptions) -> Unit,
+    addListButtonOnClick: (Copy) -> Unit,
 ) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
@@ -184,8 +186,8 @@ fun AddScreen(
             1 -> {
                 AddListBottomSheetContent(
                     itemList = selectedItemList,
-                    buttonOnClick = { itemList, option ->
-                        addListButtonOnClick(itemList, option)
+                    buttonOnClick = { option ->
+                        addListButtonOnClick(option)
                         showBottomSheet = false
                     }
                 )
@@ -327,7 +329,7 @@ fun AddListPage(
 @Composable
 fun AddListBottomSheetContent(
     itemList: ItemListWithItems,
-    buttonOnClick: (ItemListWithItems, AddListOptions) -> Unit,
+    buttonOnClick: (Copy) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -340,14 +342,14 @@ fun AddListBottomSheetContent(
             style = MaterialTheme.typography.headlineMedium
         )
         Button(
-            onClick = { buttonOnClick(itemList, AddListOptions.ALL_AS_UNCHECKED) },
+            onClick = { buttonOnClick(AllAsUnchecked(itemList)) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {
             Text(text = sRes(R.string.asbs_add_all_unchecked).uppercase())
         }
         Button(
-            onClick = { buttonOnClick(itemList, AddListOptions.ALL_AS_IS) },
+            onClick = { buttonOnClick(AllAsIs(itemList)) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
             colors = ButtonDefaults.filledTonalButtonColors(
@@ -358,7 +360,7 @@ fun AddListBottomSheetContent(
             Text(text = sRes(R.string.asbs_add_all_as_is).uppercase())
         }
         OutlinedButton(
-            onClick = { buttonOnClick(itemList, AddListOptions.ONLY_UNCHECKED) },
+            onClick = { buttonOnClick(OnlyUnchecked(itemList)) },
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraSmall,
         ) {
@@ -381,7 +383,7 @@ private fun AddScreenPreview() {
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
                 itemLists = emptyList(),
-                addListButtonOnClick = { _, _ -> },
+                addListButtonOnClick = { _ -> },
             )
         }
     }
@@ -401,7 +403,7 @@ private fun AddScreenBlankQueryPreview() {
                 addToListOnClick = { },
                 deleteDefaultItemOnClick = { },
                 itemLists = emptyList(),
-                addListButtonOnClick = { _, _ -> },
+                addListButtonOnClick = { _ -> },
             )
         }
     }
@@ -444,7 +446,7 @@ private fun AddListBottomSheetPreview() {
             Surface {
                 AddListBottomSheetContent(
                     itemList = halfCheckedItemList,
-                    buttonOnClick = { _, _ -> },
+                    buttonOnClick = { _ -> },
                 )
             }
         }

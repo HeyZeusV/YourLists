@@ -28,6 +28,24 @@ enum class OverviewBottomSheetActions(
         iconCdescId = R.string.osbs_cdesc_copy,
         iconSize = 20.dp,
     ),
+    COPY_AS_UNCHECKED(
+        nameId = R.string.osbs_copy_as_unchecked,
+        iconId = R.drawable.icon_blank,
+        iconCdescId = R.string.osbs_cdesc_copy_as_unchecked,
+        iconSize = 28.dp,
+    ),
+    COPY_AS_IS(
+        nameId = R.string.osbs_copy_as_is,
+        iconId = R.drawable.icon_blank,
+        iconCdescId = R.string.osbs_cdesc_copy_as_is,
+        iconSize = 28.dp,
+    ),
+    COPY_ONLY_UNCHECKED(
+        nameId = R.string.osbs_copy_only_unchecked,
+        iconId = R.drawable.icon_blank,
+        iconCdescId = R.string.osbs_cdesc_copy_only_unchecked,
+        iconSize = 28.dp,
+    ),
     DELETE(
         nameId = R.string.osbs_delete,
         iconId = R.drawable.icon_delete,

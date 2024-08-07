@@ -7,8 +7,8 @@ import com.heyzeusv.yourlists.database.Repository
 import com.heyzeusv.yourlists.database.models.Category
 import com.heyzeusv.yourlists.database.models.DefaultItem
 import com.heyzeusv.yourlists.database.models.Item
-import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.util.AddDestination
+import com.heyzeusv.yourlists.util.ListOptions.Copy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -97,18 +97,14 @@ class AddViewModel @Inject constructor(
         viewModelScope.launch { repo.deleteDefaultItems(defaultItem) }
     }
 
-    fun addListWithOption(itemList: ItemListWithItems, option: AddListOptions) {
+    fun addListWithOption(option: Copy) {
         viewModelScope.launch {
-            val itemsToAdd: List<Item> = when (option) {
-                AddListOptions.ALL_AS_UNCHECKED -> itemList.items.map { it.copy(isChecked = false) }
-                AddListOptions.ALL_AS_IS -> itemList.items
-                AddListOptions.ONLY_UNCHECKED -> itemList.items.filter { !it.isChecked }
-            }
+            val itemsToAdd: List<Item> = option.copyItems()
             val itemsToAddEdited = itemsToAdd.map {
                 it.copy(
                     itemId = 0L,
                     parentItemListId = itemListId.value,
-                    originItemListId = itemList.itemList.itemListId
+                    originItemListId = option.itemList.itemList.itemListId
                 )
             }
             repo.insertItems(*itemsToAddEdited.toTypedArray())

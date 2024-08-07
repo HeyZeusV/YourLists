@@ -6,6 +6,9 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,14 +44,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.heyzeusv.yourlists.R
-import com.heyzeusv.yourlists.database.models.ItemList
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha90
+import com.heyzeusv.yourlists.util.ArrowVerticalFlip
 import com.heyzeusv.yourlists.util.BottomSheet
 import com.heyzeusv.yourlists.util.DrawerOnClicks
 import com.heyzeusv.yourlists.util.EmptyList
@@ -56,6 +61,12 @@ import com.heyzeusv.yourlists.util.FabState
 import com.heyzeusv.yourlists.util.FilterAlertDialog
 import com.heyzeusv.yourlists.util.InputAlertDialog
 import com.heyzeusv.yourlists.util.ListInfo
+import com.heyzeusv.yourlists.util.ListOptions
+import com.heyzeusv.yourlists.util.ListOptions.Copy.AllAsIs
+import com.heyzeusv.yourlists.util.ListOptions.Copy.AllAsUnchecked
+import com.heyzeusv.yourlists.util.ListOptions.Copy.OnlyUnchecked
+import com.heyzeusv.yourlists.util.ListOptions.Delete
+import com.heyzeusv.yourlists.util.ListOptions.Rename
 import com.heyzeusv.yourlists.util.OverviewDestination
 import com.heyzeusv.yourlists.util.PreviewUtil
 import com.heyzeusv.yourlists.util.SingleFilterSelection
@@ -134,9 +145,7 @@ fun OverviewScreen(
         emptyButtonOnClick = { showNewListDialog = true },
         showBottomSheet = showBottomSheet,
         updateShowBottomSheet = { showBottomSheet = it },
-        optionRenameOnClick = overviewVM::renameItemList,
-        optionCopyOnClick = overviewVM::copyItemList,
-        optionDeleteOnClick = overviewVM::deleteItemList,
+        listOptionOnClick = overviewVM::handleListOption,
     )
     DrawerSetup(
         overviewVM = overviewVM,
@@ -203,12 +212,10 @@ fun OverviewScreen(
     emptyButtonOnClick: () -> Unit,
     showBottomSheet: Boolean,
     updateShowBottomSheet: (Boolean) -> Unit,
-    optionRenameOnClick: (ItemList, String) -> Unit,
-    optionCopyOnClick: (ItemListWithItems) -> Unit,
-    optionDeleteOnClick: (ItemList) -> Unit,
+    listOptionOnClick: (ListOptions) -> Unit,
 ) {
     var selectedItemList by remember { mutableStateOf(ItemListWithItems()) }
-    var showRenameAlertDialog by remember { mutableStateOf<ItemList?>(null) }
+    var showRenameAlertDialog by remember { mutableStateOf(false) }
 
     if (itemLists.isNotEmpty()) {
         LazyColumn(
@@ -244,35 +251,36 @@ fun OverviewScreen(
         )
     }
     BottomSheet(
+        modifier = Modifier.height(dRes(R.dimen.osbs_height)),
         isVisible = showBottomSheet,
         updateIsVisible = { updateShowBottomSheet(it) },
     ) {
         OverviewBottomSheetContent(
             itemList = selectedItemList,
             renameOnClick = {
-                showRenameAlertDialog = selectedItemList.itemList
+                showRenameAlertDialog = true
                 updateShowBottomSheet(false)
             },
             copyOnClick = {
-                optionCopyOnClick(selectedItemList)
+                listOptionOnClick(it)
                 updateShowBottomSheet(false)
             },
             deleteOnClick = {
-                optionDeleteOnClick(selectedItemList.itemList)
+                listOptionOnClick(Delete(selectedItemList))
                 updateShowBottomSheet(false)
             },
         )
     }
     InputAlertDialog(
-        display = showRenameAlertDialog != null,
-        onDismissRequest = { showRenameAlertDialog = null },
+        display = showRenameAlertDialog,
+        onDismissRequest = { showRenameAlertDialog = false },
         title = sRes(R.string.os_ad_rename_title),
         maxLength = iRes(R.integer.name_max_length),
         onConfirm = { input ->
-            optionRenameOnClick(showRenameAlertDialog!!, input)
-            showRenameAlertDialog = null
+            listOptionOnClick(Rename(selectedItemList, input))
+            showRenameAlertDialog = false
         },
-        onDismiss = { showRenameAlertDialog = null }
+        onDismiss = { showRenameAlertDialog = false }
     )
 }
 
@@ -303,27 +311,30 @@ fun OverviewFilter(
 fun OverviewBottomSheetContent(
     itemList: ItemListWithItems,
     renameOnClick: () -> Unit,
-    copyOnClick: () -> Unit,
+    copyOnClick: (ListOptions) -> Unit,
     deleteOnClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
-            .padding(bottom = dRes(R.dimen.osbs_padding_bottom))
             .padding(all = dRes(R.dimen.bs_padding_all))
             .fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
     ) {
         Text(
             text = sRes(R.string.osbs_manage, itemList.itemList.name),
-            style = MaterialTheme.typography.headlineMedium
+            maxLines = 2,
+            style = MaterialTheme.typography.headlineMedium.copy(
+                lineBreak = LineBreak.Paragraph,
+                hyphens = Hyphens.Auto,
+            ),
         )
         OverviewBottomSheetAction(
             action = OverviewBottomSheetActions.RENAME,
             actionOnClick = renameOnClick,
         )
-        OverviewBottomSheetAction(
-            action = OverviewBottomSheetActions.COPY,
-            actionOnClick = copyOnClick,
+        OverviewCopyListAction(
+            itemList = itemList,
+            copyOptionOnClick = copyOnClick,
         )
         OverviewBottomSheetAction(
             action = OverviewBottomSheetActions.DELETE,
@@ -333,27 +344,72 @@ fun OverviewBottomSheetContent(
 }
 
 @Composable
+fun OverviewCopyListAction(
+    itemList: ItemListWithItems,
+    copyOptionOnClick: (ListOptions) -> Unit,
+) {
+    var showCopyOptions by remember { mutableStateOf(false) }
+    Column {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OverviewBottomSheetAction(
+                action = OverviewBottomSheetActions.COPY,
+                actionOnClick = { showCopyOptions = !showCopyOptions },
+                modifier = Modifier.align(Alignment.CenterStart),
+            )
+            ArrowVerticalFlip(
+                trigger = showCopyOptions,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
+        }
+        AnimatedVisibility(
+            visible = showCopyOptions,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            Column(
+                modifier = Modifier.padding(top = dRes(R.dimen.bs_vertical_spacedBy)),
+                verticalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_vertical_spacedBy)),
+            ) {
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_AS_UNCHECKED,
+                    actionOnClick = { copyOptionOnClick(AllAsUnchecked(itemList)) },
+                )
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_AS_IS,
+                    actionOnClick = { copyOptionOnClick(AllAsIs(itemList)) },
+                )
+                OverviewBottomSheetAction(
+                    action = OverviewBottomSheetActions.COPY_ONLY_UNCHECKED,
+                    actionOnClick = { copyOptionOnClick(OnlyUnchecked(itemList)) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun OverviewBottomSheetAction(
     action: OverviewBottomSheetActions,
     actionOnClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable { actionOnClick() },
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy))
+        horizontalArrangement = Arrangement.spacedBy(dRes(R.dimen.bs_horizontal_spacedBy)),
     ) {
         Icon(
             painter = pRes(action.iconId),
             contentDescription = sRes(action.iconCdescId),
             modifier = Modifier.height(action.iconSize),
-            tint = action.color
+            tint = action.color,
         )
         Text(
             text = sRes(action.nameId),
             color = action.color,
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge,
         )
     }
 }
@@ -469,7 +525,7 @@ fun PortationProgress(portationStatus: PortationStatus) {
             modifier = Modifier
                 .fillMaxSize()
                 .background(BlackAlpha90)
-                .clickable(enabled = false) {  },
+                .clickable(enabled = false) { },
             contentAlignment = Alignment.Center,
         ) {
             Column(
@@ -503,9 +559,7 @@ private fun OverviewScreenPreview() {
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },
-                optionRenameOnClick = { _, _ -> },
-                optionCopyOnClick = { },
-                optionDeleteOnClick = { },
+                listOptionOnClick = { },
             )
         }
     }
@@ -537,9 +591,7 @@ private fun OverviewScreenEmptyPreview() {
                 emptyButtonOnClick = { },
                 showBottomSheet = false,
                 updateShowBottomSheet = { },
-                optionRenameOnClick = { _, _ -> },
-                optionCopyOnClick = { },
-                optionDeleteOnClick = { },
+                listOptionOnClick = { },
             )
         }
     }
@@ -556,6 +608,21 @@ private fun OverviewBottomSheetPreview() {
                     renameOnClick = { },
                     copyOnClick = { },
                     deleteOnClick = { },
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun OverviewCopyListActionPreview() {
+    PreviewUtil.run {
+        Preview {
+            Surface(modifier = Modifier.fillMaxWidth()) {
+                OverviewCopyListAction(
+                    itemList = ItemListWithItems(),
+                    copyOptionOnClick = { }
                 )
             }
         }

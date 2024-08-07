@@ -31,6 +31,8 @@ interface Repository {
 
     suspend fun deleteItemList(vararg itemLists: ItemList)
 
+    suspend fun copyItemListWithItems(itemList: ItemList, items: List<Item>)
+
     fun getItemListWithId(id: Long): Flow<ItemList>
 
     fun getSortedItemListsWithItems(filter: OverviewFilter): Flow<List<ItemListWithItems>>

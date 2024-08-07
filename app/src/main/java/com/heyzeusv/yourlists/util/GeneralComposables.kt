@@ -1,9 +1,17 @@
 package com.heyzeusv.yourlists.util
 
+import androidx.annotation.ArrayRes
+import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.IntegerRes
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -30,6 +38,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,7 +47,6 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -49,23 +57,34 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.integerResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import com.heyzeusv.yourlists.R
 import com.heyzeusv.yourlists.database.models.BaseItem
 import com.heyzeusv.yourlists.database.models.Category
@@ -73,6 +92,56 @@ import com.heyzeusv.yourlists.database.models.Item
 import com.heyzeusv.yourlists.database.models.ItemListWithItems
 import com.heyzeusv.yourlists.ui.theme.BlackAlpha60
 import java.text.DecimalFormat
+
+/**
+ *  Load a string resource with formatting.
+ *
+ *  @param id The resource identifier.
+ *  @param args The format arguments.
+ *  @return The string data associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun sRes(@StringRes id: Int, vararg args: Any): String = stringResource(id, *args)
+
+/**
+ *  Load a string array resource .
+ *
+ *  @param id The resource identifier.
+ *  @return The string array data associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun saRes(@ArrayRes id: Int): Array<String> = stringArrayResource(id)
+
+/**
+ *  Create a [Painter] from an Android resource id.
+ *
+ *  @param id Resources object to query the image file from.
+ *  @return [Painter] used for drawing the loaded resource.
+ */
+@Composable
+fun pRes(@DrawableRes id: Int): Painter = painterResource(id)
+
+/**
+ *  Load a dimension resource.
+ *
+ *  @param id The resource identifier.
+ *  @return The dimension value associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun dRes(@DimenRes id: Int): Dp = dimensionResource(id)
+
+/**
+ *  Load a integer resource.
+ *
+ *  @param id The resource identifier.
+ *  @return The integer value associated with the resource.
+ */
+@Composable
+@ReadOnlyComposable
+fun iRes(@IntegerRes id: Int): Int = integerResource(id)
 
 @Composable
 fun EmptyList(
@@ -283,6 +352,7 @@ fun TextFieldWithLimit(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BottomSheet(
+    modifier: Modifier = Modifier,
     isVisible: Boolean,
     updateIsVisible: (Boolean) -> Unit,
     content: @Composable () -> Unit,
@@ -313,7 +383,7 @@ fun BottomSheet(
             contentAlignment = Alignment.BottomCenter,
         ) {
             Card(
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .offset(y = dRes(R.dimen.bs_bottom_spacer))
                     .animateEnterExit(
@@ -534,7 +604,7 @@ fun FilteredDropDownMenu(
                 .onFocusChanged { expanded = it.isFocused }
                 .menuAnchor(),
             label = { Text(label) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = { ArrowVerticalFlip(trigger = expanded) },
             supportingText = {
                 Row {
                     Text(
@@ -572,6 +642,29 @@ fun FilteredDropDownMenu(
             }
         }
     }
+}
+
+@Composable
+fun ArrowVerticalFlip(
+    trigger: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var rotation by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(key1 = trigger) {
+        animate(
+            initialValue = if (trigger) 0f else 180f,
+            targetValue = if (trigger) 180f else 0f,
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+        ) { value, _ ->
+            rotation = value
+        }
+    }
+
+    Icon(
+        imageVector = Icons.Filled.ArrowDropDown,
+        contentDescription = sRes(R.string.arrow_flip_cdesc),
+        modifier = modifier.rotate(rotation),
+    )
 }
 
 @Preview
